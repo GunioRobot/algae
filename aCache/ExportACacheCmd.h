@@ -9,7 +9,7 @@
 
 #include <maya/MGlobal.h>
 #include <maya/MPxCommand.h>
-#include <maya/MPxDeformerNode.h> 
+#include <maya/MPxDeformerNode.h>
 #include <maya/MPointArray.h>
 #include <maya/MFloatArray.h>
 #include <maya/MVectorArray.h>
@@ -28,13 +28,13 @@ class ExportACache : public MPxCommand
 	static MSyntax newSyntax();
 
 	void save(const char* filename, int frameNumber, char bfirst);
-  
+
 private:
 	MStatus parseArgs ( const MArgList& args );
-	
+
 	MDagPathArray m_mesh_list;
 	MDagPathArray m_nurbs_list;
-	
+
 	float m_space[4][4];
 	float m_eye[4][4];
 	MDagPath p_eye;

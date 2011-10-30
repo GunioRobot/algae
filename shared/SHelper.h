@@ -8,7 +8,7 @@ class SHelper
 public:
 		SHelper() {}
 		~SHelper() {}
-		
+
 		static void divideByFirstSpace(std::string& ab2a, std::string& b);
 		static void trimByFirstSpace(std::string& res);
 		static void getTime(std::string& log);

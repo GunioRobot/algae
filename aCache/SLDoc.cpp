@@ -45,30 +45,30 @@ void SLDoc::save()
 	string slpath = _path+_name+".sl";
 	_file.open(slpath.c_str(), ios::out);
 	if(!_file) return;
-	
+
 // declare blocks
 	for(BlockList::iterator it= _blocks.begin(); it != _blocks.end(); ++it) {
 		_file.write((*it)->type.c_str(), (*it)->type.length());
 		emitSpace();
 		_file.write((*it)->name.c_str(), (*it)->name.length());
 		parenthesisBegin();
-		
+
 // declare external vars
 		for(VariableList::iterator varit= (*it)->_args.begin(); varit != (*it)->_args.end(); ++varit) {
 			if((*varit)->access != "uniform") {
 				_file.write((*varit)->access.c_str(), (*varit)->access.length());
 				emitSpace();
 			}
-			
+
 			_file.write((*varit)->type.c_str(), (*varit)->type.length());
 			emitSpace();
 			_file.write((*varit)->name.c_str(), (*varit)->name.length());
 			emitEOL();
 		}
-		
+
 		parenthesisEnd();
 		braceBegin();
-		
+
 		if(!(*it)->no_var) {
 			for(VariableList::iterator varit= (*it)->_vars.begin(); varit != (*it)->_vars.end(); ++varit) {
 				_file.write((*varit)->type.c_str(), (*varit)->type.length());
@@ -80,7 +80,7 @@ void SLDoc::save()
 			}
 		}
 		_file.write((*it)->body.c_str(), (*it)->body.length());
-		
+
 		braceEnd();
 		separate();
 	}
@@ -95,7 +95,7 @@ void SLDoc::save()
 			_file.write((*it)->access.c_str(), (*it)->access.length());
 			emitSpace();
 		}
-			
+
 		_file.write((*it)->type.c_str(), (*it)->type.length());
 		emitSpace();
 		_file.write((*it)->name.c_str(), (*it)->name.length());
@@ -115,7 +115,7 @@ void SLDoc::save()
 		_file.write((*it)->value.c_str(), (*it)->value.length());
 		emitEOL();
 	}
-	
+
 // body
 	_file.write(_main.c_str(), _main.length());
 	braceEnd();

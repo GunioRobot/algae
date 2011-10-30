@@ -80,7 +80,7 @@ void ZXMLDoc::begin()
         printf("testXmlwriterDoc: Error creating the xml writer\n");
         return;
     }
-	
+
 	/* Start the document with the xml default for the version,
      * encoding ISO 8859-1 and the default for the standalone
      * declaration. */
@@ -105,7 +105,7 @@ void ZXMLDoc::end(const char *file)
     } */
 
     xmlFreeTextWriter(writer);
-	
+
     //xmlSaveFileEnc(file, doc, MY_ENCODING);
 	xmlSaveFormatFile (file, doc, 1);
 
@@ -136,7 +136,7 @@ void ZXMLDoc::addAttribute(const char* name, const char* value)
 {
 	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST name,
                                      BAD_CAST value);
-    if (rc < 0) 
+    if (rc < 0)
 	{
         printf("testXmlwriterDoc: Error at xmlTextWriterWriteAttribute\n");
         return;
@@ -147,7 +147,7 @@ void ZXMLDoc::addAttribute(const char* name, float value)
 {
 	rc = xmlTextWriterWriteFormatAttribute(writer, BAD_CAST name,
                                      "%f", value);
-    if (rc < 0) 
+    if (rc < 0)
 	    {
         printf("testXmlwriterDoc: Error at xmlTextWriterWriteAttribute\n");
         return;
@@ -158,7 +158,7 @@ void ZXMLDoc::addAttribute(const char* name, float x, float y, float z)
 {
 	rc = xmlTextWriterWriteFormatAttribute(writer, BAD_CAST name,
                                      "%f %f %f", x, y, z);
-    if (rc < 0) 
+    if (rc < 0)
 	    {
         printf("testXmlwriterDoc: Error at xmlTextWriterWriteAttribute\n");
         return;
@@ -170,7 +170,7 @@ void ZXMLDoc::addAttribute(const char* name, int value)
 	rc = xmlTextWriterWriteFormatAttribute(writer, BAD_CAST name,
                                      "%d", value);
 
-    if (rc < 0) 
+    if (rc < 0)
 	    {
         printf("testXmlwriterDoc: Error at xmlTextWriterWriteAttribute\n");
         return;
@@ -181,7 +181,7 @@ void ZXMLDoc::addContent(const char* value)
 {
 	rc = xmlTextWriterWriteFormatRaw(writer, "%s", value);
 
-	if (rc < 0) 
+	if (rc < 0)
 	{
 		printf("testXmlwriterDoc: Error at xmlTextWriterWriteElement\n");
 		return;
@@ -192,7 +192,7 @@ void ZXMLDoc::addContent(float value)
 {
 	rc = xmlTextWriterWriteFormatRaw(writer, "%f", value);
 
-	if (rc < 0) 
+	if (rc < 0)
 	{
 		printf("testXmlwriterDoc: Error at xmlTextWriterWriteElement\n");
 		return;
@@ -203,7 +203,7 @@ void ZXMLDoc::addContent(int value)
 {
 	rc = xmlTextWriterWriteFormatRaw(writer, "%d", value);
 
-	if (rc < 0) 
+	if (rc < 0)
 	{
 		printf("testXmlwriterDoc: Error at xmlTextWriterWriteElement\n");
 		return;
@@ -214,10 +214,10 @@ void ZXMLDoc::addContent(float r, float g, float b)
 {
 	char sbuf[64];
 	sprintf(sbuf, "%f %f %f", r, g, b);
-	
+
 	rc = xmlTextWriterWriteFormatRaw(writer, "%s", sbuf);
 
-	if (rc < 0) 
+	if (rc < 0)
 	{
 		printf("testXmlwriterDoc: Error at xmlTextWriterWriteElement\n");
 		return;
@@ -228,11 +228,11 @@ int ZXMLDoc::load(const char* file)
 {
 	doc = xmlParseFile(file);
 	if(!doc) return 0;
-	
+
 	cur = xmlDocGetRootElement(doc);
-	
+
 	if(!cur) return 0;
-	
+
 	return 1;
 }
 
@@ -306,9 +306,9 @@ float ZXMLDoc::getFloatNodeContent()
 int ZXMLDoc::getChildByName(const char* name)
 {
 	//if(isEmpty() == 1) return 0;
-	
+
 	cur = cur->xmlChildrenNode;
-	while (isLastNode() != 1) 
+	while (isLastNode() != 1)
 	{
 		if ((!xmlStrcmp(cur->name, (const xmlChar *)name))) return 1;
 		nextNode();

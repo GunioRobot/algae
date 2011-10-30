@@ -7,9 +7,9 @@
  *
  */
 
-#include <maya/MPxLocatorNode.h> 
-#include <maya/MString.h> 
-#include <maya/MTypeId.h> 
+#include <maya/MPxLocatorNode.h>
+#include <maya/MString.h>
+#include <maya/MTypeId.h>
 #include <maya/MPlug.h>
 #include <maya/MVector.h>
 #include <maya/MDataBlock.h>
@@ -26,11 +26,11 @@ class ACacheMeshViz : public MPxLocatorNode
 {
 public:
 	ACacheMeshViz();
-	virtual ~ACacheMeshViz(); 
+	virtual ~ACacheMeshViz();
 
     virtual MStatus   		compute( const MPlug& plug, MDataBlock& data );
 
-	virtual void            draw( M3dView & view, const MDagPath & path, 
+	virtual void            draw( M3dView & view, const MDagPath & path,
 								  M3dView::DisplayStyle style,
 								  M3dView::DisplayStatus status );
 
@@ -39,7 +39,7 @@ public:
 
 	static  void *          creator();
 	static  MStatus         initialize();
-	
+
 		// Internally cached attribute handling routines
 	virtual bool getInternalValueInContext( const MPlug&,
 											  MDataHandle&,
@@ -59,13 +59,13 @@ public:
 	static MObject asurfacecolor;
 	static MObject aoutval;
 	static MTypeId id;
-	
+
 		// Cached internal values
 	double m_time;
 	//float m_size;
 	MString m_cachename, m_meshname;
 	const FXMLMesh* getMeshPointer() const { return m_pMesh; }
-	
+
 private :
 	FXMLMesh* m_pMesh;
 	RenderACache* m_pRender;

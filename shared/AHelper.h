@@ -66,14 +66,14 @@ public:
 	static char getStringAttributeByName(const MFnDependencyNode& fnode, const char* attrname, MString& v);
 	static char getStringAttributeByName(const MObject& node, const char* attrname, MString& v);
 	static int getConnectedAttributeByName(const MFnDependencyNode& fnode, const char* attrname, MString& v);
-	
+
 	static void getNamedPlug(MPlug& val, const MObject& node, const char* attrname);
 	static void getIntFromNamedPlug(int& val, const MObject& node, const char* attrname);
 	static void getDoubleFromNamedPlug(double& val, const MObject& node, const char* attrname);
 	static void getVectorArrayFromPlug(MVectorArray& array, MPlug& plug);
 	static void getDoubleArrayFromPlug(MDoubleArray& array, MPlug& plug);
 	static void extractMeshParams(const MObject& mesh, unsigned & numVertex, unsigned & numPolygons, MPointArray& vertices, MIntArray& pcounts, MIntArray& pconnects);
-	
+
 	static MStatus createIntAttr(MObject& attr, const char* nameLong, const char* nameShort, int val, int min);
 	static MStatus createDoubleAttr(MObject& attr, const MString& nameLong, const MString& nameShort, double val);
 	static MStatus createTypedAttr(MObject& attr, const MString& nameLong, const MString& nameShort, MFnData::Type type);
@@ -84,9 +84,9 @@ public:
 	static MStatus createTimeAttrInternal(MObject& attr, const MString& nameLong,const MString& nameShort, double val);
 	static MStatus createVectorAttr(MObject& attr, MObject& attr0, MObject& attr1, MObject& attr2, const MString& nameLong,const MString& nameShort);
 	static MStatus createVectorArrayAttr(MObject& attr, const MString& nameLong,const MString& nameShort);
-	
+
 	static MObject getMeshAttr(MDataBlock& data, MObject& attr);
-	
+
 	static void getTypedPath(MFn::Type type, const MObject& root, MDagPath& path);
 	static void getAllTypedPath(MFn::Type type, MObjectArray& obj_array);
 	static int getAllTypedPathByRoot(MFn::Type type, MObject& root, MObjectArray& obj_array);
@@ -95,12 +95,12 @@ public:
 	static void getTypedNodeByName(MFn::Type type, MString& name, MObject& node);
 	static void getConnectedNode(MObject& val, const MPlug& plg);
 	static void getConnectedNodeName(MString& val, const MPlug& plg);
-	
+
 	static void getNamedObject(MString& name, MObject& obj);
-	
+
 	static MMatrix getMatrixAttr(const MObject& node, MObject& attr);
 	static MString getStringAttr(const MObject& node, MObject& attr);
-	
+
 	static MVectorArray getVectorArrayAttr(MDataBlock& data, MObject& attr);
 	static MDoubleArray getDoubleArrayAttr(MDataBlock& data, MObject& attr);
 	static void validateFilePath(MString& name);
@@ -113,7 +113,7 @@ public:
 	static int hasNamedAttribute(const MObject& node, const char* attrname);
 	static void displayIntParam(const char* str, int val);
 	static void displayVectorParam(const char* str, double x, double y, double z);
-	
+
 	static void getTransformWorld(const MString& name, float space[4][4]);
 	static MVector getTransformWorldNoScale(const MString& name, float space[4][4]);
 };

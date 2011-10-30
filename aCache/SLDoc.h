@@ -19,8 +19,8 @@ struct SLVariable
 	string value;
 	string type;
 	string access;
-	
-	void setDefault() 
+
+	void setDefault()
 	{
 		if(type == "float") value = "0.0";
 		else if(type == "color") value = "color( 0.0, 0.0, 0.0 )";
@@ -41,7 +41,7 @@ struct SLBlock
 	VariableList _vars;
 	VariableList _args;
 	char no_var;
-	
+
 	char checkExistingArgs(string& name)
 	{
 		for(VariableList::iterator it= _args.begin(); it != _args.end(); ++it) {
@@ -49,12 +49,12 @@ struct SLBlock
 		}
 		return 0;
 	}
-	
+
 	void addInternal(SLVariable *var)
 	{
 		_vars.push_back(var);
 	}
-	
+
 	void addArg(SLVariable *var)
 	{
 		if(!checkExistingArgs(var->name)) _args.push_back(var);
@@ -68,7 +68,7 @@ class SLDoc
 public:
 	SLDoc::SLDoc() {}
 	SLDoc::~SLDoc() {}
-	
+
 	void setPath(const char* name) {_path = name;}
 	void setName(const char* name) {_name = name;}
 	void setType(const char* name) {_type = name;}
@@ -77,12 +77,12 @@ public:
 	void addVariable(SLVariable* var);
 	void addBlock(SLBlock* blk);
 	void save();
-	
+
 	void addArg(SLVariable* var);
 
 	char checkExistingArgs(string& name);
 	char checkExistingBlock(string& name);
-	
+
 	VariableList _args;
 private:
 	string _path;
@@ -98,9 +98,9 @@ private:
 	void braceBegin();
 	void braceEnd();
 	void separate();
-	
+
 	VariableList _vars;
-	
+
 	BlockList _blocks;
 };
 #endif

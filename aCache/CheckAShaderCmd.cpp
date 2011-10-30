@@ -27,12 +27,12 @@
 #include "../shared/TVectors.h"
 #include "PieceASHader.h"
 
-  
+
 CheckAShader::CheckAShader() {}
 
 CheckAShader::~CheckAShader() {}
 
-MSyntax CheckAShader::newSyntax() 
+MSyntax CheckAShader::newSyntax()
 {
 	MSyntax syntax;
 
@@ -44,37 +44,37 @@ MSyntax CheckAShader::newSyntax()
 	syntax.addFlag("-ic", "-icon", MSyntax::kString);
 	syntax.addFlag("-de", "-description", MSyntax::kString );
 	syntax.addFlag("-fe", "-frameend", MSyntax::kLong );
-	
+
 	syntax.enableQuery(false);
 	syntax.enableEdit(false);
 
 	return syntax;
 }
 
-MStatus CheckAShader::doIt( const MArgList& args ) 
+MStatus CheckAShader::doIt( const MArgList& args )
 {
 
 	MStatus status = parseArgs( args );
-	
+
 	if( status != MS::kSuccess ) return status;
-	
+
 	MArgDatabase argData(syntax(), args);
-	
+
 	MString node_name;
 	if (argData.isFlagSet("-n")) argData.getFlagArgument("-n", 0, node_name);
 // get obj
 	MObject opiece;
 	AHelper::getNamedObject(node_name, opiece);
-	
+
 	if(opiece == MObject::kNullObj) {
 		MGlobal::displayInfo( MString("cannot find ") + node_name);
 		return MS::kSuccess;
 	}
-	
+
 	MFnDependencyNode fnNode(opiece);
-	
+
 	if(fnNode.typeName() == "aShaderPiece") {
-	
+
 		PieceAShaderNode* pnode = (PieceAShaderNode*) fnNode.userNode();
 		XRSLPiece *ppiece = pnode->getPiece();
 		if(ppiece) {
@@ -88,7 +88,7 @@ MStatus CheckAShader::doIt( const MArgList& args )
 				for(ParamList::iterator it= params.begin(); it != params.end(); ++it) {
 //5 strings each - name type value (float with min max) detail access
 					appendToResult((*it)->name.c_str());
-					
+
 					/*
 					if((*it)->type == RSLFloat) {
 						appendToResult("double");
@@ -114,7 +114,7 @@ MStatus CheckAShader::doIt( const MArgList& args )
 						sprintf(valbuf, "%f %f %f", (*it)->r, (*it)->g, (*it)->b);
 						appendToResult(valbuf);
 					}*/
-					
+
 					switch((*it)->type) {
 						case RSLColor:
 							appendToResult("double3");
@@ -141,12 +141,12 @@ MStatus CheckAShader::doIt( const MArgList& args )
 							appendToResult(valbuf);
 							break;
 					}
-					
+
 					/*if((*it)->detail == Simple) appendToResult("simple");
 					else if((*it)->detail == Slider) appendToResult("slider");
 					else if((*it)->detail == Switch) appendToResult("switch");
 					else if((*it)->detail == Connection) appendToResult("connection");*/
-					
+
 					switch((*it)->detail) {
 						case Slider:
 							appendToResult("slider");
@@ -161,7 +161,7 @@ MStatus CheckAShader::doIt( const MArgList& args )
 							appendToResult("simple");
 							break;
 					}
-					
+
 					switch((*it)->access) {
 						case Output:
 							appendToResult("output");
@@ -194,16 +194,16 @@ MStatus CheckAShader::doIt( const MArgList& args )
 			}
 		}
 	}
-	
-	
+
+
 	//if (argData.isFlagSet("-bc")) argData.getFlagArgument("-bc", 0, sscat);
-	
+
 
 	//if (argData.isFlagSet("-ec")) argData.getFlagArgument("-ec", 0, seye);
-	
+
 	//if(argData.isFlagSet("-fs")) argData.getFlagArgument("-fs", 0, istart);
 	//if(argData.isFlagSet("-fe")) argData.getFlagArgument("-fe", 0, iend);
-		
+
 	//
  return MS::kSuccess;
  }
@@ -211,7 +211,7 @@ MStatus CheckAShader::doIt( const MArgList& args )
 void* CheckAShader::creator() {
  return new CheckAShader;
  }
- 
+
 MStatus CheckAShader::parseArgs( const MArgList& args )
 {
 	// Parse the arguments.

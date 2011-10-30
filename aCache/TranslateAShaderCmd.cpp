@@ -27,48 +27,48 @@
 #include "../shared/TVectors.h"
 #include "PieceASHader.h"
 
-  
+
 TranslateAShader::TranslateAShader() {}
 
 TranslateAShader::~TranslateAShader() {}
 
-MSyntax TranslateAShader::newSyntax() 
+MSyntax TranslateAShader::newSyntax()
 {
 	MSyntax syntax;
 
 	syntax.addFlag("-e", "-emit", MSyntax::kString);
 
 	//syntax.setObjectType(MSyntax::kStringObjects, 0, 1);
-syntax.setObjectType(MSyntax::kSelectionList, 0, 1); 
+syntax.setObjectType(MSyntax::kSelectionList, 0, 1);
 	return syntax;
 }
 
-MStatus TranslateAShader::doIt( const MArgList& args ) 
+MStatus TranslateAShader::doIt( const MArgList& args )
 {
 
 	MStatus status = parseArgs( args );
-	
+
 	if( status != MS::kSuccess ) return status;
-	
+
 	MArgDatabase argData(syntax(), args);
-	
+
 	MString semit;
 	if (argData.isFlagSet("-e")) {
 		argData.getFlagArgument("-e", 0, semit);
-			
+
 	// get obj
 		MObject oviz;
 		AHelper::getNamedObject(semit, oviz);
-		
+
 		if(oviz == MObject::kNullObj) {
 			MGlobal::displayInfo( MString("cannot find ") + semit);
 			return MS::kSuccess;
 		}
-		
+
 		MString ssname("nil");
 		MString spass("nil");
 // find ensemble attached
-		
+
 		injectShaderStatement(oviz, ssname, spass, 0);
 	}
 
@@ -78,7 +78,7 @@ MStatus TranslateAShader::doIt( const MArgList& args )
 void* TranslateAShader::creator() {
  return new TranslateAShader;
  }
- 
+
 MStatus TranslateAShader::parseArgs( const MArgList& args )
 {
 	// Parse the arguments.
@@ -92,17 +92,17 @@ MObject TranslateAShader::getDirectEnsembleNode(MPlug& plg, MString& objname, MS
 		MObject oconn;
 		AHelper::getConnectedNode(oconn, plg);
 		if(oconn == MObject::kNullObj) return oconn;
-		
+
 		MFnDependencyNode fnode(oconn);
-		
+
 		if(fnode.typeName() == "aShaderEnsemble") return oconn;
 		else if(fnode.typeName() == "aShaderAdaptEnsemble") {
 
 			char byobj = 0;
-			if(fnode.findPlug("handle").asString() != "context") byobj = 1; 
-			
+			if(fnode.findPlug("handle").asString() != "context") byobj = 1;
+
 			int match_sit = 0;
-			
+
 			if(byobj) match_sit = getMatchedCondition(oconn, objname);
 			else match_sit = getMatchedCondition(oconn, passname);
 
@@ -131,11 +131,11 @@ void TranslateAShader::injectShaderStatement(MObject& node, MString& objname, MS
 	string sscn = scn.asChar();
 	SHelper::filenameWithoutPath(sscn);
 	MString shader_path = proj+"/rmanshaders/"+sscn.c_str()+"/";
-	
+
 	MString pathcmd = MString("system(\"mkdir ")+shader_path+"\")";
 //MGlobal::displayInfo(pathcmd);
 	MGlobal::executeCommand(pathcmd);
-	
+
 	MFnDependencyNode fnode(node);
 	if(fnode.typeName() == "aShaderPiece") {
 		PieceAShaderNode* pnode = (PieceAShaderNode*) fnode.userNode();
@@ -147,20 +147,20 @@ void TranslateAShader::injectShaderStatement(MObject& node, MString& objname, MS
 			_sl->setName(fnode.name().asChar());
 			_sl->setType("surface");
 			_sl->setMain(ppiece->getBody());
-			
+
 // variables, if no connections, use values from node
 			ParamList params = ppiece->getAttrib();
 			for(ParamList::iterator it= params.begin(); it != params.end(); ++it) {
-				
+
 				SLVariable* var = new SLVariable();
 				var->name = (*it)->name;
 				convertType((*it)->type, var);
 				var->setDefault();
-				
+
 				if((*it)->access != Output) {
 
 					MPlug pgattr = fnode.findPlug((*it)->name.c_str());
-					
+
 					MObject oconn;
 					AHelper::getConnectedNode(oconn, pgattr);
 					if(oconn == MObject::kNullObj) valueFromPieceNode((*it)->type, (*it)->name.c_str(), pgattr, node, var);
@@ -168,7 +168,7 @@ void TranslateAShader::injectShaderStatement(MObject& node, MString& objname, MS
 // set by a func or var, collect uniform varying output
 						VariableList uniformvar;
 						MString funcname = funcOrVarNode(oconn, objname, passname, uniformvar);
-						
+
 						var->value = funcname.asChar();
 
 						for(VariableList::iterator varit= uniformvar.begin(); varit != uniformvar.end(); ++varit)
@@ -195,7 +195,7 @@ void TranslateAShader::injectShaderStatement(MObject& node, MString& objname, MS
 						break;
 				}
 			}
-			
+
 			_sl->save();
 
 			MString slog;
@@ -218,22 +218,22 @@ MString TranslateAShader::funcOrVarNode(MObject& node, MString& objname, MString
 		PieceAShaderNode* pnode = (PieceAShaderNode*) fnode.userNode();
 		XRSLPiece *ppiece = pnode->getPiece();
 		if(ppiece) {
-			
+
 			SLBlock *block = new SLBlock();
 			block->name = fnode.name().asChar();
 			block->type = ppiece->getType();
 			block->body = ppiece->getBody();
 // block variables
 			// variables, if no connections, use values from node
-			
+
 			ParamList params = ppiece->getAttrib();
 			for(ParamList::iterator it= params.begin(); it != params.end(); ++it) {
 				SLVariable * var = new SLVariable();
 				var->name = (*it)->name.c_str();
-				
+
 				convertType((*it)->type, var);
 				var->setDefault();
-				
+
 				if((*it)->access != Output) {
 // standard
 					MPlug pgattr = fnode.findPlug((*it)->name.c_str());
@@ -244,15 +244,15 @@ MString TranslateAShader::funcOrVarNode(MObject& node, MString& objname, MString
 // set by a func or var
 						VariableList uniformvar;
 						MString funcname = funcOrVarNode(oconn, objname, passname, uniformvar);
-						
+
 						var->value = funcname.asChar();
-	
+
 						for(VariableList::iterator varit= uniformvar.begin(); varit != uniformvar.end(); ++varit) {
 							block->addArg(*varit);
 						}
 					}
 				}
-				
+
 // add var to sl block
 				switch((*it)->access) {
 					case Uniform:
@@ -282,7 +282,7 @@ MString TranslateAShader::funcOrVarNode(MObject& node, MString& objname, MString
 				if(i < block->_args.size()) res = res + ", ";
 			}
 			res = res + " )";
-			
+
 			// update external vars
 			downstreamargs = block->_args;
 		}
@@ -295,10 +295,10 @@ MString TranslateAShader::funcOrVarNode(MObject& node, MString& objname, MString
 		valueFromVarNode(node, var, access);
 		if(access==0) var->access = "uniform";
 		else var->access = "varying";
-		
+
 		res = fnode.name();
-		
-// update external vars		
+
+// update external vars
 				downstreamargs.push_back(var);
 	}
 	else if(fnode.typeName() == "aShaderAdaptVariable") {
@@ -316,7 +316,7 @@ MString TranslateAShader::funcOrVarNode(MObject& node, MString& objname, MString
 			if(tvar == "color") sattr = "inputC";
 			int nsit = fnode.findPlug("numCondition").asInt();
 			for(int i=0; i<nsit; i++) {
-// add var				
+// add var
 				MPlug plgvar = fnode.findPlug(sattr).elementByLogicalIndex( i, &status);
 				if(status) {
 					MObject oconn;
@@ -324,17 +324,17 @@ MString TranslateAShader::funcOrVarNode(MObject& node, MString& objname, MString
 					if(oconn != MObject::kNullObj) { // only when it is connected
 						VariableList uniformvar;
 						MString funcname = funcOrVarNode(oconn, objname, passname, uniformvar);
-						
+
 						SLVariable * var = new SLVariable();
 						var->type = block->type;
 						var->value = funcname.asChar();
 						var->name = MFnDependencyNode(oconn).name().asChar();
 						//block->_extns.push_back(var);
-// only have external vars	
+// only have external vars
 						for(VariableList::iterator varit= uniformvar.begin(); varit != uniformvar.end(); ++varit) {
 							block->addArg(*varit);
 						}
-						
+
 // add var to sl block
 						block->addInternal(var);
 
@@ -346,21 +346,21 @@ MString TranslateAShader::funcOrVarNode(MObject& node, MString& objname, MString
 // ...
 // return res
 			string sbody = block->type;
-// only color and float can be combined 
+// only color and float can be combined
 			sbody += " res = ";
 			if(tvar == "color") sbody += "color( 0.0, 0.0, 0.0 ); \n";
 			else sbody += "0.0; \n";
-			
+
 			for(VariableList::iterator varit= block->_vars.begin(); varit != block->_vars.end(); ++varit) {
 				sbody += "res += ";
 				sbody += (*varit)->value;
 				sbody += " ;\n";
 			}
-			
+
 			sbody += "return res;\n";
 			block->body = sbody;
 			if(!_sl->checkExistingBlock(block->name)) _sl->addBlock(block);
-			
+
 // output func
 			res = fnode.name() + " ( ";
 			int i = 0;
@@ -370,30 +370,30 @@ MString TranslateAShader::funcOrVarNode(MObject& node, MString& objname, MString
 				if(i < block->_args.size()) res = res + ", ";
 			}
 			res = res + " )";
-			
+
 // update external vars
 			downstreamargs = block->_args;
 		}
 		else {
 // context or objname var select as single external var
-			
+
 			MString sattr("input");
 			if(tvar == "color") sattr = "inputC";
 			else if(tvar == "string") sattr = "inputS";
-			
-			char byobj = 0; 
-			if( tadp == "objname" ) byobj = 1; 
-			
+
+			char byobj = 0;
+			if( tadp == "objname" ) byobj = 1;
+
 			int match_sit = 0;
-			
+
 			if( tadp != "objname" ) match_sit = getMatchedCondition(node, passname);
 			else match_sit = getMatchedCondition(node, objname);
-			
+
 			SLVariable *var = new SLVariable();
 			var->name = fnode.name().asChar();
 			var->type = tvar;
 			var->setDefault();
-			
+
 			res = fnode.name();
 
 			MPlug plgvar = fnode.findPlug(sattr).elementByLogicalIndex( match_sit, &status);
@@ -408,7 +408,7 @@ MString TranslateAShader::funcOrVarNode(MObject& node, MString& objname, MString
 			downstreamargs.push_back(var);
 		}
 	}
-	
+
 	return res;
 }
 
@@ -419,20 +419,20 @@ int TranslateAShader::getMatchedCondition(MObject& node, MString& name)
 
 	int default_sit = 0;
 	int match_sit = 0;
-	
+
 	MStringArray ctxlist;
 	MStatus status;
 	for(int i=0; i<nsit; i++) {
-		
+
 		MPlug plgcondition = fnode.findPlug("condition").elementByLogicalIndex( i, &status);
 		if(status) {
 			MString scondition = plgcondition.asString();
 			ctxlist.append(scondition);
 // empty as default situation
 			if(scondition == "") default_sit = i;
-			
+
 				if(SHelper::isInArrayDividedBySpace(name.asChar(), scondition.asChar())) {
-				
+
 					match_sit = i;
 					return match_sit;
 				}
@@ -442,7 +442,7 @@ int TranslateAShader::getMatchedCondition(MObject& node, MString& name)
 			return 0;
 		}
 	}
-// use default if no match is found				
+// use default if no match is found
 	return default_sit;
 }
 
@@ -460,24 +460,24 @@ MString TranslateAShader::valueVarNode(MObject& node)
 		float x = fnode.findPlug("valueX").asFloat();
 		float y = fnode.findPlug("valueY").asFloat();
 		float z = fnode.findPlug("valueZ").asFloat();
-		sprintf(valbuf, "color( %f, %f, %f )", x, y, z);				
+		sprintf(valbuf, "color( %f, %f, %f )", x, y, z);
 	}
 	else if(handle == "vector") {
 		float x = fnode.findPlug("valueX").asFloat();
 		float y = fnode.findPlug("valueY").asFloat();
 		float z = fnode.findPlug("valueZ").asFloat();
-		sprintf(valbuf, "vector( %f, %f, %f )", x, y, z);				
+		sprintf(valbuf, "vector( %f, %f, %f )", x, y, z);
 	}
 	else if(handle == "point") {
 		float x = fnode.findPlug("valueX").asFloat();
 		float y = fnode.findPlug("valueY").asFloat();
 		float z = fnode.findPlug("valueZ").asFloat();
-		sprintf(valbuf, "point( %f, %f, %f )", x, y, z);				
+		sprintf(valbuf, "point( %f, %f, %f )", x, y, z);
 	}
 	else if(handle == "string"){
 		sprintf(valbuf, "\"%s\"", fnode.findPlug("value").asString().asChar());
 	}
-	
+
 	return MString(valbuf);
 }
 
@@ -486,7 +486,7 @@ void TranslateAShader::valueFromPieceNode(int type, const char* nmattr, MPlug& p
 	MFnDependencyNode fnode(node);
 	float x, y, z;
 	char valbuf[256];
-// value from node 
+// value from node
 	switch(type) {
 		case RSLFloat:
 			var->type = "float";
@@ -532,7 +532,7 @@ void TranslateAShader::valueFromVarNode(MObject& node, SLVariable* var, int& acc
 // no output here
 	if(saccess == "uniform") access = 0;
 	else access = 1;
-	
+
 	char valbuf[256];
 	if(var->type == "float") {
 		float x =  fnode.findPlug("value").asFloat();
@@ -542,19 +542,19 @@ void TranslateAShader::valueFromVarNode(MObject& node, SLVariable* var, int& acc
 		float x = fnode.findPlug("valueX").asFloat();
 		float y = fnode.findPlug("valueY").asFloat();
 		float z = fnode.findPlug("valueZ").asFloat();
-		sprintf(valbuf, "color( %f, %f, %f )", x, y, z);				
+		sprintf(valbuf, "color( %f, %f, %f )", x, y, z);
 	}
 	else if(var->type == "vector") {
 		float x = fnode.findPlug("valueX").asFloat();
 		float y = fnode.findPlug("valueY").asFloat();
 		float z = fnode.findPlug("valueZ").asFloat();
-		sprintf(valbuf, "vector( %f, %f, %f )", x, y, z);				
+		sprintf(valbuf, "vector( %f, %f, %f )", x, y, z);
 	}
 	else if(var->type == "point") {
 		float x = fnode.findPlug("valueX").asFloat();
 		float y = fnode.findPlug("valueY").asFloat();
 		float z = fnode.findPlug("valueZ").asFloat();
-		sprintf(valbuf, "point( %f, %f, %f )", x, y, z);				
+		sprintf(valbuf, "point( %f, %f, %f )", x, y, z);
 	}
 	else if(var->type == "string"){
 		sprintf(valbuf, "\"%s\"", fnode.findPlug("value").asString().asChar());

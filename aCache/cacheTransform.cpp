@@ -1,22 +1,22 @@
 //-
 // ==========================================================================
-// Copyright (C) 1995 - 2005 Alias Systems Corp. and/or its licensors.  All 
-// rights reserved. 
-// 
-// The coded instructions, statements, computer programs, and/or related 
-// material (collectively the "Data") in these files are provided by Alias 
-// Systems Corp. ("Alias") and/or its licensors for the exclusive use of the 
-// Customer (as defined in the Alias Software License Agreement that 
-// accompanies this Alias software). Such Customer has the right to use, 
-// modify, and incorporate the Data into other products and to distribute such 
+// Copyright (C) 1995 - 2005 Alias Systems Corp. and/or its licensors.  All
+// rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files are provided by Alias
+// Systems Corp. ("Alias") and/or its licensors for the exclusive use of the
+// Customer (as defined in the Alias Software License Agreement that
+// accompanies this Alias software). Such Customer has the right to use,
+// modify, and incorporate the Data into other products and to distribute such
 // products for use by end-users.
-//  
-// THE DATA IS PROVIDED "AS IS".  ALIAS HEREBY DISCLAIMS ALL WARRANTIES 
-// RELATING TO THE DATA, INCLUDING, WITHOUT LIMITATION, ANY AND ALL EXPRESS OR 
-// IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND/OR FITNESS FOR A 
-// PARTICULAR PURPOSE. IN NO EVENT SHALL ALIAS BE LIABLE FOR ANY DAMAGES 
-// WHATSOEVER, WHETHER DIRECT, INDIRECT, SPECIAL, OR PUNITIVE, WHETHER IN AN 
-// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, OR IN EQUITY, 
+//
+// THE DATA IS PROVIDED "AS IS".  ALIAS HEREBY DISCLAIMS ALL WARRANTIES
+// RELATING TO THE DATA, INCLUDING, WITHOUT LIMITATION, ANY AND ALL EXPRESS OR
+// IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE. IN NO EVENT SHALL ALIAS BE LIABLE FOR ANY DAMAGES
+// WHATSOEVER, WHETHER DIRECT, INDIRECT, SPECIAL, OR PUNITIVE, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, OR IN EQUITY,
 // ARISING OUT OF ACCESS TO, USE OF, OR RELIANCE UPON THE DATA.
 // ==========================================================================
 //+
@@ -87,10 +87,10 @@ MTypeId rockingTransformMatrix::id(0x00021215);
 rockingTransformMatrix::rockingTransformMatrix()
 {
 	rockXValue = 0.0;
-	fm[0][0] =1; fm[0][1] =0; fm[0][2] =0; fm[0][3] =0; 
-	fm[1][0] =0; fm[1][1] =1; fm[1][2] =0; fm[1][3] =0; 
-	fm[2][0] =0; fm[2][1] =0; fm[2][2] =1; fm[2][3] =0; 
-	fm[3][0] =0; fm[3][1] =0; fm[3][2] =0; fm[3][3] =1; 
+	fm[0][0] =1; fm[0][1] =0; fm[0][2] =0; fm[0][3] =0;
+	fm[1][0] =0; fm[1][1] =1; fm[1][2] =0; fm[1][3] =0;
+	fm[2][0] =0; fm[2][1] =0; fm[2][2] =1; fm[2][3] =0;
+	fm[3][0] =0; fm[3][1] =0; fm[3][2] =0; fm[3][3] =1;
 }
 
 //
@@ -111,56 +111,56 @@ double rockingTransformMatrix::getRockInX() const
 }
 
 //
-//	Utility method for setting the rcok 
+//	Utility method for setting the rcok
 //	motion in the X axis
 //
 void rockingTransformMatrix::setRockInX( double rock, const MString& scene, const MString& mesh)
 {
 	if(scene=="" || mesh=="") return;
 	double delta = rock - SHelper::safeConvertToInt(rock);
-	
+
 	std::string sbuf(scene.asChar());
 	SHelper::changeFrameNumber(sbuf, SHelper::safeConvertToInt(rock));
-	
+
 	if(doc.load(sbuf.c_str()) != 1) return;
-	
+
 	XYZ a, b, c;
 	float size;
-	
+
 	if(XMLUtil::findByNameAndType( mesh.asChar(), "transform", doc))
 	{
 		doc.getFloat3AttribByName("X", fm[0][0], fm[0][1], fm[0][2]);
 		doc.getFloat3AttribByName("Y", fm[1][0], fm[1][1], fm[1][2]);
 		doc.getFloat3AttribByName("Z", fm[2][0], fm[2][1], fm[2][2]);
 		doc.getFloat3AttribByName("W", fm[3][0], fm[3][1], fm[3][2]);
-		
-		doc.free();	
+
+		doc.free();
 	}
 	else {
 		doc.setParent();
-		
+
 		if(XMLUtil::findByNameAndType( mesh.asChar(), "camera", doc))
 		{
 			doc.getFloat3AttribByName("X", fm[0][0], fm[0][1], fm[0][2]);
 			doc.getFloat3AttribByName("Y", fm[1][0], fm[1][1], fm[1][2]);
 			doc.getFloat3AttribByName("Z", fm[2][0], fm[2][1], fm[2][2]);
 			doc.getFloat3AttribByName("W", fm[3][0], fm[3][1], fm[3][2]);
-			
-			doc.free();	
+
+			doc.free();
 		}
 		else {
-			doc.free();	
+			doc.free();
 			MGlobal::displayWarning(MString("cannot find ") + mesh + " in " +sbuf.c_str());
 		}
 	}
-	
-	
+
+
 	if(delta >0)
 	{
 		SHelper::changeFrameNumber(sbuf, SHelper::safeConvertToInt(rock+1.0));
-		
+
 		if(doc.load(sbuf.c_str()) != 1) return;
-		
+
 		char found = 0;
 		if(XMLUtil::findByNameAndType( mesh.asChar(), "transform", doc))
 		{
@@ -169,12 +169,12 @@ void rockingTransformMatrix::setRockInX( double rock, const MString& scene, cons
 			doc.getFloat3AttribByName("Y", fm1[1][0], fm1[1][1], fm1[1][2]);
 			doc.getFloat3AttribByName("Z", fm1[2][0], fm1[2][1], fm1[2][2]);
 			doc.getFloat3AttribByName("W", fm1[3][0], fm1[3][1], fm1[3][2]);
-			
-			doc.free();	
+
+			doc.free();
 		}
 		else {
 			doc.setParent();
-			
+
 			if(XMLUtil::findByNameAndType( mesh.asChar(), "camera", doc))
 			{
 				found = 1;
@@ -182,15 +182,15 @@ void rockingTransformMatrix::setRockInX( double rock, const MString& scene, cons
 				doc.getFloat3AttribByName("Y", fm1[1][0], fm1[1][1], fm1[1][2]);
 				doc.getFloat3AttribByName("Z", fm1[2][0], fm1[2][1], fm1[2][2]);
 				doc.getFloat3AttribByName("W", fm1[3][0], fm1[3][1], fm1[3][2]);
-				
-				doc.free();	
+
+				doc.free();
 			}
 			else {
-				doc.free();	
+				doc.free();
 				MGlobal::displayWarning(MString("cannot find ") + mesh + " in " +sbuf.c_str());
 			}
 		}
-		
+
 		if(found)
 		{
 			a.x = fm[0][0];
@@ -203,10 +203,10 @@ void rockingTransformMatrix::setRockInX( double rock, const MString& scene, cons
 			c = a + (b-a)*delta;
 			c.normalize();
 			c *= size;
-			fm[0][0] =c.x; 
-			fm[0][1] =c.y; 
-			fm[0][2] =c.z; 
-			
+			fm[0][0] =c.x;
+			fm[0][1] =c.y;
+			fm[0][2] =c.z;
+
 			a.x = fm[1][0];
 			a.y = fm[1][1];
 			a.z = fm[1][2];
@@ -217,8 +217,8 @@ void rockingTransformMatrix::setRockInX( double rock, const MString& scene, cons
 			c = a + (b-a)*delta;
 			c.normalize();
 			c *= size;
-			fm[1][0] =c.x; 
-			fm[1][1] =c.y; 
+			fm[1][0] =c.x;
+			fm[1][1] =c.y;
 			fm[1][2] =c.z;
 
 			a.x = fm[2][0];
@@ -231,10 +231,10 @@ void rockingTransformMatrix::setRockInX( double rock, const MString& scene, cons
 			c = a + (b-a)*delta;
 			c.normalize();
 			c *= size;
-			fm[2][0] =c.x; 
-			fm[2][1] =c.y; 
-			fm[2][2] =c.z; 
-			
+			fm[2][0] =c.x;
+			fm[2][1] =c.y;
+			fm[2][2] =c.z;
+
 			a.x = fm[3][0];
 			a.y = fm[3][1];
 			a.z = fm[3][2];
@@ -242,11 +242,11 @@ void rockingTransformMatrix::setRockInX( double rock, const MString& scene, cons
 			b.y = fm1[3][1];
 			b.z = fm1[3][2];
 			c = a + (b-a)*delta;
-			fm[3][0] =c.x; 
-			fm[3][1] =c.y; 
+			fm[3][0] =c.x;
+			fm[3][1] =c.y;
 			fm[3][2] =c.z;
-		}	
-		
+		}
+
 	}
 	//rockXValue = rock;
 }
@@ -273,11 +273,11 @@ MMatrix rockingTransformMatrix::asMatrix() const
 	// Apply the rocking rotation to the existing rotation
 	//tm.addRotationQuaternion( quat.x, quat.y, quat.z, quat.w, MSpace::kTransform );
 	//MVector tv(0,getRockInX(),0);
-	
-	//fm[0][0] =1; fm[0][1] =0; fm[0][2] =0; fm[0][3] =0; 
-	//fm[1][0] =0; fm[1][1] =1; fm[1][2] =0; fm[1][3] =0; 
-	//fm[2][0] =0; fm[2][1] =0; fm[2][2] =1; fm[2][3] =0; 
-	//fm[3][0] =0; fm[3][1] =getRockInX(); fm[3][2] =0; fm[3][3] =1; 
+
+	//fm[0][0] =1; fm[0][1] =0; fm[0][2] =0; fm[0][3] =0;
+	//fm[1][0] =0; fm[1][1] =1; fm[1][2] =0; fm[1][3] =0;
+	//fm[2][0] =0; fm[2][1] =0; fm[2][2] =1; fm[2][3] =0;
+	//fm[3][0] =0; fm[3][1] =getRockInX(); fm[3][2] =0; fm[3][3] =1;
 	MMatrix mm(fm);
 	//tm.setTranslation( tv,MSpace::kTransform);
 	tm = mm;
@@ -360,7 +360,7 @@ void rockingTransformNode::postConstructor()
 	//
 	ParentClass::postConstructor();
 
-	// 	The baseTransformationMatrix pointer should be setup properly 
+	// 	The baseTransformationMatrix pointer should be setup properly
 	//	at this point, but just in case, set the value if it is missing.
 	//
 	if (NULL == baseTransformationMatrix) {
@@ -406,31 +406,31 @@ MStatus rockingTransformNode::initialize()
 	numFn.setKeyable(true);
 	numFn.setAffectsWorldSpace(true);
 	addAttribute(aRockInX);
-	
+
 	MStatus				stat;
 	MFnNumericAttribute numAttr;
-	
+
 	aframe = numAttr.create( "currentTime", "ct", MFnNumericData::kDouble, 1.0 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	addAttribute( aframe );
-	
+
 	aminframe = numAttr.create( "minFrame", "mnf", MFnNumericData::kInt, 1 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	addAttribute( aminframe );
-	
+
 	amaxframe = numAttr.create( "maxFrame", "mxf", MFnNumericData::kInt, 24 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	addAttribute( amaxframe );
-	
+
 	MFnTypedAttribute   stringAttr;
 	acachename = stringAttr.create( "cachePath", "cp", MFnData::kString );
  	stringAttr.setStorable(true);
 	stringAttr.setInternal(true);
 	addAttribute( acachename );
-	
+
 	ameshname = stringAttr.create( "meshName", "mn", MFnData::kString );
  	stringAttr.setStorable(true);
 	stringAttr.setInternal(true);
@@ -445,7 +445,7 @@ MStatus rockingTransformNode::initialize()
 //
 //	Debugging method
 //
-const char* rockingTransformNode::className() 
+const char* rockingTransformNode::className()
 {
 	return "rockingTransformNode";
 }
@@ -474,7 +474,7 @@ void  rockingTransformNode::resetTransformation (MPxTransformationMatrix *resetM
 // Meaning you would implement methods similar to:
 //	* applyRotationLocks();
 //	* applyRotationLimits();
-//	* checkAndSetRotation();  
+//	* checkAndSetRotation();
 // but for the rocking attribute.  The method checkAndSetRotation()
 // would be called below rather than updating the rocking attribute
 // directly.
@@ -493,55 +493,55 @@ MStatus rockingTransformNode::validateAndSetValue(const MPlug& plug,
 	MDataBlock block = forceCache(*(MDGContext *)&context);
 	MDataHandle blockHandle = block.outputValue(plug, &status);
 	ReturnOnError(status);
-	
+
 	MString cachename =  block.inputValue( acachename ).asString();
 	MString meshname =  block.inputValue( ameshname ).asString();
-	
-/*	
+
+/*
 	if ( plug == aRockInX )
 	{
 		// Update our new rock in x value
 		double rockInX = handle.asDouble();
 		blockHandle.set(rockInX);
 		rockXValue = rockInX;
-		
+
 		// Update the custom transformation matrix to the
-		// right rock value.  
+		// right rock value.
 		rockingTransformMatrix *ltm = getRockingTransformMatrix();
 		if (ltm)
 			ltm->setRockInX(rockXValue);
-		else 
+		else
 			MGlobal::displayError("Failed to get rock transform matrix");
-			
+
 		blockHandle.setClean();
-		
+
 		// Mark the matrix as dirty so that DG information
 		// will update.
-		dirtyMatrix();		
+		dirtyMatrix();
 	}
-*/	
+*/
 	if ( plug == aframe )
 	{
 		// Update our new rock in x value
 		double rockInX = handle.asDouble();
 		blockHandle.set(rockInX);
 		rockXValue = rockInX;
-		
+
 		// Update the custom transformation matrix to the
-		// right rock value.  
+		// right rock value.
 		rockingTransformMatrix *ltm = getRockingTransformMatrix();
 		if (ltm)
 			ltm->setRockInX(rockXValue, cachename, meshname);
-		else 
+		else
 			MGlobal::displayError("Failed to get rock transform matrix");
-			
+
 		blockHandle.setClean();
-		
+
 		// Mark the matrix as dirty so that DG information
 		// will update.
-		dirtyMatrix();		
+		dirtyMatrix();
 	}
-	
+
 	// Allow processing for other attributes
 	return ParentClass::validateAndSetValue(plug, handle, context);
 }
@@ -566,7 +566,6 @@ rockingTransformMatrix *rockingTransformNode::getRockingTransformMatrix()
  *double DegreeRadianConverter::radiansToDegrees( double radians )
  *{
  *	return radians * (180.0/M_PI);
- *}	
+ *}
 
  */
- 

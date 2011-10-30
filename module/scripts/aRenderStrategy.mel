@@ -19,7 +19,7 @@ global proc anm_chooseStrategy(int $stg)
 {
 	global string $ANM_StrategyPasses[];
 	global int $ANM_NumStrategyPasses;
-	
+
 	if($stg==0) {
 		$ANM_StrategyPasses[0] = "estimateRadiosity";
 		$ANM_StrategyPasses[1] = "approxGlobalDiffuse";
@@ -38,7 +38,7 @@ global proc anm_chooseStrategy(int $stg)
 		$ANM_StrategyPasses[2] = "renderFinale";
 		$ANM_NumStrategyPasses = 3;
 	}
-	
+
 	anm_createStrategy;
 	anm_initStrategy;
 	anm_listStrategyPasses;
@@ -56,7 +56,7 @@ global proc int anm_checkExistingPass(string $name)
 	 for($i=0; $i<size($render_passes); $i++) {
 	 	 if($render_passes[$i] == $name) return 1;
 	 }
-	return 0;	
+	return 0;
 }
 
 /*
@@ -67,7 +67,7 @@ global proc anm_createStrategy()
 {
 	global string $ANM_StrategyPasses[];
 	global int $ANM_NumStrategyPasses;
-	
+
 	int $i;
 	for($i=0; $i<$ANM_NumStrategyPasses; $i++) {
 		if(`anm_checkExistingPass($ANM_StrategyPasses[$i])` != 1) {
@@ -86,17 +86,17 @@ global proc anm_initStrategy()
 {
 	global string $ANM_StrategyPasses[];
 	global int $ANM_NumStrategyPasses;
-	
+
 	int $i;
 	for($i=0; $i<$ANM_NumStrategyPasses; $i++) {
 		print("initialize pass "+$ANM_StrategyPasses[$i]+"\n");
 		setAttr ($ANM_StrategyPasses[$i]+".renderMode") 1;
 		setAttr ($ANM_StrategyPasses[$i]+".ribFilename") -type "string" "3delight/<scene>/rib/<pass>.@.<ext>";
 		setAttr ($ANM_StrategyPasses[$i]+".connectToRenderGlobals") 0;
-		
+
 		string $conn[] =`listConnections -p on -scn on -d off -s on ($ANM_StrategyPasses[$i]+".resolutionX")`;
 		if(size($conn)>0) disconnectAttr $conn[0] ($ANM_StrategyPasses[$i]+".resolutionX");
-		
+
 		$conn =`listConnections -p on -scn on -d off -s on ($ANM_StrategyPasses[$i]+".resolutionY")`;
 		if(size($conn)>0) disconnectAttr $conn[0] ($ANM_StrategyPasses[$i]+".resolutionY");
 	}
@@ -164,46 +164,46 @@ global proc anm_listStrategyPasses()
 	string $pass[] =`columnLayout -q -childArray anm_renderStrategyClm`;
 	string $an;
 	for($an in $pass) deleteUI $an;
-	
+
 	global string $ANM_StrategyPasses[];
 	global int $ANM_NumStrategyPasses;
-	
+
 	int $i;
 	for($i=0; $i<$ANM_NumStrategyPasses; $i++) {
 		string $passname = $ANM_StrategyPasses[$i];
-		string $frmpass = `frameLayout -p anm_renderStrategyClm 
-			-label $passname 
+		string $frmpass = `frameLayout -p anm_renderStrategyClm
+			-label $passname
 			-collapsable on
 			-labelAlign "center"
 			-borderStyle "in"
 			-width 300
 			-ann "on"`;
                 columnLayout;
-                    string $chkpass = `checkBox -l "Enable" -v 1`; 
+                    string $chkpass = `checkBox -l "Enable" -v 1`;
                     checkBox -e -cc ("anm_activatePass(\""+$chkpass+"\", \""+$frmpass+"\")") $chkpass;
                     button -l "Select and Open in AE" -c ("select "+$passname+";ShowAttributeEditorOrChannelBox");
-                    
+
                     if($ANM_StrategyPasses[$i] == "estimateRadiosity") {
                     	attrControlGrp -attribute ($passname+".renderPhotonMaps");
 			attrControlGrp -attribute ($passname+".numberOfPhotons");
 		    }
-		    
+
 		    if($ANM_StrategyPasses[$i] != "makeGlobalDiffuseBrickMap") {
 		    	    attrControlGrp -attribute ($passname+".shadingRate");
 		    	    attrControlGrp -attribute ($passname+".resolutionX");
 		    	    attrControlGrp -attribute ($passname+".resolutionY");
 		    }
-                    
+
                     string $camopt = `optionMenu -ann $passname -label "Camera"`;
 
 				anm_listCameraAsMenuItems;
-			setParent ..;	
+			setParent ..;
 				int $usrcam = anm_findPassCamera($passname);
-				
+
 				$usrcam++;
-				
+
 				optionMenu -e -sl $usrcam $camopt;
-				optionMenu -e -cc ("anm_stg_onChangeCameraOpt(\""+$camopt+"\")") $camopt;   
+				optionMenu -e -cc ("anm_stg_onChangeCameraOpt(\""+$camopt+"\")") $camopt;
                 setParent ..;
 	}
 }
@@ -228,7 +228,7 @@ global proc int anm_checkActivePass(string $name)
 			}
 		}
 	}
-	return 0;	
+	return 0;
 }
 
 /*
@@ -246,26 +246,26 @@ global proc anm_renderStrategy()
 	$numTokens = `tokenize $scn "." $buffer`;
 	$scn = $buffer[0];
 	string $job_path = `workspace -q -fn`+"/rmantmp/" + $scn +"/";
-	
+
 // get rib path
 	string $rib_path = `workspace -q -fn`+"/3delight/" + $scn + "/rib/";
-	
+
 // open job file
 	int $jobfile =`fopen ($job_path+"jobspool.txt") "w"`;
-	
+
 	global string $ANM_StrategyPasses[];
 	global int $ANM_NumStrategyPasses;
-	
+
 	int $i;
 	int $frame = `currentTime -q`;
 	string $ribfile;
 	if(!`checkBox -q -v anm_stg_multiframe`) {
 		for($i=0; $i<$ANM_NumStrategyPasses; $i++) {
 			if(`anm_checkActivePass($ANM_StrategyPasses[$i])`==1) {
-				delightRenderMenuItemCommand $ANM_StrategyPasses[$i];	
+				delightRenderMenuItemCommand $ANM_StrategyPasses[$i];
 				$ribfile = "renderdl " + $rib_path + $ANM_StrategyPasses[$i] +"."+$frame+".rib";
 				fprint $jobfile ($ribfile+"\n");
-				
+
 				if(`checkBox -q -v anm_stg_depends`) {
 					print("check RIB dependency:\n\n");
 					string $ribdepents = system("ribdepends " + $rib_path + $ANM_StrategyPasses[$i] +"."+$frame+".rib");
@@ -277,7 +277,7 @@ global proc anm_renderStrategy()
 	else {
 		int $frame_start = `intField -q -v anm_stg_minframe`;
 		int $frame_end = `intField -q -v anm_stg_maxframe`;
-		
+
 		for($frame = $frame_start; $frame <= $frame_end; $frame++) {
 			currentTime $frame;
 			for($i=0; $i<$ANM_NumStrategyPasses; $i++) {
@@ -285,7 +285,7 @@ global proc anm_renderStrategy()
 					delightRenderMenuItemCommand $ANM_StrategyPasses[$i];
 					$ribfile = "renderdl " + $rib_path + $ANM_StrategyPasses[$i] +"."+$frame+".rib";
 					fprint $jobfile ($ribfile+"\n");
-					
+
 					if(`checkBox -q -v anm_stg_depends`) {
 						print("check RIB dependency:\n\n");
 						string $ribdepents = system("ribdepends " + $rib_path + $ANM_StrategyPasses[$i] +"."+$frame+".rib");
@@ -318,13 +318,13 @@ global proc anm_openRenderStrategyWin()
 {
 //create shader path
 	string $shader_path = `workspace -q -fn`+"/rmanshaders/";
-	
+
 	system("mkdir \""+$shader_path +"\"");
 // create tmp path
 	string $tmp_path = `workspace -q -fn`+"/rmantmp/";
-	
+
 	system("mkdir \""+$tmp_path +"\"");
-	
+
 // get scene name
 	string $scnname = `file -q -sceneName`;
 	if($scnname == "") $scnname = "untitled";
@@ -339,13 +339,13 @@ global proc anm_openRenderStrategyWin()
 // shader and tmp per scene
 	system("mkdir \""+$tmp_path + "/" + $scnname + "\"");
 	system("mkdir \""+$shader_path + "/" + $scnname + "\"");
-	
+
 //If such a window already exists, destory it.
  if ( (`window -exists anm_renderStrategyWin`) == true ) deleteUI anm_renderStrategyWin;
 
 //Create the window.
  window -title "Anemone 4.3 - Render Strategy" -wh 400 300  -mb on anm_renderStrategyWin;
- 
+
  menu -label "Create Strategy" -tearOff false;
     menuItem -label "Global Illumination Simple" -c "anm_chooseStrategy(1)";
     menuItem -label "Global Illumination with Bake" -c "anm_chooseStrategy(2)";
@@ -362,7 +362,7 @@ string $scroll = `scrollLayout -p $form`;
 
 columnLayout -adjustableColumn true anm_renderStrategyClm;
 
-	
+
 //row begin
 checkBox -label "Multi Frame" -p $row anm_stg_multiframe;
 intField -v 1 -p $row anm_stg_minframe;

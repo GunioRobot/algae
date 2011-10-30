@@ -1,22 +1,22 @@
 //-
 // ==========================================================================
-// Copyright (C) 1995 - 2005 Alias Systems Corp. and/or its licensors.  All 
-// rights reserved. 
-// 
-// The coded instructions, statements, computer programs, and/or related 
-// material (collectively the "Data") in these files are provided by Alias 
-// Systems Corp. ("Alias") and/or its licensors for the exclusive use of the 
-// Customer (as defined in the Alias Software License Agreement that 
-// accompanies this Alias software). Such Customer has the right to use, 
-// modify, and incorporate the Data into other products and to distribute such 
+// Copyright (C) 1995 - 2005 Alias Systems Corp. and/or its licensors.  All
+// rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files are provided by Alias
+// Systems Corp. ("Alias") and/or its licensors for the exclusive use of the
+// Customer (as defined in the Alias Software License Agreement that
+// accompanies this Alias software). Such Customer has the right to use,
+// modify, and incorporate the Data into other products and to distribute such
 // products for use by end-users.
-//  
-// THE DATA IS PROVIDED "AS IS".  ALIAS HEREBY DISCLAIMS ALL WARRANTIES 
-// RELATING TO THE DATA, INCLUDING, WITHOUT LIMITATION, ANY AND ALL EXPRESS OR 
-// IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND/OR FITNESS FOR A 
-// PARTICULAR PURPOSE. IN NO EVENT SHALL ALIAS BE LIABLE FOR ANY DAMAGES 
-// WHATSOEVER, WHETHER DIRECT, INDIRECT, SPECIAL, OR PUNITIVE, WHETHER IN AN 
-// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, OR IN EQUITY, 
+//
+// THE DATA IS PROVIDED "AS IS".  ALIAS HEREBY DISCLAIMS ALL WARRANTIES
+// RELATING TO THE DATA, INCLUDING, WITHOUT LIMITATION, ANY AND ALL EXPRESS OR
+// IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE. IN NO EVENT SHALL ALIAS BE LIABLE FOR ANY DAMAGES
+// WHATSOEVER, WHETHER DIRECT, INDIRECT, SPECIAL, OR PUNITIVE, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, OR IN EQUITY,
 // ARISING OUT OF ACCESS TO, USE OF, OR RELIANCE UPON THE DATA.
 // ==========================================================================
 //+
@@ -44,25 +44,25 @@ class rockingTransformMatrix : public MPxTransformationMatrix
 {
 	// A really simple implementation of MPxTransformationMatrix.
 	// The methods include:
-	// - Two accessor methods for getting and setting the 
+	// - Two accessor methods for getting and setting the
 	// rock
-	// - The virtual asMatrix() method which passes the matrix 
+	// - The virtual asMatrix() method which passes the matrix
 	// back to Maya when the command "xform -q -ws -m" is invoked
 
 	public:
 		rockingTransformMatrix();
 		static void *creator();
-		
+
 		virtual MMatrix asMatrix() const;
 		//virtual MMatrix	asMatrix(double percent) const;
 		//virtual MMatrix	asRotateMatrix() const;
-		
+
 		// Degrees
 		double	getRockInX() const;
 		void	setRockInX( double rock, const MString& scene, const MString& mesh);
-		
+
 		static	MTypeId	id;
-	protected:		
+	protected:
 		typedef MPxTransformationMatrix ParentClass;
 		// Degrees
 		double rockXValue;
@@ -71,7 +71,7 @@ class rockingTransformMatrix : public MPxTransformationMatrix
 		ZXMLDoc doc;
 };
 
-class rockingTransformNode : public MPxTransform 
+class rockingTransformNode : public MPxTransform
 {
 	// A really simple custom transform.
 	public:
@@ -80,22 +80,22 @@ class rockingTransformNode : public MPxTransform
 		virtual ~rockingTransformNode();
 
 		virtual MPxTransformationMatrix *createTransformationMatrix();
-					
+
 		virtual void postConstructor();
 
 		virtual MStatus validateAndSetValue(const MPlug& plug,
 					const MDataHandle& handle, const MDGContext& context);
-					
+
 		virtual void  resetTransformation (MPxTransformationMatrix *);
 		virtual void  resetTransformation (const MMatrix &);
-					
+
 		// Utility for getting the related rock matrix pointer
 		rockingTransformMatrix *getRockingTransformMatrix();
-				
+
 		const char* className();
 		static	void * 	creator();
 		static  MStatus	initialize();
-		
+
 		static	MTypeId	id;
 	protected:
 		// Degrees

@@ -40,18 +40,18 @@ class RenderACache
 public:
 	RenderACache();
 	~RenderACache();
-	
+
 	void initialize();
 	void uninitialize();
-	
+
 	char isInitialized() const { return m_isInitialized; }
-	
+
 	void setTriangles(const int *triidx, unsigned int num_idx);
 	void setP(const XYZ *p, unsigned int num_vert);
 	void draw();
 	void enableProgram(GLuint p);
 	void disableProgram();
-	
+
 private:
 	char m_isInitialized;
 	GLuint ibo;

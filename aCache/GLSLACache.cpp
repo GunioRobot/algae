@@ -13,11 +13,11 @@
 #include "../shared/gExtension.h"
 #endif
 
-const char *particleVS = 
-// point size in world space 
+const char *particleVS =
+// point size in world space
 //"uniform float pointRadius;     \n"
 // scale to calculate size in pixels \n
-//"uniform float pointScale;"   
+//"uniform float pointScale;"
 
 
 //"uniform mat4 shadowMatrix;"
@@ -31,7 +31,7 @@ const char *particleVS =
 "	eyez = -gl_Position.z;"
 " gl_Position = gl_ProjectionMatrix * gl_Position;"
 
-// calculate window-space point size                    
+// calculate window-space point size
 //"    vec4 eyeSpacePos = gl_ModelViewMatrix * wpos;           \n"
 //"    float dist = length(eyeSpacePos.xyz);                   \n"
 //"    gl_PointSize = 128.0/dist;       \n"
@@ -49,12 +49,12 @@ const char *particleVS =
 // world point for noise
 //"	gl_TexCoord[3] = wpos;"
 
-// side and up of 
+// side and up of
 //"	gl_TexCoord[4] = spriteSide;"
 //"	gl_TexCoord[5] = spriteUp;"
 "}";
 
-const char *particleFS = 
+const char *particleFS =
 "uniform vec3 baseColor;"
 "uniform vec2 clipping;"
 "uniform float handle;"
@@ -69,12 +69,12 @@ const char *particleFS =
 "    if(handle == 0.0) gl_FragColor = vec4(cs, 1.0);              \n"
 "} ";
 
-GLSLACache::GLSLACache() 
+GLSLACache::GLSLACache()
 {
 	m_isValid = initProgram();
 }
 
-GLSLACache::~GLSLACache() 
+GLSLACache::~GLSLACache()
 {
 	glDeleteProgram( program );
 }
@@ -84,30 +84,30 @@ char GLSLACache::initProgram()
 	GLuint vertex_shader   = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertex_shader, 1, &particleVS, NULL);
 	glCompileShader(vertex_shader);
-	
+
 	GLint vertexshader_compiled;
 	glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, (GLint*)&vertexshader_compiled);
 	if(!vertexshader_compiled) return 0;
-	
+
 	GLuint fragment_shader   = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragment_shader, 1, &particleFS, NULL);
 	glCompileShader(fragment_shader);
-	
+
 	GLint fragmentshader_compiled;
 	glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, (GLint*)&fragmentshader_compiled);
 	if(!fragmentshader_compiled) return 0;
-	
+
 	program = glCreateProgram();
-	
+
 	glAttachShader(program, vertex_shader);
 	glAttachShader(program, fragment_shader);
-	
+
 	glLinkProgram(program);
-	
+
 	GLint linked;
 	glGetProgramiv(program, GL_LINK_STATUS, &linked);
 	if(!linked) return 0;
-	
+
 	glUseProgram(program);
 	//glUniform1f(glGetUniformLocation(program, "scaleDensity"), 1.0);
 	//glUniform1f(glGetUniformLocation(program, "pointRadius"), 1.0);

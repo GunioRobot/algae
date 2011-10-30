@@ -24,10 +24,10 @@ public:
 
 	void begin();
 	void end(const char *file);
-	
+
 	void elementBegin(const char* name);
 	void elementEnd();
-	
+
 	void addAttribute(const char* name, const char* value);
 	void addAttribute(const char* name, float value);
 	void addAttribute(const char* name, float x, float y, float z);
@@ -37,7 +37,7 @@ public:
 	void addContent(float value);
 	void addContent(int value);
 	void addContent(float r, float g, float b);
-	
+
 	int load(const char* file);
 	void free();
 	void reset();
@@ -56,9 +56,9 @@ public:
 	int getIntAttribByName(const char* name);
 	float getFloatAttribByName(const char* name);
 	void getFloat3AttribByName(const char* name, float& x, float& y, float& z);
-	
+
 private:
-	
+
 	xmlTextWriterPtr writer;
     xmlDocPtr doc;
 	int rc;

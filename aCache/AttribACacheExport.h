@@ -1,12 +1,12 @@
-#include <maya/MPxNode.h> 
+#include <maya/MPxNode.h>
 
 
- 
+
 class AttribACacheExportNode : public MPxNode
 {
 public:
 						AttribACacheExportNode();
-	virtual				~AttribACacheExportNode(); 
+	virtual				~AttribACacheExportNode();
 
 	virtual MStatus		compute( const MPlug& plug, MDataBlock& data );
 

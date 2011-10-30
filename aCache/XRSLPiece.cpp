@@ -18,16 +18,16 @@ char XRSLPiece::load(const char* filename)
 {
 	m_icon = "anm_default.xpm";
 	m_sl_path = filename;
-	
+
 	ZXMLDoc doc;
 	if(doc.load(filename) != 1) return 0;
-	
+
 	m_name = doc.getAttribByName("name");
 	m_type = doc.getAttribByName("type");
 	m_description = "no description";
-	
+
 	doc.setChildren();
-	
+
 	while(doc.isLastNode() != 1) {
 		if(doc.checkNodeName("icon") == 1) {
 			m_icon = doc.getNodeContent();
@@ -46,7 +46,7 @@ char XRSLPiece::load(const char* filename)
 			aparam->min = 0.f;
 			aparam->max = 1.f;
 			aparam->name = doc.getAttribByName("name");
-			
+
 			const char* typestr = doc.getAttribByName("type");
 			if(strcmp(typestr, "float") == 0) {
 				aparam->type = RSLFloat;
@@ -68,7 +68,7 @@ char XRSLPiece::load(const char* filename)
 				aparam->type = RSLPoint;
 				doc.getFloat3AttribByName("value", aparam->r, aparam->g, aparam->b);
 			}
-			
+
 			if(doc.isEmpty() != 1) {
 				doc.setChildren();
 				while(doc.isLastNode()!=1)
@@ -79,12 +79,12 @@ char XRSLPiece::load(const char* filename)
 						//printf("set range");
 					}
 					else if(doc.checkNodeName("detail") ==1) {
-						if(strcmp(doc.getAttribByName("value"), "slider") == 0) aparam->detail = Slider;	
+						if(strcmp(doc.getAttribByName("value"), "slider") == 0) aparam->detail = Slider;
 						else if(strcmp(doc.getAttribByName("value"), "switch") == 0) aparam->detail = Switch;
 						else if(strcmp(doc.getAttribByName("value"), "connection") == 0) aparam->detail = Connection;
 					}
 					else if(doc.checkNodeName("access") ==1) {
-						if(strcmp(doc.getAttribByName("value"), "uniform") == 0) aparam->access = Uniform;	
+						if(strcmp(doc.getAttribByName("value"), "uniform") == 0) aparam->access = Uniform;
 						else if(strcmp(doc.getAttribByName("value"), "varying") == 0) aparam->access = Varying;
 						else if(strcmp(doc.getAttribByName("value"), "output") == 0) aparam->access = Output;
 					}
@@ -96,10 +96,10 @@ char XRSLPiece::load(const char* filename)
 		}
 		doc.nextNode();
 	}
-	
+
 	doc.setParent();
 	doc.free();
-	
+
 	m_isValid = 1;
 	return m_isValid;
 }

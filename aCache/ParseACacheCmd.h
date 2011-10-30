@@ -9,7 +9,7 @@
 
 #include <maya/MGlobal.h>
 #include <maya/MPxCommand.h>
-#include <maya/MPxDeformerNode.h> 
+#include <maya/MPxDeformerNode.h>
 #include <maya/MPointArray.h>
 #include <maya/MFloatArray.h>
 #include <maya/MVectorArray.h>

@@ -114,12 +114,12 @@ char gExtensionInit()
 	GET_EXT_POINTER(glFramebufferRenderbufferEXT, PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC);
 	GET_EXT_POINTER(glGetFramebufferAttachmentParameterivEXT, PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC);
 	GET_EXT_POINTER(glGenerateMipmapEXT, PFNGLGENERATEMIPMAPEXTPROC);
-	
-	if( !glIsRenderbufferEXT || !glBindRenderbufferEXT || !glDeleteRenderbuffersEXT || 
-	!glGenRenderbuffersEXT || !glRenderbufferStorageEXT || !glGetRenderbufferParameterivEXT || 
-	!glIsFramebufferEXT || !glBindFramebufferEXT || !glDeleteFramebuffersEXT || 
-	!glGenFramebuffersEXT || !glCheckFramebufferStatusEXT || !glFramebufferTexture1DEXT || 
-	!glFramebufferTexture2DEXT || !glFramebufferTexture3DEXT || !glFramebufferRenderbufferEXT||  
+
+	if( !glIsRenderbufferEXT || !glBindRenderbufferEXT || !glDeleteRenderbuffersEXT ||
+	!glGenRenderbuffersEXT || !glRenderbufferStorageEXT || !glGetRenderbufferParameterivEXT ||
+	!glIsFramebufferEXT || !glBindFramebufferEXT || !glDeleteFramebuffersEXT ||
+	!glGenFramebuffersEXT || !glCheckFramebufferStatusEXT || !glFramebufferTexture1DEXT ||
+	!glFramebufferTexture2DEXT || !glFramebufferTexture3DEXT || !glFramebufferRenderbufferEXT||
 	!glGetFramebufferAttachmentParameterivEXT || !glGenerateMipmapEXT ) {
 		printf( "ERROR: One or more EXT_framebuffer_object functions were not found");
 		return 0;
@@ -134,26 +134,26 @@ char gExtensionInit()
 	GET_EXT_POINTER(glMultiTexCoord2f, PFNGLMULTITEXCOORD2FPROC);
 	GET_EXT_POINTER(glMultiTexCoord3f, PFNGLMULTITEXCOORD3FPROC);
 	GET_EXT_POINTER(glMultiTexCoord4f, PFNGLMULTITEXCOORD4FPROC);
-	
+
 	if(!glActiveTexture || !glMultiTexCoord1i || !glMultiTexCoord2i ||
 		!glMultiTexCoord3i || !glMultiTexCoord4i || !glMultiTexCoord1f ||
 		!glMultiTexCoord2f || !glMultiTexCoord3f || !glMultiTexCoord4f) {
 		printf( "ERROR: One or more texture functions were not found");
 		return 0;
-	} 
-	
+	}
+
 	GET_EXT_POINTER(glBlendFuncSeparate, PFNGLBLENDFUNCSEPARATEPROC);
 	if(!glBlendFuncSeparate) {
 		printf( "ERROR: blend separate functions were not found");
 		return 0;
-	} 
-	
+	}
+
 	GET_EXT_POINTER(glTexImage3D, PFNGLTEXIMAGE3DPROC);
 	if(!glTexImage3D) {
 		printf( "ERROR: texture 3d functions were not found");
 		return 0;
 	}
-	
+
 	GET_EXT_POINTER(glUniform1iARB, PFNGLUNIFORM1IARBPROC);
 	GET_EXT_POINTER(glUniform2iARB, PFNGLUNIFORM2IARBPROC);
 	GET_EXT_POINTER(glUniform3iARB, PFNGLUNIFORM3IARBPROC);
@@ -163,14 +163,14 @@ char gExtensionInit()
 	GET_EXT_POINTER(glUniform3fARB, PFNGLUNIFORM3FARBPROC);
 	GET_EXT_POINTER(glUniform4fARB, PFNGLUNIFORM4FARBPROC);
 	GET_EXT_POINTER(glUniformMatrix4fvARB, PFNGLUNIFORMMATRIX4FVARBPROC);
-	
+
 	if(!glUniform1iARB || !glUniform2iARB || !glUniform3iARB || !glUniform4iARB ||
 		!glUniform1fARB || !glUniform2fARB || !glUniform3fARB || !glUniform4fARB ||
 		!glUniformMatrix4fvARB) {
 		printf( "ERROR: shader param functions were not found");
 		return 0;
 	}
-	
+
 	GET_EXT_POINTER(glDeleteObjectARB, PFNGLDELETEOBJECTARBPROC);
 	GET_EXT_POINTER(glUseProgramObjectARB, PFNGLUSEPROGRAMOBJECTARBPROC);
 	GET_EXT_POINTER(glCreateShaderObjectARB, PFNGLCREATESHADEROBJECTARBPROC);
@@ -181,7 +181,7 @@ char gExtensionInit()
 	GET_EXT_POINTER(glCompileShaderARB, PFNGLCOMPILESHADERARBPROC);
 	GET_EXT_POINTER(glGetObjectParameterivARB, PFNGLGETOBJECTPARAMETERIVARBPROC);
 	GET_EXT_POINTER(glGetUniformLocationARB, PFNGLGETUNIFORMLOCATIONARBPROC);
-	
+
 	GET_EXT_POINTER(glCreateProgram,  PFNGLCREATEPROGRAMPROC );
 	GET_EXT_POINTER(glDeleteProgram, PFNGLDELETEPROGRAMPROC);
 	GET_EXT_POINTER(glUseProgram,  PFNGLUSEPROGRAMPROC);
@@ -194,7 +194,7 @@ char gExtensionInit()
 	GET_EXT_POINTER(glGetShaderiv,  PFNGLGETSHADERIVPROC);
 	GET_EXT_POINTER(glProgramParameteriEXT, PFNGLPROGRAMPARAMETERIEXTPROC );
 	GET_EXT_POINTER(glGetUniformLocation, PFNGLGETUNIFORMLOCATIONPROC);
-	
+
 	GET_EXT_POINTER(glUniform1i, PFNGLUNIFORM1IPROC );
 GET_EXT_POINTER(glUniform2i, PFNGLUNIFORM2IPROC);
 GET_EXT_POINTER(glUniform3i, PFNGLUNIFORM3IPROC);
@@ -210,7 +210,7 @@ GET_EXT_POINTER(glDeleteBuffers, PFNGLDELETEBUFFERSPROC );
 GET_EXT_POINTER(glBindBuffer, PFNGLBINDBUFFERPROC );
 GET_EXT_POINTER(glBufferData, PFNGLBUFFERDATAPROC );
 GET_EXT_POINTER(glClientActiveTexture, PFNGLCLIENTACTIVETEXTUREPROC );
-	
+
 	if(!glDeleteObjectARB || !glUseProgramObjectARB || !glCreateShaderObjectARB ||
 		!glShaderSourceARB || !glLinkProgramARB || !glCreateProgramObjectARB ||
 		!glAttachObjectARB || !glCompileShaderARB || !glGetObjectParameterivARB ||
@@ -218,7 +218,7 @@ GET_EXT_POINTER(glClientActiveTexture, PFNGLCLIENTACTIVETEXTUREPROC );
 		printf( "ERROR: shader functions were not found");
 		return 0;
 	}
-	
+
 	return 1;
 }
 
@@ -235,7 +235,7 @@ char gCheckExtension(char* extName)
 
     extNameLen = strlen(extName);
     end = p + strlen(p);
-    
+
     while (p < end) {
          int n = strcspn(p, " ");
          if ((extNameLen == n) && (strncmp(extName, p, n) == 0)) {

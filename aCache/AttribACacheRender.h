@@ -1,12 +1,12 @@
-#include <maya/MPxNode.h> 
+#include <maya/MPxNode.h>
 
 
- 
+
 class AttribACacheRenderNode : public MPxNode
 {
 public:
 						AttribACacheRenderNode();
-	virtual				~AttribACacheRenderNode(); 
+	virtual				~AttribACacheRenderNode();
 
 	virtual MStatus		compute( const MPlug& plug, MDataBlock& data );
 

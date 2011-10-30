@@ -1,7 +1,7 @@
 #include "EnsembleAShader.h"
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MFnTypedAttribute.h>
-#include <maya/MTypeId.h> 
+#include <maya/MTypeId.h>
 #include <maya/MPlug.h>
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
@@ -13,23 +13,23 @@ MObject		EnsembleAShaderNode::aribbox;
 MObject		EnsembleAShaderNode::aoperation;
 MObject EnsembleAShaderNode::atracebias;
 MObject EnsembleAShaderNode::adisplacementbound;
-MObject     EnsembleAShaderNode::output;       
+MObject     EnsembleAShaderNode::output;
 
 EnsembleAShaderNode::EnsembleAShaderNode() {}
 EnsembleAShaderNode::~EnsembleAShaderNode() {}
 
 MStatus EnsembleAShaderNode::compute( const MPlug& plug, MDataBlock& data )
 {
-	
+
 	MStatus returnStatus;
- 
+
 	if( plug == output )
 	{
 		float result = 1.0f;
 		MDataHandle outputHandle = data.outputValue( EnsembleAShaderNode::output );
 		outputHandle.set( result );
 		data.setClean(plug);
-		
+
 	} else {
 		return MS::kUnknownParameter;
 	}
@@ -47,42 +47,42 @@ MStatus EnsembleAShaderNode::initialize()
 	MFnNumericAttribute numAttr;
 	MFnTypedAttribute tAttr;
 	MStatus				stat;
-	
+
 	asurface = numAttr.create( "surfaceShader", "sfs", MFnNumericData::kFloat, 0.0 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	addAttribute( asurface );
-	
+
 	adisplacement = numAttr.create( "displacementShader", "dls", MFnNumericData::kFloat, 0.0 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	addAttribute( adisplacement );
-	
+
 	aribbox = tAttr.create( "ribBox", "rbx", MFnData::kString);
 	tAttr.setStorable(false);
 	addAttribute( aribbox );
-	
+
 	aoperation = numAttr.create( "operation", "opt", MFnNumericData::kInt, 0 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	addAttribute( aoperation );
-	
+
 	atracebias = numAttr.create( "traceBias", "tbs", MFnNumericData::kFloat, 0.1 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	addAttribute( atracebias );
-	
+
 	adisplacementbound = numAttr.create( "displacementBound", "dpb", MFnNumericData::kFloat, 1.0 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	addAttribute( adisplacementbound );
-	
+
 	output = numAttr.create( "output", "out", MFnNumericData::kFloat, 0.0 );
 	numAttr.setWritable(false);
 	numAttr.setStorable(false);
 	stat = addAttribute( output );
 		if (!stat) { stat.perror("addAttribute"); return stat;}
-		
+
 	attributeAffects( asurface, output );
 	attributeAffects( adisplacement, output );
 	attributeAffects( aribbox, output );

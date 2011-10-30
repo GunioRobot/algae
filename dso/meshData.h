@@ -8,7 +8,7 @@ public:
 	meshData(std::string& parameter);
     ~meshData();
 	void generateRIB(RtFloat detail);
-    
+
 private:
 	char m_cache_name[1024];
 	char m_mesh_name[1024];

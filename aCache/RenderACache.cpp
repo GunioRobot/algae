@@ -14,7 +14,7 @@
 #endif
 
 RenderACache::RenderACache():m_isInitialized(0),ibo(0),vbo(0) {}
-RenderACache::~RenderACache() 
+RenderACache::~RenderACache()
 {
 	uninitialize();
 }
@@ -23,7 +23,7 @@ void RenderACache::initialize()
 {
 	glGenBuffers(1, &ibo);
 	glGenBuffers(1, &vbo);
-	
+
 	if( ibo &&  vbo) m_isInitialized = 1;
 }
 
@@ -56,7 +56,7 @@ void RenderACache::draw()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glEnableClientState(GL_VERTEX_ARRAY);
-		
+
 	//glBindBuffer(GL_ARRAY_BUFFER, tbo);
 	//glTexCoordPointer(4, GL_FLOAT, 0, 0);
 	//glClientActiveTexture(GL_TEXTURE0);
@@ -65,10 +65,10 @@ void RenderACache::draw()
 		glDrawElements(GL_TRIANGLES, m_n_draw, GL_UNSIGNED_INT, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	glDisableClientState(GL_VERTEX_ARRAY);	
+	glDisableClientState(GL_VERTEX_ARRAY);
 	//glClientActiveTexture(GL_TEXTURE0);
 	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 

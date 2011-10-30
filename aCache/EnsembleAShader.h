@@ -1,12 +1,12 @@
-#include <maya/MPxNode.h> 
+#include <maya/MPxNode.h>
 
 
- 
+
 class EnsembleAShaderNode : public MPxNode
 {
 public:
 						EnsembleAShaderNode();
-	virtual				~EnsembleAShaderNode(); 
+	virtual				~EnsembleAShaderNode();
 
 	virtual MStatus		compute( const MPlug& plug, MDataBlock& data );
 

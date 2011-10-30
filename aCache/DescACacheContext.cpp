@@ -17,7 +17,7 @@ MTypeId DescACacheContext::typeId() const
 }
 
 MString DescACacheContext::name() const
-{ 
+{
 	return DescACacheContext::typeName;
 }
 

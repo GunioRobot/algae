@@ -1,12 +1,12 @@
-#include <maya/MPxNode.h> 
+#include <maya/MPxNode.h>
 
 
- 
+
 class AdaptVariableAShaderNode : public MPxNode
 {
 public:
 						AdaptVariableAShaderNode();
-	virtual				~AdaptVariableAShaderNode(); 
+	virtual				~AdaptVariableAShaderNode();
 
 	virtual MStatus		compute( const MPlug& plug, MDataBlock& data );
 

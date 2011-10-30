@@ -14,9 +14,9 @@ global string $g_DL_geoPluginRequirements[];
 global string $g_DL_geoCacheCommands[];
 global string $g_DL_geoOutputCommands[];
 
-/* 
+/*
 	tampered by zhang
-	storage of camera for output geo 
+	storage of camera for output geo
 */
 global string $ZHANG_curcamera;
 global string $ZHANG_curpass;
@@ -101,12 +101,12 @@ shadingGroupsShaderName( string $shading_groups[], string $shader_type )
     if( size($connections) != 0 )
     {
       $name += materialShaderName( $connections[0] );
-      
+
       if ($shader_type == "displacement")
       {
         $name += ("_" + $shader_type);
       }
-      
+
       $has_shader = 1;
     }
   }
@@ -127,10 +127,10 @@ shadingGroupsShaderName( string $shading_groups[], string $shader_type )
 
 global proc int
 buildShader(string $shader_name,
-            string $shading_groups[], 
-            string $shader_type, 
-            string $shaderdl_opts, 
-            string $sl_path, 
+            string $shading_groups[],
+            string $shader_type,
+            string $shaderdl_opts,
+            string $sl_path,
             string $sdl_path,
             int $write_to_disk )
 {
@@ -149,7 +149,7 @@ buildShader(string $shader_name,
   {
     return 0;
   }
-  
+
   // Attempt to generate shader
 
   if( $shader_name == "" )
@@ -166,7 +166,7 @@ buildShader(string $shader_name,
 
   // Create .sl file
   int $file_id = fopen($sl_file_path, "w");
-  
+
   if ($file_id == 0)
   {
     error("Could not create shader file:\"" + $sl_file_path + "\"\n");
@@ -179,7 +179,7 @@ buildShader(string $shader_name,
   // Now compile the shader
   string $sdl_output;
   string $cmd;
-  
+
   $cmd = "shaderdl ";
   $cmd += $shaderdl_opts;
   $cmd += " -DSHADER_TYPE_" + $shader_type;
@@ -196,23 +196,23 @@ buildShader(string $shader_name,
   $cmd += "\" \"";
   $cmd += $sl_file_path;
   $cmd += "\" 2>&1\n";
-  
+
   print ("Compiling shader for " + $shading_groups[0] + " :");
   print $cmd;
 
   $sdl_output = DL_system($cmd);
   if ($sdl_output != "")
   {
-    error(  "compilation of " 
-          + $shader_type 
-          + " shader of shading group \"" 
-          + $shading_groups[0] 
+    error(  "compilation of "
+          + $shader_type
+          + " shader of shading group \""
+          + $shading_groups[0]
           + "\" failed: "
           + $sdl_output
           + "\n");
 
     return -1;
-  }    
+  }
 
   return 0;
 }
@@ -254,12 +254,12 @@ outputTranslatedMayaShader(
   global string $g_shaders_with_params_flags[];
 
   string $sdl_path = DL_getExpandedAbsoluteOutputPath(
-    "", 
+    "",
     "",
     "",
     DL_getShadersPath());
 
-  $sdl_path = DL_createDir($sdl_path + "/OBJ");  
+  $sdl_path = DL_createDir($sdl_path + "/OBJ");
 
   string $shader_command;
 
@@ -297,18 +297,18 @@ outputTranslatedMayaShader(
   if( $shader_idx != -1 )
   {
     string $shader_params = $g_shaders_with_params_flags[$shader_idx];
-    
+
     if( match("#insertcompositeattrib#", $shader_params) != "")
     {
       $shader_params = substitute("#insertcompositeattrib#", $shader_params, "");
-      $shader_command = 
+      $shader_command =
         "RiAttribute -n \"hider\" -p \"composite\" \"int\" \"0\"; " +
         $shader_command;
     }
-      
+
     $shader_command += $shader_params;
   }
-  
+
   eval($shader_command);
 }
 
@@ -337,12 +337,12 @@ getLayersContaining(string $geo_name, string $geo_layers[])
 {
   string $parent[];
   $parent = `listRelatives -parent $geo_name`;
-  
+
   if (size($parent) != 0)
   {
     string $layers[];
     $layers = `listConnections ($parent[0] + ".renderLayerInfo")`;
-    
+
     DL_stringArrayAppend($geo_layers, $layers);
     getLayersContaining($parent[0], $geo_layers);
   }
@@ -353,13 +353,13 @@ getDepthMapFilename(string $light_name)
 {
   string $file = "";
   int $first_append = 1;
-  
+
   if (attributeExists("dmapName", $light_name))
   {
     $file += getAttr($light_name + ".dmapName");
-    $first_append = 0;    
+    $first_append = 0;
   }
-  
+
   if (attributeExists("dmapSceneName", $light_name))
   {
     if (getAttr($light_name + ".dmapSceneName") == 1)
@@ -372,11 +372,11 @@ getDepthMapFilename(string $light_name)
       {
         $file += "_";
       }
-      
+
       $file += "<scene>";
     }
   }
-  
+
   if (attributeExists("dmapLightName", $light_name))
   {
     if (getAttr($light_name + ".dmapLightName") == 1)
@@ -401,15 +401,15 @@ getDepthMapFilename(string $light_name)
       else
       {
         $file += "_";
-      }      
+      }
 
       $file += "#";
     }
   }
-  
+
   $file += ".<ext>";
   $file = DL_getExpandedFilename($file, $light_name, "", "shadowmap");
-  
+
   return $file;
 }
 
@@ -422,7 +422,7 @@ createAreaLightPlane()
   {
     string $cur_selection[] = `ls -sl`;
 
-    string $plane_nodes[] = 
+    string $plane_nodes[] =
       `nurbsPlane -ch off -axis 0 0 1 -width 2 -name "delightAreaLightPlane"`;
 
     setAttr ($plane_nodes[0] + ".visibility") 0;
@@ -441,24 +441,24 @@ createAreaLightPlane()
 proc string[]
 getDefaultLightSetShapes(int $long_names)
 {
-  string $default_light_set_members[] = 
+  string $default_light_set_members[] =
     DL_getFlattenedSetMembers("defaultLightSet");
-  
+
   int $i;
   int $num_default_lights = size($default_light_set_members);
   for ($i = 0; $i < $num_default_lights; $i++)
   {
     string $shape = DL_getShapeFromTransform($default_light_set_members[$i]);
-    
+
     if ($long_names)
     {
       string $long_names[] = `ls -l $shape`;
       $shape = $long_names[0];
     }
-    
+
     $default_light_set_members[$i] = $shape;
   }
-  
+
   return $default_light_set_members;
 }
 
@@ -467,44 +467,44 @@ DRP_saveAsTemplate(string $render_pass)
 {
   string $cur_sel[] = `ls -sl`;
   select $render_pass;
-  
+
   string $output_dir = DL_getExpandedAbsoluteOutputPath(
-    "", 
-    "", 
+    "",
+    "",
     $render_pass,
     DL_getTemplatesPath());
-    
+
   $output_dir = DL_createDir($output_dir);
-  
-  string $template_file = `file 
-    -op "v=0" 
-    -pr 
-    -ch false 
-    -chn false 
-    -con false 
+
+  string $template_file = `file
+    -op "v=0"
+    -pr
+    -ch false
+    -chn false
+    -con false
     -exp true
-    -sh false 
-    -exportSelected 
+    -sh false
+    -exportSelected
     -type "mayaAscii"
     ($output_dir + "/" + $render_pass + "_rpt.ma")`;
-    
+
   // We need to add the connections to the exported file
   string $connections[];
   $connections = `listConnections -s true -d true -p true -c true $render_pass`;
-  
+
   int $file = `fopen $template_file "a"`;
-  
+
   if ($file == 0)
   {
     error("Cannot write to template file:" + $file);
     return;
   }
-  
+
   int $i;
   for($i = 0; $i < size($connections) - 1; $i += 2)
   {
     string $dest_node = plugNode($connections[$i + 1]);
-    
+
     if (   $dest_node != "defaultResolution"
         && match("_pixelRatioExpr$", $dest_node) == "")
     {
@@ -517,14 +517,14 @@ DRP_saveAsTemplate(string $render_pass)
       }
       else
       {
-        fprint $file ("connectAttr \":" + $connections[$i + 1] + "\" \"" + 
+        fprint $file ("connectAttr \":" + $connections[$i + 1] + "\" \"" +
           $connections[$i] + "\";\n");
       }
     }
   }
-  
+
   fclose $file;
-  
+
   select $cur_sel;
 }
 
@@ -532,23 +532,23 @@ global proc
 DRP_createFromTemplate(string $template)
 {
   string $render_passes[] = `ls -type delightRenderPass`;
-  
+
   string $templates_dir = DL_getExpandedAbsoluteOutputPath(
-    "", 
-    "", 
+    "",
+    "",
     $template,
     DL_getTemplatesPath());
-  
+
   string $new_nodes[] = `file -i -rnn ($templates_dir + "/" + $template + "_rpt.ma")`;
   string $new_pass;
-  
+
   for($node in $new_nodes)
   {
     if (match(($template + "_rpt_"), $node) != "")
     {
       string $new_name = substring($node, size($template + "_rpt_") + 1, size($node));
       $new_name = `rename $node $new_name`;
-      
+
       if (nodeType($new_name) == "delightRenderPass")
       {
         $new_pass = $new_name;
@@ -559,7 +559,7 @@ DRP_createFromTemplate(string $template)
       $new_pass = $node;
     }
   }
-  
+
   select $new_pass;
 }
 
@@ -587,7 +587,7 @@ getObjectSpaceBboxUnion(string $objects[], float $union_bbox[])
   {
     float $curr_min[] = getAttr($curr_obj + ".boundingBoxMin");
     float $curr_max[] = getAttr($curr_obj + ".boundingBoxMax");
-    
+
     if ($curr_min[0] < $union_bbox[0])
       $union_bbox[0] = $curr_min[0];
 
@@ -606,7 +606,7 @@ getObjectSpaceBboxUnion(string $objects[], float $union_bbox[])
     if ($curr_max[2] > $union_bbox[5])
       $union_bbox[5] = $curr_max[2];
   }
-  
+
   return $union_bbox;
 }
 
@@ -654,7 +654,7 @@ beginRIB(string $render_pass,
          string $prev_ribfile)
 {
   string $rib_file;
-  
+
   if( DRP_isImmediateRenderMode($render_pass) )
   {
     RiBegin;
@@ -676,11 +676,11 @@ beginRIB(string $render_pass,
     int $append;
 
     $rib_file = DL_getExpandedFilename(
-      getAttr($render_pass + ".ribFilename"), 
+      getAttr($render_pass + ".ribFilename"),
       "",
       $render_pass,
       "rib");
-    
+
     $binary_rib = getAttr($render_pass + ".binaryRib");
 
     $compressed_rib = getAttr($render_pass + ".compressedRib");
@@ -692,13 +692,13 @@ beginRIB(string $render_pass,
 
     beginRIBfile($rib_file, $binary_rib, $compressed_rib, $append);
   }
-  
+
   return $rib_file;
 }
 
 global proc string
 DRP_expandFragmentFilename(string $render_pass,
-                           string $fragment_object_set, 
+                           string $fragment_object_set,
                            string $fragment_filename)
 {
   string $expanded_filename;
@@ -843,7 +843,7 @@ DRP_deleteRIBfragment(string $node_name, int $which)
   // we need to get rid of the set connection just in case a node is connected
   removeMultiInstance -b true ($node_name + ".fragmentObjectSets[" + $which + "]");
 }
-    
+
 
 // return only indices for those fragments that are set to be used and have
 // filenames and object sets specified
@@ -873,7 +873,7 @@ proc
 clearFragmentInfoCache(string $render_pass)
 {
   int $indices[] = DRP_getFragmentIndices($render_pass);
-  
+
   for ($i in $indices)
   {
     if (`delightTable -tableExists ("fragment" + $i)`)
@@ -894,7 +894,7 @@ setupFragmentInfoCache(string $render_pass, string $render_layer_shapes[])
   // fragments into delightTables
 
   int $indices[] = DRP_getValidFragmentIndices($render_pass);
-  
+
   delightTable -addTable "ignore_fragment_geo";
 
   for ($i in $indices)
@@ -973,7 +973,7 @@ DRP_isRenderMode(string $render_pass)
 global proc int
 DRP_getAnimation(string $render_pass)
 {
-  return getAttr($render_pass + ".animation"); 
+  return getAttr($render_pass + ".animation");
 }
 
 global proc float
@@ -1076,7 +1076,7 @@ DRP_getSampleOffsets(string $render_pass,
   {
     $sample_offsets[$i] = $shutter_open_offset + $sample_delta * $i;
   }
-  
+
   return $sample_offsets;
 }
 
@@ -1100,7 +1100,7 @@ DRP_getDefaultDisplayDrivers()
   $all_drivers[13] = "shadowmap";
   $all_drivers[14] = "texture";
   $all_drivers[15] = "dsm";
-  
+
   return $all_drivers;
 }
 
@@ -1109,7 +1109,7 @@ DRP_getAllDisplayDrivers()
 {
   if (exists("DL_userGetAllDisplayDrivers"))
     return DL_userGetAllDisplayDrivers();
-  
+
   return DRP_getDefaultDisplayDrivers();
 }
 
@@ -1118,7 +1118,7 @@ DRP_getDefaultDisplayAOVs()
 {
   string $all_AOVs[];
   clear($all_AOVs);
-  
+
   $all_AOVs[size($all_AOVs)] = "z (depth)";
   $all_AOVs[size($all_AOVs)] = "rgb (color)";
   $all_AOVs[size($all_AOVs)] = "a (alpha channel)";
@@ -1151,7 +1151,7 @@ DRP_getDefaultDisplayAOVs()
   $all_AOVs[size($all_AOVs)] = "ambient no shadow";
   $all_AOVs[size($all_AOVs)] = "camera space normal";
   $all_AOVs[size($all_AOVs)] = "facing ratio";
-	
+
   return $all_AOVs;
 }
 
@@ -1163,12 +1163,12 @@ DRP_getAllDisplayAOVs()
   //
   string $all_AOVs[];
   clear ($all_AOVs);
-  
+
   // First array entry is reserved.
   //
   $all_AOVs[0] = "(user specified)";
-  
-  if (   exists("DL_userGetAllDisplayAOVs") 
+
+  if (   exists("DL_userGetAllDisplayAOVs")
       && exists("DL_userGetAllDisplayAOVDeclarations"))
   {
     DL_stringArrayAppend($all_AOVs, DL_userGetAllDisplayAOVs());
@@ -1177,7 +1177,7 @@ DRP_getAllDisplayAOVs()
   {
      DL_stringArrayAppend($all_AOVs, DRP_getDefaultDisplayAOVs());
   }
-  
+
   return $all_AOVs;
 }
 
@@ -1187,7 +1187,7 @@ DRP_getDefaultDisplayAOVDeclarations()
 {
   string $declarations[];
   clear($declarations);
-  
+
   $declarations[size($declarations)] = "z";
   $declarations[size($declarations)] = "rgb";
   $declarations[size($declarations)] = "a";
@@ -1227,31 +1227,31 @@ DRP_getDefaultDisplayAOVDeclarations()
 global proc string[]
 DRP_getAllDisplayAOVDeclarations()
 {
-  // Returns an array of AOV declaration strings. Each array entry is the 
+  // Returns an array of AOV declaration strings. Each array entry is the
   // declartion of an AOV, and that AOV will be described in the UI by the
   // corresponding element in the array returned by DRP_getAllDisplayAOVs.
-  // 
+  //
   string $all_declarations[];
   clear ($all_declarations);
-  
+
   // First array entry is reserved.
   //
   $all_declarations[0] = "";
-  
-  if (   exists("DL_userGetAllDisplayAOVs") 
+
+  if (   exists("DL_userGetAllDisplayAOVs")
       && exists("DL_userGetAllDisplayAOVDeclarations"))
   {
     DL_stringArrayAppend(
-      $all_declarations, 
+      $all_declarations,
       DL_userGetAllDisplayAOVDeclarations());
   }
   else
   {
      DL_stringArrayAppend(
-      $all_declarations, 
+      $all_declarations,
       DRP_getDefaultDisplayAOVDeclarations());
   }
-  
+
   return $all_declarations;
 }
 
@@ -1311,14 +1311,14 @@ DRP_getClippingPlanesToRenderSet(string $render_pass)
 global proc string
 DRP_getLayerToRender(string $render_pass)
 {
-  // Returns the render layer connectged to this attribute. When none is 
+  // Returns the render layer connectged to this attribute. When none is
   // connected, return the "current" render layer.
-  // 
+  //
   string $layer_to_render = DL_getSourceNode($render_pass + ".layerToRender");
-  
+
   if ($layer_to_render == "")
     $layer_to_render = `editRenderLayerGlobals -q -currentRenderLayer`;
-    
+
   // We can't set a referenced default render layer as the current one, so in
   // that case use this scene's default render layer.
   if (match(":defaultRenderLayer$", $layer_to_render) != "")
@@ -1402,10 +1402,10 @@ DRP_getDisplayPrimaryIndex(string $render_pass)
 {
   int $indices[] = DRP_getDisplayIndices($render_pass);
   int $i = -1;
-  
+
   if (size($indices) > 0)
     $i = $indices[0];
-  
+
   return $i;
 }
 
@@ -1439,10 +1439,10 @@ DRP_expandDisplayFilename(string $render_pass, int $display_index, string $filen
   $aov = DL_substituteAll("[ ,]+", $aov, "_");
 
   string $driver = DRP_getDisplayDriver($render_pass, $display_index);
-  
+
   $filename = DL_replaceAllTokens("<output_variable>", $aov, $filename);
   $filename = DL_getExpandedFilename($filename, "", $render_pass, $driver);
-  
+
   return $filename;
 }
 
@@ -1450,7 +1450,7 @@ global proc int
 DRP_getDisplayOverridePixelFilter(string $render_pass, int $display_index)
 {
   return getMultiAttributeIntValue(
-    $render_pass + ".displayOverridePixelFilters", 
+    $render_pass + ".displayOverridePixelFilters",
     $display_index);
 }
 
@@ -1458,7 +1458,7 @@ global proc string
 DRP_getDisplayDriver(string $render_pass, int $display_index)
 {
   return getMultiAttributeStringValue(
-    $render_pass + "." + "displayDrivers", 
+    $render_pass + "." + "displayDrivers",
     $display_index);
 }
 
@@ -1467,9 +1467,9 @@ DRP_getDisplayOutputVariableIndex(string $render_pass, int $display_index)
 {
   string $aov_decls[] = DRP_getAllDisplayAOVDeclarations();
   int $num_aov_decls = size($aov_decls);
-  
+
   string $curr_aov = DRP_getDisplayOutputVariable($render_pass, $display_index);
-  
+
   int $i;
   for($i = 0; $i < $num_aov_decls; $i++)
   {
@@ -1488,7 +1488,7 @@ global proc string
 DRP_getDisplayOutputVariable(string $render_pass, int $display_index)
 {
   return getMultiAttributeStringValue(
-    $render_pass + "." + "displayOutputVariables", 
+    $render_pass + "." + "displayOutputVariables",
     $display_index);
 }
 
@@ -1496,7 +1496,7 @@ global proc string
 DRP_getDisplayPixelFilter(string $render_pass, int $display_index)
 {
   return getMultiAttributeStringValue(
-    $render_pass + "." + "displayPixelFilters", 
+    $render_pass + "." + "displayPixelFilters",
     $display_index);
 }
 
@@ -1504,7 +1504,7 @@ global proc float
 DRP_getDisplayFilterWidthX(string $render_pass, int $display_index)
 {
   return getMultiAttributeFloatValue(
-    $render_pass + "." + "displayFilterWidthsX", 
+    $render_pass + "." + "displayFilterWidthsX",
     $display_index);
 }
 
@@ -1512,7 +1512,7 @@ global proc float
 DRP_getDisplayFilterWidthY(string $render_pass, int $display_index)
 {
   return getMultiAttributeFloatValue(
-    $render_pass + "." + "displayFilterWidthsY", 
+    $render_pass + "." + "displayFilterWidthsY",
     $display_index);
 }
 
@@ -1520,7 +1520,7 @@ global proc float
 DRP_getDisplayQuantizeDither(string $render_pass, int $display_index)
 {
   return getMultiAttributeFloatValue(
-    $render_pass + "." + "displayQuantizeDithers", 
+    $render_pass + "." + "displayQuantizeDithers",
     $display_index);
 }
 
@@ -1534,19 +1534,19 @@ DRP_getDisplayQuantizeString(string $render_pass, int $display_index)
   int $quantize_max;
 
   $quantize_zero = getMultiAttributeIntValue(
-      $render_pass + ".displayQuantizeZeros", 
+      $render_pass + ".displayQuantizeZeros",
       $display_index);
-      
+
   $quantize_one = getMultiAttributeIntValue(
-      $render_pass + ".displayQuantizeOnes", 
+      $render_pass + ".displayQuantizeOnes",
       $display_index);
-      
+
   $quantize_min = getMultiAttributeIntValue(
-      $render_pass + ".displayQuantizeMins", 
+      $render_pass + ".displayQuantizeMins",
       $display_index);
-      
+
   $quantize_max = getMultiAttributeIntValue(
-      $render_pass + ".displayQuantizeMaxs", 
+      $render_pass + ".displayQuantizeMaxs",
       $display_index);
 
   $quantize_string = $quantize_zero + " "
@@ -1561,11 +1561,11 @@ global proc string
 DRP_getQuantizeStringForUI(string $render_pass, int $display_index)
 {
   string $ret_val;
-  
+
   string $quantize = DRP_getDisplayQuantizeString($render_pass, $display_index)
     + " "
     + DRP_getDisplayQuantizeDither($render_pass, $display_index);
-  
+
   switch($quantize)
   {
     case "0 255 0 255 0.5": $ret_val = "8 bit integer"; break;
@@ -1574,15 +1574,15 @@ DRP_getQuantizeStringForUI(string $render_pass, int $display_index)
     default:
       $ret_val = "Custom (" + $quantize + ")";
   }
-  
+
   return $ret_val;
-}   
+}
 
 global proc float
 DRP_getDisplayGain(string $render_pass, int $display_index)
 {
   return getMultiAttributeFloatValue(
-    $render_pass + "." + "displayGains", 
+    $render_pass + "." + "displayGains",
     $display_index);
 }
 
@@ -1590,7 +1590,7 @@ global proc float
 DRP_getDisplayGamma(string $render_pass, int $display_index)
 {
   return getMultiAttributeFloatValue(
-    $render_pass + "." + "displayGammas", 
+    $render_pass + "." + "displayGammas",
     $display_index);
 }
 
@@ -1645,7 +1645,7 @@ DRP_getDisplayEdgeDetectionString(string $render_pass, int $display_index)
   $edge_varname = getMultiAttributeStringValue(
     $render_pass + ".displayEdgeVarNames", $display_index);
 
-  $edge_color = `getAttr 
+  $edge_color = `getAttr
     ($render_pass + ".displayEdgeColors[" + $display_index + "]")`;
 
   $edge_threshold = getMultiAttributeFloatValue(
@@ -1663,10 +1663,10 @@ DRP_getDisplayEdgeDetectionString(string $render_pass, int $display_index)
     $edge_filter_param = "\"edgewidth\"";
     $edge_filterwidth /= 100;
   }
-  
+
   $edge_depth_enable = getMultiAttributeIntValue(
     $render_pass + ".displayEdgeDepthEnables", $display_index);
-  
+
   $edge_depth_zmin = getMultiAttributeFloatValue(
     $render_pass + ".displayEdgeDepthZMins", $display_index);
 
@@ -1694,9 +1694,9 @@ DRP_getDisplayEdgeDetectionString(string $render_pass, int $display_index)
   return $edgestring;
 }
 
-// This is a patch because Linux AE refresh like crazy and quickly becomes 
+// This is a patch because Linux AE refresh like crazy and quickly becomes
 // extremely slow. So instead of using the regular advanced collapse state attr,
-// we use a single string attribute which acts like a stack of uncollapsed 
+// we use a single string attribute which acts like a stack of uncollapsed
 // "advanced" frame layouts. While this should pertain only to the AE template
 // file, we need the "stack" string attr to be correclty updatd when a display
 // is removed.
@@ -1713,27 +1713,27 @@ DRP_getDisplayAdvancedCollapseState(string $render_pass, int $display_index)
     // layout is uncollapsed.
     //
     string $states = `getAttr ($render_pass + ".displaysAdvanceCollapseString")`;
-    
+
     string $match = match((" " + $display_index + " "), $states);
     $collapse = (size($match) == 0);
   }
   else
   {
-    string $collapse_attr = $render_pass 
-      + ".displayAdvancedFrameCollapseStates[" 
-      + $display_index 
+    string $collapse_attr = $render_pass
+      + ".displayAdvancedFrameCollapseStates["
+      + $display_index
       + "]";
-    
+
     $collapse = getAttr($collapse_attr);
   }
-  
+
   return $collapse;
 }
 
 global proc
 DRP_setDisplayAdvancedCollapseState(
-  int $state, 
-  string $render_pass, 
+  int $state,
+  string $render_pass,
   int $display_index)
 {
   string $os = `about -os`;
@@ -1745,18 +1745,18 @@ DRP_setDisplayAdvancedCollapseState(
     // If the received state is "expanded", remove any entry matching the
     // received index from the string, then append the index at the end.
     //
-    string $collapse_string = `getAttr 
+    string $collapse_string = `getAttr
       ($render_pass + ".displaysAdvanceCollapseString")`;
 
     string $new_collapse_string = " ";
     string $display_index_as_string = $display_index;
-    
+
     string $tokens[];
     int $num_tokens = tokenize($collapse_string, $tokens);
 
     int $i = 0;
     int $search_bound = $num_tokens;
-    
+
     if (!$state)
     {
       int $max_states = 5;
@@ -1766,30 +1766,30 @@ DRP_setDisplayAdvancedCollapseState(
         $i = 1;
       }
     }
-    
+
     for(;$i < $search_bound; $i++)
     {
       string $curr_token = $tokens[$i];
-      
+
       if ($curr_token != $display_index_as_string)
         $new_collapse_string += $curr_token + " ";
     }
-    
+
     if (!$state)
       $new_collapse_string += $display_index_as_string + " ";
-      
-    setAttr 
-      -type "string" 
+
+    setAttr
+      -type "string"
       ($render_pass + ".displaysAdvanceCollapseString")
-      $new_collapse_string;        
+      $new_collapse_string;
   }
   else
   {
-    string $collapse_attr = $render_pass 
-      + ".displayAdvancedFrameCollapseStates[" 
-      + $display_index 
+    string $collapse_attr = $render_pass
+      + ".displayAdvancedFrameCollapseStates["
+      + $display_index
       + "]";
-    
+
     setAttr $collapse_attr $state;
   }
 }
@@ -1798,29 +1798,29 @@ global proc string
 DRP_getDisplaySubset(string $render_pass, int $display_index)
 {
   string $subset;
-  
-  int $subset_type = getAttr($render_pass 
-    + ".displaySubsetTypes[" 
-    + $display_index 
+
+  int $subset_type = getAttr($render_pass
+    + ".displaySubsetTypes["
+    + $display_index
     + "]");
-  
+
   string $sets_attr = "displaySubsetSets_" + $display_index;
 
   if ($subset_type != 0 && objExists($render_pass + "." + $sets_attr) != 0 )
   {
-    string $connected_sets[] = 
+    string $connected_sets[] =
       `listConnections ($render_pass + "." + $sets_attr)`;
-    
+
     $subset = stringArrayToString($connected_sets, ",");
-    
+
     if ($subset_type == 2)
     {
       $subset = "-" + $subset;
     }
-  
+
     $subset = " -p \"subset\" \"string\" \"" + $subset + "\"";
   }
-  
+
   return $subset;
 }
 
@@ -1930,7 +1930,7 @@ DRP_setCamera(string $render_pass, string $camera)
   string $camera_attr = $render_pass + ".camera";
 
   DL_disconnectNode($camera_attr);
-  DL_connectNodeToMessagePlug($camera, $camera_attr);   
+  DL_connectNodeToMessagePlug($camera, $camera_attr);
 }
 
 global proc string
@@ -1971,24 +1971,24 @@ addObjectSetAttributes( string $render_pass )
 {
   if( !attributeExists( "lightsToRender", $render_pass ) )
   {
-    addAttr 
-      -longName lightsToRender 
+    addAttr
+      -longName lightsToRender
       -attributeType message
       $render_pass;
   }
 
   if( !attributeExists( "objectsToRender", $render_pass ) )
   {
-    addAttr 
-      -longName objectsToRender 
+    addAttr
+      -longName objectsToRender
       -attributeType message
       $render_pass;
   }
 
   if( !attributeExists( "clippingPlanesToRender", $render_pass ) )
   {
-    addAttr 
-      -longName clippingPlanesToRender 
+    addAttr
+      -longName clippingPlanesToRender
       -attributeType message
       $render_pass;
   }
@@ -1998,7 +1998,7 @@ addObjectSetAttributes( string $render_pass )
     if ($clip != "" && !`objectType -isa "objectSet" $clip`)
     {
       string $new_set = `sets -n "clippingPlaneSet" $clip`;
-      string $msg_plug = $render_pass + ".clippingPlanesToRender"; 
+      string $msg_plug = $render_pass + ".clippingPlanesToRender";
 
       DL_disconnectNode($msg_plug);
       DL_connectNodeToMessagePlug($new_set, $msg_plug);
@@ -2011,39 +2011,39 @@ addFrameRangeAttributes( string $render_pass )
 {
   if( !attributeExists( "animation", $render_pass ) )
   {
-    addAttr 
-      -longName animation 
+    addAttr
+      -longName animation
       -attributeType bool
       $render_pass;
   }
 
   if( !attributeExists( "frameRange", $render_pass ) )
   {
-    addAttr 
-      -longName frameRange 
+    addAttr
+      -longName frameRange
       -attributeType float2
       $render_pass;
 
-      addAttr 
-        -longName startFrame 
-        -attributeType "float" 
-        -defaultValue 1.0 
+      addAttr
+        -longName startFrame
+        -attributeType "float"
+        -defaultValue 1.0
         -parent frameRange
         $render_pass;
 
-      addAttr 
-        -longName endFrame 
+      addAttr
+        -longName endFrame
         -attributeType "float"
-        -defaultValue 1.0 
+        -defaultValue 1.0
         -parent frameRange
         $render_pass;
   }
 
   if( !attributeExists( "increment", $render_pass ) )
   {
-    addAttr 
-      -longName increment 
-      -attributeType "float" 
+    addAttr
+      -longName increment
+      -attributeType "float"
       -defaultValue 1.0
       $render_pass;
   }
@@ -2062,16 +2062,16 @@ addMotionBlurAttributes( string $render_pass )
 
   if( !attributeExists( "transformationBlur", $render_pass ) )
   {
-    addAttr 
-      -longName transformationBlur 
+    addAttr
+      -longName transformationBlur
       -attributeType bool
       $render_pass;
   }
 
   if( !attributeExists( "deformationBlur", $render_pass ) )
   {
-    addAttr 
-      -longName deformationBlur 
+    addAttr
+      -longName deformationBlur
       -attributeType bool
       $render_pass;
   }
@@ -2089,22 +2089,22 @@ addMotionBlurAttributes( string $render_pass )
 
   if( !attributeExists( "transformationSamples", $render_pass ) )
   {
-    addAttr 
-      -longName transformationSamples 
-      -attributeType long 
-      -defaultValue 2 
-      -min 2 
+    addAttr
+      -longName transformationSamples
+      -attributeType long
+      -defaultValue 2
+      -min 2
       -max 20
       $render_pass;
   }
 
   if( !attributeExists( "deformationSamples", $render_pass ) )
   {
-    addAttr 
-      -longName deformationSamples 
-      -attributeType long 
-      -defaultValue 2 
-      -min 2 
+    addAttr
+      -longName deformationSamples
+      -attributeType long
+      -defaultValue 2
+      -min 2
       -max 20
       $render_pass;
   }
@@ -2115,9 +2115,9 @@ addMotionBlurAttributes( string $render_pass )
 
   if( !attributeExists( "motionBlurPosition", $render_pass ) )
   {
-    addAttr 
+    addAttr
       -longName motionBlurPosition
-      -attributeType "enum" 
+      -attributeType "enum"
       -en $all_positions
       -defaultValue 1
       $render_pass;
@@ -2125,26 +2125,26 @@ addMotionBlurAttributes( string $render_pass )
 
   if( !attributeExists( "shutterEfficiency", $render_pass ) )
   {
-    addAttr 
-      -longName shutterEfficiency 
+    addAttr
+      -longName shutterEfficiency
       -attributeType float2
       $render_pass;
 
-      addAttr 
-        -longName shutterEfficiencyA 
+      addAttr
+        -longName shutterEfficiencyA
         -attributeType "float"
         -min 0.0
-        -max 1 
-        -defaultValue 1 
+        -max 1
+        -defaultValue 1
         -parent shutterEfficiency
         $render_pass;
 
-      addAttr 
-        -longName shutterEfficiencyB 
+      addAttr
+        -longName shutterEfficiencyB
         -attributeType "float"
         -min 0.0
-        -max 1 
-        -defaultValue 1 
+        -max 1
+        -defaultValue 1
         -parent shutterEfficiency
         $render_pass;
   }
@@ -2155,28 +2155,28 @@ addRibOutputAttributes( string $render_pass )
 {
   if( !attributeExists( "ribFilename", $render_pass ) )
   {
-    addAttr 
-      -longName ribFilename 
+    addAttr
+      -longName ribFilename
       -dataType "string"
       $render_pass;
   }
 
   if( !attributeExists( "binaryRib", $render_pass ) )
   {
-    addAttr 
-      -longName binaryRib 
+    addAttr
+      -longName binaryRib
       -attributeType bool
       $render_pass;
   }
 
   if( !attributeExists( "compressedRib", $render_pass ) )
   {
-    addAttr 
-      -longName compressedRib 
+    addAttr
+      -longName compressedRib
       -attributeType bool
       $render_pass;
   }
-    
+
   if( !attributeExists( "generateRIBArchives", $render_pass ) )
   {
     addAttr
@@ -2185,7 +2185,7 @@ addRibOutputAttributes( string $render_pass )
       -defaultValue true
       $render_pass;
   }
-    
+
   if( !attributeExists( "ignoreArchivedObjects", $render_pass ) )
   {
     addAttr
@@ -2203,7 +2203,7 @@ addRibOutputAttributes( string $render_pass )
       -defaultValue true
       $render_pass;
   }
-  
+
   if( !attributeExists( "archiveLighting", $render_pass ) )
   {
     addAttr
@@ -2213,7 +2213,7 @@ addRibOutputAttributes( string $render_pass )
       -enumName "No Lighting:Light Linking:Light Sources & Light Linking"
       $render_pass;
   }
-  
+
   if( !attributeExists( "archiveGeometryAttributes", $render_pass ) )
   {
     addAttr
@@ -2230,7 +2230,7 @@ addRibOutputAttributes( string $render_pass )
       -attributeType "bool"
       -defaultValue true
       $render_pass;
-  }  
+  }
 
   if (!attributeExists("archiveWriteMode", $render_pass))
   {
@@ -2241,7 +2241,7 @@ addRibOutputAttributes( string $render_pass )
       -defaultValue 1
       $render_pass;
   }
-  
+
   if (!attributeExists("backgroundRenderParams", $render_pass))
   {
     addAttr
@@ -2264,32 +2264,32 @@ addMELscriptAttribs( string $render_pass )
 {
   if( !attributeExists( "preRenderMEL", $render_pass ) )
   {
-    addAttr 
-      -longName preRenderMEL 
+    addAttr
+      -longName preRenderMEL
       -dataType "string"
       $render_pass;
   }
 
   if( !attributeExists( "postRenderMEL", $render_pass ) )
   {
-    addAttr 
-      -longName postRenderMEL 
+    addAttr
+      -longName postRenderMEL
       -dataType "string"
       $render_pass;
   }
 
   if( !attributeExists( "preFrameMEL", $render_pass ) )
   {
-    addAttr 
-      -longName preFrameMEL 
+    addAttr
+      -longName preFrameMEL
       -dataType "string"
       $render_pass;
   }
 
   if( !attributeExists( "postFrameMEL", $render_pass ) )
   {
-    addAttr 
-      -longName postFrameMEL 
+    addAttr
+      -longName postFrameMEL
       -dataType "string"
       $render_pass;
   }
@@ -2300,27 +2300,27 @@ addNetCacheAttribs( string $render_pass )
 {
   if( !attributeExists( "useNetCache", $render_pass ) )
   {
-    addAttr 
-      -longName useNetCache 
-      -attributeType bool 
+    addAttr
+      -longName useNetCache
+      -attributeType bool
       -defaultValue 0
       $render_pass;
   }
 
   if( !attributeExists( "netCacheDir", $render_pass ) )
   {
-    addAttr 
-      -longName netCacheDir 
+    addAttr
+      -longName netCacheDir
       -dataType "string"
       $render_pass;
   }
 
   if( !attributeExists( "netCacheSize", $render_pass ) )
   {
-    addAttr 
-      -longName netCacheSize 
-      -attributeType long 
-      -min 100 
+    addAttr
+      -longName netCacheSize
+      -attributeType long
+      -min 100
       -defaultValue 100
       $render_pass;
   }
@@ -2347,18 +2347,18 @@ addPhotonMapAttribs( string $render_pass )
   if( !attributeExists( "globalMap", $render_pass ) )
   {
     addAttr -longName globalMap -dt "string" $render_pass;
-    setAttr 
-      -type "string" 
-      ($render_pass + ".globalMap") 
+    setAttr
+      -type "string"
+      ($render_pass + ".globalMap")
       "3delight/<scene>/photonmaps/global.pmap";
   }
 
   if( !attributeExists( "causticMap", $render_pass ) )
   {
     addAttr -longName causticMap -dt "string" $render_pass;
-    setAttr 
-      -type "string" 
-      ($render_pass + ".causticMap") 
+    setAttr
+      -type "string"
+      ($render_pass + ".causticMap")
       "3delight/<scene>/photonmaps/caustic.pmap";
   }
 }
@@ -2368,23 +2368,23 @@ addStatisticsAttribs( string $render_pass )
 {
   if( !attributeExists( "statisticsLevel", $render_pass ) )
   {
-    addAttr 
-      -longName statisticsLevel 
-      -attributeType long 
-      -min 0 
-      -max 3 
+    addAttr
+      -longName statisticsLevel
+      -attributeType long
+      -min 0
+      -max 3
       -defaultValue 0
       $render_pass;
   }
 
   if( !attributeExists( "statisticsFile", $render_pass ) )
   {
-    addAttr 
-      -longName statisticsFile 
+    addAttr
+      -longName statisticsFile
       -dataType "string"
       $render_pass;
   }
-  
+
   if( !attributeExists( "outputRenderProgress", $render_pass ) )
   {
     addAttr
@@ -2400,8 +2400,8 @@ addSearchPathAttributes( string $render_pass )
 {
   if( !attributeExists( "shaderPath", $render_pass ) )
   {
-    addAttr 
-      -longName shaderPath 
+    addAttr
+      -longName shaderPath
       -dataType "string"
       $render_pass;
     setAttr ($render_pass + ".shaderPath") -type "string" "@";
@@ -2409,8 +2409,8 @@ addSearchPathAttributes( string $render_pass )
 
   if( !attributeExists( "proceduralPath", $render_pass ) )
   {
-    addAttr 
-      -longName proceduralPath 
+    addAttr
+      -longName proceduralPath
       -dataType "string"
       $render_pass;
     setAttr ($render_pass + ".proceduralPath") -type "string" "@";
@@ -2418,8 +2418,8 @@ addSearchPathAttributes( string $render_pass )
 
   if( !attributeExists( "texturePath", $render_pass ) )
   {
-    addAttr 
-      -longName texturePath 
+    addAttr
+      -longName texturePath
       -dataType "string"
       $render_pass;
     setAttr ($render_pass + ".texturePath") -type "string" "@";
@@ -2427,8 +2427,8 @@ addSearchPathAttributes( string $render_pass )
 
   if( !attributeExists( "archivePath", $render_pass ) )
   {
-    addAttr 
-      -longName archivePath 
+    addAttr
+      -longName archivePath
       -dataType "string"
       $render_pass;
     setAttr ($render_pass + ".archivePath") -type "string" "@";
@@ -2440,30 +2440,30 @@ addCommonMiscOptions( string $render_pass )
 {
   if( !attributeExists( "gridSize", $render_pass ) )
   {
-    addAttr 
-      -longName gridSize 
-      -attributeType long 
-      -min 16 
+    addAttr
+      -longName gridSize
+      -attributeType long
+      -min 16
       -defaultValue 256
       $render_pass;
   }
 
   if( !attributeExists( "textureMemory", $render_pass ) )
   {
-    addAttr 
-      -longName textureMemory 
-      -attributeType long 
-      -min 128 
+    addAttr
+      -longName textureMemory
+      -attributeType long
+      -min 128
       -defaultValue 32768
       $render_pass;
   }
 
   if( !attributeExists( "eyeSplits", $render_pass ) )
   {
-    addAttr 
-      -longName eyeSplits 
-      -attributeType long 
-      -min 0 
+    addAttr
+      -longName eyeSplits
+      -attributeType long
+      -min 0
       -defaultValue 10
       $render_pass;
   }
@@ -2474,43 +2474,43 @@ addDisplaysAttributes(string $render_pass)
 {
   if (!objExists($render_pass + ".displayRenderables"))
   {
-    addAttr 
-      -longName "displayRenderables" 
-      -multi 
-      -attributeType "bool" 
+    addAttr
+      -longName "displayRenderables"
+      -multi
+      -attributeType "bool"
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayFilenames"))
   {
-    addAttr 
+    addAttr
       -longName displayFilenames
-      -multi 
+      -multi
       -dataType "string"
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayDrivers"))
   {
-    addAttr 
+    addAttr
       -longName displayDrivers
-      -multi 
+      -multi
       -dataType "string"
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayOutputVariables"))
   {
-    addAttr 
-      -longName displayOutputVariables 
-      -multi 
+    addAttr
+      -longName displayOutputVariables
+      -multi
       -dataType "string"
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayOverridePixelFilters"))
   {
-    addAttr 
+    addAttr
       -longName displayOverridePixelFilters
       -multi
       -attributeType bool
@@ -2524,10 +2524,10 @@ addDisplaysAttributes(string $render_pass)
     DRP_getAllPixelFiltersForEnum(),
     1,
     5);
-    
+
   if (!objExists($render_pass + ".displayFilterWidthsX"))
   {
-    addAttr 
+    addAttr
       -longName displayFilterWidthsX
       -multi
       -attributeType "float"
@@ -2538,7 +2538,7 @@ addDisplaysAttributes(string $render_pass)
 
   if (!objExists($render_pass + ".displayFilterWidthsY"))
   {
-    addAttr 
+    addAttr
       -longName displayFilterWidthsY
       -multi
       -attributeType "float"
@@ -2555,76 +2555,76 @@ addDisplaysAttributes(string $render_pass)
     0);
 
   // SubsetSets message attr needs to be a per-display multi since it may have
-  // multiple incoming connections for each display. It is created in the 
+  // multiple incoming connections for each display. It is created in the
   // addDisplay procedure.
   //
-  
+
   if (!objExists($render_pass + ".displayQuantizeZeros"))
   {
-    addAttr 
-      -longName displayQuantizeZeros 
-      -multi 
-      -attributeType long 
+    addAttr
+      -longName displayQuantizeZeros
+      -multi
+      -attributeType long
       -defaultValue 0
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayQuantizeOnes"))
   {
-    addAttr 
-      -longName displayQuantizeOnes 
-      -multi 
-      -attributeType long 
+    addAttr
+      -longName displayQuantizeOnes
+      -multi
+      -attributeType long
       -defaultValue 255
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayQuantizeMins"))
   {
-    addAttr 
-      -longName displayQuantizeMins 
-      -multi 
-      -attributeType long 
+    addAttr
+      -longName displayQuantizeMins
+      -multi
+      -attributeType long
       -defaultValue 0
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayQuantizeMaxs"))
   {
-    addAttr 
-      -longName displayQuantizeMaxs 
-      -multi 
-      -attributeType long 
+    addAttr
+      -longName displayQuantizeMaxs
+      -multi
+      -attributeType long
       -defaultValue 255
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayQuantizeDithers"))
   {
-    addAttr 
-      -longName displayQuantizeDithers 
-      -multi 
-      -attributeType "float" 
+    addAttr
+      -longName displayQuantizeDithers
+      -multi
+      -attributeType "float"
       -defaultValue 0.5
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayGains"))
   {
-    addAttr 
-      -longName displayGains 
-      -multi 
-      -attributeType "float" 
+    addAttr
+      -longName displayGains
+      -multi
+      -attributeType "float"
       -defaultValue 1.0
       $render_pass;
   }
 
   if (!objExists($render_pass + ".displayGammas"))
   {
-    addAttr 
+    addAttr
       -longName displayGammas
-      -multi 
-      -attributeType "float" 
+      -multi
+      -attributeType "float"
       -defaultValue 1.0
       $render_pass;
   }
@@ -2704,7 +2704,7 @@ addDisplaysAttributes(string $render_pass)
       -uac
       -at "float3"
       $render_pass;
-      
+
     addAttr
       -longName displayEdgeColorsR
       -parent displayEdgeColors
@@ -2738,7 +2738,7 @@ addDisplaysAttributes(string $render_pass)
     "Pixels:% Of Frame Width",
     1,
     0);
-    
+
   if (!objExists($render_pass + ".displayEdgeDepthEnables"))
   {
     addAttr
@@ -2771,7 +2771,7 @@ addDisplaysAttributes(string $render_pass)
       -multi
       $render_pass;
   }
-  
+
   if (!objExists($render_pass + ".displayFrameCollapseStates"))
   {
     addAttr
@@ -2801,7 +2801,7 @@ addDisplaysAttributes(string $render_pass)
       -hidden true
       $render_pass;
   }
-  
+
   if (!objExists($render_pass + ".displaysAdvanceCollapseString"))
   {
     addAttr
@@ -2816,17 +2816,17 @@ addDisplaysAttributes(string $render_pass)
 proc
 copyDisplayAttr(
   string $render_pass,
-  string $old_attr, 
+  string $old_attr,
   string $new_attr,
   int $delete_src_after_copy)
 {
   string $old_plug = $render_pass + "." + $old_attr;
   string $new_plug = $render_pass + "." + $new_attr;
-  
+
   if (objExists($old_plug))
   {
     DL_copyAttribute($old_plug, $new_plug);
-    
+
     if ($delete_src_after_copy)
       deleteAttr $old_plug;
   }
@@ -2840,7 +2840,7 @@ updateDisplayAttributes(string $render_pass)
   if (objExists($render_pass + ".imageFilename"))
   {
     int $index = DRP_addDisplay($render_pass);
-    
+
     string $src = "imageFilename";
     string $dst = "displayFilenames[" + $index + "]";
     copyDisplayAttr($render_pass, $src, $dst, 1);
@@ -2850,12 +2850,12 @@ updateDisplayAttributes(string $render_pass)
     if (objExists($render_pass + "." + $src))
     {
       int $old_driver = getAttr($render_pass + "." + $src);
-        
+
       setAttr
         -type "string"
         ($render_pass + "." + $dst)
         $display_drivers[$old_driver];
-        
+
       deleteAttr ($render_pass + ".displayDriver");
     }
 
@@ -2866,23 +2866,23 @@ updateDisplayAttributes(string $render_pass)
     if (objExists($render_pass + ".bitDepth"))
     {
       string $old_bit_depth = `getAttr -asString ($render_pass + ".bitDepth")`;
-      
+
       switch($old_bit_depth)
       {
         case "16 bit integer":
           DRP_setDisplayQuantizeAttrs(
-            $render_pass, 
-            $index, 
+            $render_pass,
+            $index,
             0, 65535, 0, 65535, 0.5);
           break;
 
         case "32 bit float":
           DRP_setDisplayQuantizeAttrs(
-            $render_pass, 
-            $index, 
+            $render_pass,
+            $index,
             0, 0, 0, 0, 0);
           break;
-        
+
         case "Custom Quantize":
           DRP_setDisplayQuantizeAttrs(
             $render_pass,
@@ -2893,16 +2893,16 @@ updateDisplayAttributes(string $render_pass)
             getAttr($render_pass + ".quantizeMax"),
             getAttr($render_pass + ".quantizeDither"));
           break;
-          
+
         case "8 bit integer":
         default:
           DRP_setDisplayQuantizeAttrs(
-            $render_pass, 
-            $index, 
+            $render_pass,
+            $index,
             0, 255, 0, 255, 0.5);
           break;
       }
-      
+
       deleteAttr ($render_pass + ".quantizeZero");
       deleteAttr ($render_pass + ".quantizeOne");
       deleteAttr ($render_pass + ".quantizeMin");
@@ -2918,7 +2918,7 @@ updateDisplayAttributes(string $render_pass)
     $src = "gamma";
     $dst = "displayGammas[" + $index + "]";
     copyDisplayAttr($render_pass, $src, $dst, 1);
-    
+
     $src = "renderPrimaryDisplay";
     $dst = "displayRenderables[" + $index + "]";
     copyDisplayAttr($render_pass, $src, $dst, 1);
@@ -2926,7 +2926,7 @@ updateDisplayAttributes(string $render_pass)
 
   if (objExists($render_pass + ".secondaryFilenames"))
   {
-    int $old_indices[] = 
+    int $old_indices[] =
       getMultiAttribElementIndices($render_pass + ".secondaryFilenames");
 
     int $i;
@@ -2934,7 +2934,7 @@ updateDisplayAttributes(string $render_pass)
     {
       int $do_delete = ($i == (size($old_indices) - 1));
       int $curr_index = $old_indices[$i];
-      
+
       int $index = DRP_addDisplay($render_pass);
 
       string $src = "secondaryFilenames[" + $curr_index + "]";
@@ -2948,10 +2948,10 @@ updateDisplayAttributes(string $render_pass)
         int $old_driver = getAttr($render_pass + "." + $src);
 
         setAttr
-          -type "string" 
+          -type "string"
           ($render_pass + "." + $dst)
           $display_drivers[$old_driver];
-      
+
         if ($do_delete)
           deleteAttr ($render_pass + ".secondaryDisplayDrivers");
       }
@@ -2975,28 +2975,28 @@ updateDisplayAttributes(string $render_pass)
       $src = "secondaryFilterWidthsY[" + $curr_index + "]";
       $dst = "displayFilterWidthsY[" + $index + "]";
       copyDisplayAttr($render_pass, $src, $dst, $do_delete);
-     
+
       $src = "secondaryBitDepths[" + $curr_index + "]";
       if (objExists($render_pass + "." + $src))
       {
         string $old_bit_depth = `getAttr -asString ($render_pass + "." + $src)`;
-        
+
         switch($old_bit_depth)
         {
           case "16 bit integer":
             DRP_setDisplayQuantizeAttrs(
-              $render_pass, 
-              $index, 
+              $render_pass,
+              $index,
               0, 65535, 0, 65535, 0.5);
             break;
 
           case "32 bit float":
             DRP_setDisplayQuantizeAttrs(
-              $render_pass, 
-              $index, 
+              $render_pass,
+              $index,
               0, 0, 0, 0, 0.5);
             break;
-          
+
           case "Custom Quantize":
             DRP_setDisplayQuantizeAttrs(
               $render_pass,
@@ -3007,16 +3007,16 @@ updateDisplayAttributes(string $render_pass)
               getAttr($render_pass + ".secondaryQuantizeMaxes[" + $curr_index + "]"),
               getAttr($render_pass + ".secondaryQuantizeDithers[" + $curr_index + "]"));
             break;
-            
+
           case "8 bit integer":
           default:
             DRP_setDisplayQuantizeAttrs(
-              $render_pass, 
+              $render_pass,
               $index,
               0, 255, 0, 255, 0.5);
             break;
         }
-      
+
         if ($do_delete)
         {
           deleteAttr ($render_pass + ".secondaryBitDepths");
@@ -3031,7 +3031,7 @@ updateDisplayAttributes(string $render_pass)
       $src = "secondaryGains[" + $curr_index + "]";
       $dst = "displayGains[" + $index + "]";
       copyDisplayAttr($render_pass, $src, $dst, $do_delete);
-     
+
       $src = "secondaryGammas[" + $curr_index + "]";
       $dst = "displayGammas[" + $index + "]";
       copyDisplayAttr($render_pass, $src, $dst, $do_delete);
@@ -3076,14 +3076,14 @@ updateDisplayAttributes(string $render_pass)
       // its children. So we simply do a get / set attr.
       //
       $src = "secondaryEdgeColors[" + $curr_index + "]";
-      $dst = "displayEdgeColors[" + $index + "]";      
+      $dst = "displayEdgeColors[" + $index + "]";
       if (objExists($render_pass + "." + $src))
       {
         float $edge_color[] = `getAttr ($render_pass + "." + $src)`;
         setAttr ($render_pass + "." + $dst + ".displayEdgeColorsR") $edge_color[0];
         setAttr ($render_pass + "." + $dst + ".displayEdgeColorsG") $edge_color[1];
         setAttr ($render_pass + "." + $dst + ".displayEdgeColorsB") $edge_color[2];
-        
+
         if ($do_delete)
           deleteAttr ($render_pass + ".secondaryEdgeColors");
       }
@@ -3111,7 +3111,7 @@ updateDisplayAttributes(string $render_pass)
       $src = "secondaryEdgeDepthMinFilters[" + $curr_index + "]";
       $dst = "displayEdgeDepthMinFilters[" + $index + "]";
       copyDisplayAttr($render_pass, $src, $dst, $do_delete);
-    }  
+    }
   }
 }
 
@@ -3120,7 +3120,7 @@ DL_createRenderPassNode()
 {
   string  $new_node;
   string  $display_driver_enum;
-  
+
   if (`getApplicationVersionAsFloat` >= 8.0)
   {
     $new_node = `createNode -skipSelect delightRenderPass`;
@@ -3156,16 +3156,16 @@ DRP_init(string $render_pass, int $update_node)
 {
   if( !attributeExists( "connectToRenderGlobals", $render_pass ) )
   {
-    addAttr 
+    addAttr
       -longName connectToRenderGlobals
       -attributeType bool
       -defaultValue ($update_node == 1 ? 0 : 1)
       $render_pass;
   }
-  
-  // Each render pass is associated with a single shader collection. 
-  // A connection between delightShaderCollection.pass and 
-  // delightRenderPass.shaderCollection indicates that the shader collection 
+
+  // Each render pass is associated with a single shader collection.
+  // A connection between delightShaderCollection.pass and
+  // delightRenderPass.shaderCollection indicates that the shader collection
   // is associated with the pass.
   //
 
@@ -3182,43 +3182,43 @@ DRP_init(string $render_pass, int $update_node)
 
   if( !attributeExists( "camera", $render_pass ) )
   {
-    addAttr 
-      -longName camera 
+    addAttr
+      -longName camera
       -attributeType message
       $render_pass;
   }
 
   if( !attributeExists( "resolution", $render_pass ) )
   {
-    addAttr 
-      -longName resolution 
+    addAttr
+      -longName resolution
       -attributeType long2
       $render_pass;
 
-      addAttr 
-        -longName resolutionX 
-        -attributeType long 
-        -min 0 
-        -defaultValue 720 
+      addAttr
+        -longName resolutionX
+        -attributeType long
+        -min 0
+        -defaultValue 720
         -parent resolution
         $render_pass;
 
-      addAttr 
-        -longName resolutionY 
-        -attributeType long 
-        -min 0 
-        -defaultValue 486 
+      addAttr
+        -longName resolutionY
+        -attributeType long
+        -min 0
+        -defaultValue 486
         -parent resolution
         $render_pass;
   }
 
   DL_updateEnumAttr(
-    $render_pass, 
-    "resolutionMultiplier", 
+    $render_pass,
+    "resolutionMultiplier",
     "Full:Half:Quarter:Eighth",
     0,
     0);
-		
+
   if( !attributeExists( "pixelAspectRatio", $render_pass ) )
   {
     addAttr
@@ -3240,34 +3240,34 @@ DRP_init(string $render_pass, int $update_node)
 
   if( !attributeExists( "pixelSamples", $render_pass ) )
   {
-    addAttr 
-      -longName pixelSamples 
+    addAttr
+      -longName pixelSamples
       -attributeType long2
       $render_pass;
 
-      addAttr 
-        -longName pixelSamplesX 
-        -attributeType long 
-        -min 1 
-        -defaultValue 3 
+      addAttr
+        -longName pixelSamplesX
+        -attributeType long
+        -min 1
+        -defaultValue 3
         -parent pixelSamples
         $render_pass;
 
-      addAttr 
-        -longName pixelSamplesY 
-        -attributeType long 
-        -min 1 
-        -defaultValue 3 
+      addAttr
+        -longName pixelSamplesY
+        -attributeType long
+        -min 1
+        -defaultValue 3
         -parent pixelSamples
         $render_pass;
   }
 
   if( !attributeExists( "shadingRate", $render_pass ) )
   {
-    addAttr 
-      -longName shadingRate 
-      -attributeType "float" 
-      -min 0.001 
+    addAttr
+      -longName shadingRate
+      -attributeType "float"
+      -min 0.001
       -defaultValue 1
       $render_pass;
   }
@@ -3278,27 +3278,27 @@ DRP_init(string $render_pass, int $update_node)
     "box:triangle:gaussian:catmull-rom:bessel:sinc:mitchell:zmin:zmax",
     0,
     5);
-		
+
   if( !attributeExists( "filterWidth", $render_pass ) )
   {
-    addAttr 
+    addAttr
       -longName filterWidth
       -attributeType float2
       $render_pass;
 
-      addAttr 
+      addAttr
         -longName filterWidthX
-        -attributeType "float" 
-        -min 0.001 
-        -defaultValue 4 
+        -attributeType "float"
+        -min 0.001
+        -defaultValue 4
         -parent filterWidth
         $render_pass;
 
-      addAttr 
+      addAttr
         -longName filterWidthY
-        -attributeType "float" 
-        -min 0.001 
-        -defaultValue 4 
+        -attributeType "float"
+        -min 0.001
+        -defaultValue 4
         -parent filterWidth
         $render_pass;
   }
@@ -3310,80 +3310,80 @@ DRP_init(string $render_pass, int $update_node)
       -attributeType long2
       $render_pass;
 
-      addAttr 
+      addAttr
         -longName bucketSizeX
-        -attributeType long 
-        -min 2 
-        -defaultValue 16 
+        -attributeType long
+        -min 2
+        -defaultValue 16
         -parent bucketSize
         $render_pass;
 
-      addAttr   
+      addAttr
         -longName bucketSizeY
-        -attributeType long 
-        -min 2 
-        -defaultValue 16 
+        -attributeType long
+        -min 2
+        -defaultValue 16
         -parent bucketSize
         $render_pass;
   }
 
   if( !attributeExists( "useCropWindow", $render_pass ) )
   {
-    addAttr 
-      -longName useCropWindow 
-      -attributeType bool 
+    addAttr
+      -longName useCropWindow
+      -attributeType bool
       -defaultValue 0
       $render_pass;
   }
 
   if( !attributeExists( "cropMin", $render_pass ) )
   {
-    addAttr 
-      -longName cropMin 
+    addAttr
+      -longName cropMin
       -attributeType float2
       $render_pass;
 
-      addAttr 
-        -longName cropMinX 
-        -attributeType "float" 
-        -min 0 
-        -max 1 
-        -defaultValue 0 
+      addAttr
+        -longName cropMinX
+        -attributeType "float"
+        -min 0
+        -max 1
+        -defaultValue 0
         -parent cropMin
         $render_pass;
 
-      addAttr 
-        -longName cropMinY 
-        -attributeType "float" 
-        -min 0 
-        -max 1 
-        -defaultValue 0 
+      addAttr
+        -longName cropMinY
+        -attributeType "float"
+        -min 0
+        -max 1
+        -defaultValue 0
         -parent cropMin
         $render_pass;
   }
 
   if( !attributeExists( "cropMax", $render_pass ) )
   {
-    addAttr 
-      -longName cropMax 
+    addAttr
+      -longName cropMax
       -attributeType float2
       $render_pass;
 
-      addAttr 
-        -longName cropMaxX 
-        -attributeType "float" 
-        -min 0 
-        -max 1 
-        -defaultValue 1 
+      addAttr
+        -longName cropMaxX
+        -attributeType "float"
+        -min 0
+        -max 1
+        -defaultValue 1
         -parent cropMax
         $render_pass;
 
-      addAttr 
-        -longName cropMaxY 
-        -attributeType "float" 
-        -min 0 
-        -max 1 
-        -defaultValue 1 
+      addAttr
+        -longName cropMaxY
+        -attributeType "float"
+        -min 0
+        -max 1
+        -defaultValue 1
         -parent cropMax
         $render_pass;
   }
@@ -3394,7 +3394,7 @@ DRP_init(string $render_pass, int $update_node)
     "horizontal:vertical:zigzag:spiral:circle",
     0,
     0);
-		
+
   addMELscriptAttribs( $render_pass );
 
   if( !attributeExists( "layerToRender", $render_pass ) )
@@ -3407,24 +3407,24 @@ DRP_init(string $render_pass, int $update_node)
 
   if( !attributeExists( "postOptionMEL", $render_pass ) )
   {
-    addAttr 
-      -longName postOptionMEL 
+    addAttr
+      -longName postOptionMEL
       -dataType "string"
       $render_pass;
   }
 
   if( !attributeExists( "preWorldMEL", $render_pass ) )
   {
-    addAttr 
-      -longName preWorldMEL 
+    addAttr
+      -longName preWorldMEL
       -dataType "string"
       $render_pass;
   }
 
   if( !attributeExists( "postWorldMEL", $render_pass ) )
   {
-    addAttr 
-      -longName postWorldMEL 
+    addAttr
+      -longName postWorldMEL
       -dataType "string"
       $render_pass;
   }
@@ -3441,78 +3441,78 @@ DRP_init(string $render_pass, int $update_node)
 
   if( !attributeExists( "useImagerShaders", $render_pass ) )
   {
-    addAttr 
-      -longName useImagerShaders 
-      -attributeType bool 
+    addAttr
+      -longName useImagerShaders
+      -attributeType bool
       -defaultValue 1
       $render_pass;
   }
 
   if( !attributeExists( "opacityThreshold", $render_pass ) )
   {
-    addAttr 
-      -longName opacityThreshold 
+    addAttr
+      -longName opacityThreshold
       -attributeType "float3"
       $render_pass;
 
-      addAttr 
-        -longName "opacityThresholdR" 
-        -attributeType "float" 
-        -defaultValue 0.99608 
+      addAttr
+        -longName "opacityThresholdR"
+        -attributeType "float"
+        -defaultValue 0.99608
         -p opacityThreshold
         $render_pass;
 
-      addAttr 
-        -longName "opacityThresholdG" 
-        -attributeType "float" 
-        -defaultValue 0.99608 
+      addAttr
+        -longName "opacityThresholdG"
+        -attributeType "float"
+        -defaultValue 0.99608
         -p opacityThreshold
         $render_pass;
 
-      addAttr 
-        -longName "opacityThresholdB" 
-        -attributeType "float" 
-        -defaultValue 0.99608 
+      addAttr
+        -longName "opacityThresholdB"
+        -attributeType "float"
+        -defaultValue 0.99608
         -p opacityThreshold
         $render_pass;
   }
 
   if( !attributeExists( "zThreshold", $render_pass ) )
   {
-    addAttr 
-      -longName zThreshold 
+    addAttr
+      -longName zThreshold
       -attributeType "float3"
       $render_pass;
 
-      addAttr 
-        -longName "zThresholdR" 
-        -attributeType "float" 
-        -defaultValue 1 
+      addAttr
+        -longName "zThresholdR"
+        -attributeType "float"
+        -defaultValue 1
         -parent zThreshold
         $render_pass;
 
-      addAttr 
-        -longName "zThresholdG" 
-        -attributeType "float" 
-        -defaultValue 1 
+      addAttr
+        -longName "zThresholdG"
+        -attributeType "float"
+        -defaultValue 1
         -parent zThreshold
         $render_pass;
 
-      addAttr 
-        -longName "zThresholdB" 
-        -attributeType "float" 
-        -defaultValue 1 
+      addAttr
+        -longName "zThresholdB"
+        -attributeType "float"
+        -defaultValue 1
         -parent zThreshold
         $render_pass;
   }
 
   if( !attributeExists( "raytraceMaxDepth", $render_pass ) )
   {
-    addAttr 
-      -longName raytraceMaxDepth 
-      -attributeType long 
-      -min 0 
-      -softMaxValue 16 
+    addAttr
+      -longName raytraceMaxDepth
+      -attributeType long
+      -min 0
+      -softMaxValue 16
       -defaultValue 1
       $render_pass;
   }
@@ -3520,7 +3520,7 @@ DRP_init(string $render_pass, int $update_node)
   addObjectSetAttributes( $render_pass );
 
   addDisplaysAttributes($render_pass);
-  
+
   // If the ancient "imageFilename" attribute exists, we need to update the node
   // to the more recent disoplay attributes.
   //
@@ -3529,48 +3529,48 @@ DRP_init(string $render_pass, int $update_node)
 
   if( size(DRP_getDisplayIndices($render_pass)) == 0 )
     DRP_addDisplay($render_pass);
-  
+
   if( !attributeExists( "renderSecondaryDisplays", $render_pass ) )
   {
-    addAttr 
-      -longName renderSecondaryDisplays 
-      -attributeType bool 
+    addAttr
+      -longName renderSecondaryDisplays
+      -attributeType bool
       -defaultValue 1
       $render_pass;
   }
 
   if( !attributeExists( "renderShadowMaps", $render_pass ) )
   {
-    addAttr 
-      -longName renderShadowMaps 
-      -attributeType bool 
+    addAttr
+      -longName renderShadowMaps
+      -attributeType bool
       -defaultValue 1
       $render_pass;
   }
 
   if( !attributeExists( "fragmentObjectSets", $render_pass ) )
   {
-    addAttr 
-      -longName fragmentObjectSets 
-      -multi 
+    addAttr
+      -longName fragmentObjectSets
+      -multi
       -attributeType message
       $render_pass;
   }
 
   if( !attributeExists( "fragmentFilenames", $render_pass ) )
   {
-    addAttr 
-      -longName fragmentFilenames 
-      -multi 
+    addAttr
+      -longName fragmentFilenames
+      -multi
       -dataType "string"
       $render_pass;
   }
 
   if( !attributeExists( "fragmentUseStates", $render_pass ) )
   {
-    addAttr 
-      -longName fragmentUseStates 
-      -multi 
+    addAttr
+      -longName fragmentUseStates
+      -multi
       -attributeType bool
       -defaultValue 1
       $render_pass;
@@ -3578,9 +3578,9 @@ DRP_init(string $render_pass, int $update_node)
 
   if( !attributeExists( "fragmentWriteStates", $render_pass ) )
   {
-    addAttr 
-      -longName fragmentWriteStates 
-      -multi 
+    addAttr
+      -longName fragmentWriteStates
+      -multi
       -attributeType bool
       -defaultValue 1
       $render_pass;
@@ -3588,8 +3588,8 @@ DRP_init(string $render_pass, int $update_node)
 
   if( !attributeExists( "fragmentBinaryRib", $render_pass ) )
   {
-    addAttr 
-      -longName fragmentBinaryRib 
+    addAttr
+      -longName fragmentBinaryRib
       -attributeType bool
       -defaultValue 0
       $render_pass;
@@ -3597,7 +3597,7 @@ DRP_init(string $render_pass, int $update_node)
 
   if( !attributeExists( "fragmentCompressedRib", $render_pass ) )
   {
-    addAttr 
+    addAttr
       -longName fragmentCompressedRib
       -attributeType bool
       -defaultValue 0
@@ -3616,9 +3616,9 @@ DRP_init(string $render_pass, int $update_node)
 
   if( !attributeExists( "fragmentCollapseStates", $render_pass ) )
   {
-    addAttr 
-      -longName fragmentCollapseStates 
-      -multi 
+    addAttr
+      -longName fragmentCollapseStates
+      -multi
       -attributeType bool
       -hidden true
       -defaultValue 0
@@ -3627,125 +3627,125 @@ DRP_init(string $render_pass, int $update_node)
 
   if( !attributeExists( "numberOfCPUs", $render_pass ) )
   {
-    addAttr 
-      -longName numberOfCPUs 
-      -attributeType long 
+    addAttr
+      -longName numberOfCPUs
+      -attributeType long
       -defaultValue 0
       $render_pass;
   }
 
   if( !attributeExists( "useDisplacementShadersInShadows", $render_pass ) )
   {
-    addAttr 
-      -longName useDisplacementShadersInShadows 
-      -attributeType bool 
+    addAttr
+      -longName useDisplacementShadersInShadows
+      -attributeType bool
       -defaultValue 1
       $render_pass;
   }
 
   if( !attributeExists( "useSurfaceShadersInShadows", $render_pass ) )
   {
-    addAttr 
-      -longName useSurfaceShadersInShadows 
-      -attributeType bool 
+    addAttr
+      -longName useSurfaceShadersInShadows
+      -attributeType bool
       -defaultValue 0
       $render_pass;
   }
 
   if( !attributeExists( "useAtmosphereShadersInShadows", $render_pass ) )
   {
-    addAttr 
-      -longName useAtmosphereShadersInShadows 
-      -attributeType bool 
+    addAttr
+      -longName useAtmosphereShadersInShadows
+      -attributeType bool
       -defaultValue 0
       $render_pass;
   }
 
   if( !attributeExists( "useInteriorShadersInShadows", $render_pass ) )
   {
-    addAttr 
-      -longName useInteriorShadersInShadows 
-      -attributeType bool 
+    addAttr
+      -longName useInteriorShadersInShadows
+      -attributeType bool
       -defaultValue 0
       $render_pass;
   }
 
   if( !attributeExists( "translateMayaShaders", $render_pass ) )
   {
-    addAttr 
-      -longName translateMayaShaders 
-      -attributeType bool 
+    addAttr
+      -longName translateMayaShaders
+      -attributeType bool
       -defaultValue 1
       $render_pass;
   }
 
   if( !attributeExists( "useMayaShaders", $render_pass ) )
   {
-    addAttr 
-      -longName useMayaShaders 
-      -attributeType bool 
+    addAttr
+      -longName useMayaShaders
+      -attributeType bool
       -defaultValue 1
       $render_pass;
   }
 
   if( !attributeExists( "concatenateGeoTransforms", $render_pass ) )
   {
-    addAttr 
-      -longName concatenateGeoTransforms 
-      -attributeType bool 
+    addAttr
+      -longName concatenateGeoTransforms
+      -attributeType bool
       -defaultValue 1
       $render_pass;
   }
 
   if( !attributeExists( "concatenateLightTransforms", $render_pass ) )
   {
-    addAttr 
-      -longName concatenateLightTransforms 
-      -attributeType bool 
+    addAttr
+      -longName concatenateLightTransforms
+      -attributeType bool
       -defaultValue 1
       $render_pass;
   }
-  
+
   if( !attributeExists( "standardAtmosphere", $render_pass ) )
   {
-    addAttr 
-      -longName standardAtmosphere 
-      -attributeType bool 
+    addAttr
+      -longName standardAtmosphere
+      -attributeType bool
       -defaultValue 0
       $render_pass;
   }
 
   if( !attributeExists( "volumeShadingRate", $render_pass ) )
   {
-    addAttr 
+    addAttr
       -longName volumeShadingRate
-      -attributeType "float" 
-      -min 0.001 
+      -attributeType "float"
+      -min 0.001
       -defaultValue 1
       $render_pass;
   }
 
   DL_updateEnumAttr(
-    $render_pass, 
-    "hider", 
+    $render_pass,
+    "hider",
     "hidden:raytrace:photon",
     0,
     0);
-    
+
   if( !attributeExists( "translatedShadersAOVs", $render_pass ) )
   {
-    addAttr 
-      -longName "translatedShadersAOVs" 
-      -attributeType "enum" 
-      -en "Default AOVs for Render Mode:Defined AOVs Only:All AOVs" 
-      -defaultValue 0 
+    addAttr
+      -longName "translatedShadersAOVs"
+      -attributeType "enum"
+      -en "Default AOVs for Render Mode:Defined AOVs Only:All AOVs"
+      -defaultValue 0
       $render_pass;
   }
-  
+
   if (!objExists($render_pass + ".depthFilter"))
   {
     addAttr -ln "depthFilter"
-            -at "enum" 
+            -at "enum"
             -en "min:max:average:midpoint"
             -dv 0
             $render_pass;
@@ -3753,7 +3753,7 @@ DRP_init(string $render_pass, int $update_node)
 
   if (!objExists($render_pass + ".volumeInterpretation"))
   {
-    addAttr 
+    addAttr
       -ln "volumeInterpretation"
       -at "enum"
       -en "Discrete:Continuous:Distance Inside"
@@ -3767,40 +3767,40 @@ DRP_init(string $render_pass, int $update_node)
 global proc int
 DRP_addDisplay(string $render_pass)
 {
-  // Adds a new display to the pass, initialize it with default values and 
+  // Adds a new display to the pass, initialize it with default values and
   // return its index in the various display multi attributes.
   //
   int $index = getNextMultiAttribElementIndex($render_pass + ".displayFilenames");
-  
+
   if (!objExists($render_pass + ".displaySubsetSets_" + $index))
   {
-    addAttr 
+    addAttr
       -longName ("displaySubsetSets_" + $index)
-      -multi 
+      -multi
       -indexMatters false
-      -attributeType message 
+      -attributeType message
       $render_pass;
   }
 
   setAttr ($render_pass + ".displayRenderables[" + $index + "]") true;
- 
-  setAttr 
-    ($render_pass + ".displayFilenames[" + $index + "]") 
-    -type "string" 
+
+  setAttr
+    ($render_pass + ".displayFilenames[" + $index + "]")
+    -type "string"
     "3delight/<scene>/image/<scene>_<pass>.<ext>";
 
-  setAttr 
+  setAttr
     -type "string"
     ($render_pass + ".displayDrivers[" + $index + "]")
     "idisplay";
-  
-  setAttr 
+
+  setAttr
     ($render_pass + ".displayOutputVariables [" + $index + "]")
     -type "string"
     "rgba";
 
   setAttr ($render_pass + ".displayOverridePixelFilters[" + $index + "]") 0;
-  
+
   // default filter is sinc 4x4
   setAttr ($render_pass + ".displayPixelFilters[" + $index + "]") 5;
 
@@ -3827,21 +3827,21 @@ DRP_addDisplay(string $render_pass)
 
   // No edge detection but put sensible values in case the used enables it.
   setAttr ($render_pass + ".displayEdgeEnables[" + $index + "]") 0;
-  setAttr 
-    ($render_pass + ".displayEdgeVarNames[" + $index + "]") 
-    -type "string" 
+  setAttr
+    ($render_pass + ".displayEdgeVarNames[" + $index + "]")
+    -type "string"
     "Ci";
   setAttr ($render_pass + ".displayEdgeThresholds[" + $index + "]") 0.1;
-  setAttr 
-    ($render_pass + ".displayEdgeColors[" + $index + "]") 
-    -type float3 
+  setAttr
+    ($render_pass + ".displayEdgeColors[" + $index + "]")
+    -type float3
     1 1 1;
   setAttr ($render_pass + ".displayEdgeFilterWidths[" + $index + "]") 2;
   setAttr ($render_pass + ".displayEdgeDepthEnables[" + $index + "]") 0;
   setAttr ($render_pass + ".displayEdgeDepthZMins[" + $index + "]") 0;
   setAttr ($render_pass + ".displayEdgeDepthZMaxs[" + $index + "]") 1000;
   setAttr ($render_pass + ".displayEdgeDepthMinFilters[" + $index + "]") 1;
-  
+
   setAttr ($render_pass + ".displayFrameCollapseStates[" + $index + "]") false;
   setAttr ($render_pass + ".displayAdvancedFrameCollapseStates[" + $index + "]") true;
   setAttr ($render_pass + ".displayEdgeFrameCollapseStates[" + $index + "]") true;
@@ -3889,16 +3889,16 @@ DRP_removeDisplay(string $render_pass, int $display_index)
 
   deleteAttr ($render_pass + ".displaySubsetSets_" + $display_index);
 
-  removeMultiInstance 
-    -b true 
+  removeMultiInstance
+    -b true
     ($render_pass + ".displayFrameCollapseStates[" + $display_index + "]");
-  removeMultiInstance 
-    -b true 
+  removeMultiInstance
+    -b true
     ($render_pass + ".displayAdvancedFrameCollapseStates[" + $display_index + "]");
-  removeMultiInstance 
-    -b true 
+  removeMultiInstance
+    -b true
     ($render_pass + ".displayEdgeFrameCollapseStates[" + $display_index + "]");
-    
+
   DRP_setDisplayAdvancedCollapseState(1, $render_pass, $display_index);
 }
 
@@ -3906,7 +3906,7 @@ global proc
 DRP_duplicateDisplay(string $render_pass, int $src_index)
 {
   int $dst_index = DRP_addDisplay($render_pass);
-  
+
   string $attrs[];
   clear($attrs);
   $attrs[size($attrs)] = "displayRenderables";
@@ -3941,16 +3941,16 @@ DRP_duplicateDisplay(string $render_pass, int $src_index)
   for($curr_attr in $attrs)
   {
     copyDisplayAttr(
-      $render_pass, 
+      $render_pass,
       ($curr_attr + "[" + $src_index + "]"),
       ($curr_attr + "[" + $dst_index + "]"),
       0);
   }
-  
+
   copyDisplayAttr(
-    $render_pass, 
-    ("displaySubsetSets_" + $src_index), 
-    ("displaySubsetSets_" + $dst_index), 
+    $render_pass,
+    ("displaySubsetSets_" + $src_index),
+    ("displaySubsetSets_" + $dst_index),
     0);
 
   copyDisplayAttr(
@@ -4296,8 +4296,8 @@ proc string[]
 getAllSetMemberships(string $object_name)
 {
   //
-  // Description: 
-  //  Returns a list of the sets that the given shape and all of its parents 
+  // Description:
+  //  Returns a list of the sets that the given shape and all of its parents
   //  are a member of.  The specified name must be the full path of the shape.
   //
   return `delightListUserSets -containingShape $object_name`;
@@ -4317,11 +4317,11 @@ getLinkedLights(string $geo_name,
   // attribs node.
   //
   $attribs_node = DL_highestNodeWithAttrib(
-    "illuminationFrom", 
+    "illuminationFrom",
     $all_attribs_nodes);
 
   $use_light_linker = 1;
-  
+
   if ($attribs_node != "")
   {
     string $illumination_from_set = DGA_getIlluminationFromSet($attribs_node);
@@ -4336,18 +4336,18 @@ getLinkedLights(string $geo_name,
   {
     string $obj_name;
     $obj_name = $geo_name;
-    
+
     if (`nodeType $geo_name` == "FurFeedback")
     {
-      // We need to output illuminate statements relevant for the attached 
+      // We need to output illuminate statements relevant for the attached
       // geometry
       string $connections[];
       $connections = `listConnections -sh on ($geo_name + ".inputSurface")`;
-      
+
       if (size($connections) == 0)
       {
         $connections = `listConnections -sh on ($geo_name + ".inputMesh")`;
-        
+
         if (size($connections) != 0)
         {
           $obj_name = $connections[0];
@@ -4358,14 +4358,14 @@ getLinkedLights(string $geo_name,
         $obj_name = $connections[0];
       }
     }
-    
-    // Get a list of the lights linked to the given shape and to any sets it 
+
+    // Get a list of the lights linked to the given shape and to any sets it
     // may be a member of.
     //
-    $linked_lights = 
-      `lightlink 
-        -query 
-        -transforms false 
+    $linked_lights =
+      `lightlink
+        -query
+        -transforms false
         -sets false
         -object $obj_name`;
   }
@@ -4373,7 +4373,7 @@ getLinkedLights(string $geo_name,
   {
     string  $set_members[];
     string  $illumination_from_set;
-    
+
     $illumination_from_set = DGA_getIlluminationFromSet($attribs_node);
 
     string $curr_shape;
@@ -4391,7 +4391,7 @@ getLinkedLights(string $geo_name,
   }
 
   $visible_linked_lights = DL_stringArrayIntersect(
-    $linked_lights, 
+    $linked_lights,
     $visible_lights);
 
   return $visible_linked_lights;
@@ -4408,9 +4408,9 @@ DL_nurbsCurveRenderableCallback( string $object )
   string $all_attribs_nodes[] =
     DL_getAllGeoAttribsNodesFromShape( $object, $shader_collection );
 
-  string $attribs_node = 
+  string $attribs_node =
     DL_highestNodeWithAttrib( "outputMayaCurves", $all_attribs_nodes );
-  
+
   return DGA_outputMayaCurves( $object, $attribs_node );
 }
 
@@ -4424,7 +4424,7 @@ DL_nClothRenderableCallback( string $object )
   string $all_attribs_nodes[] =
     DL_getAllGeoAttribsNodesFromShape( $object, $shader_collection );
 
-  string $attribs_node = 
+  string $attribs_node =
     DL_highestNodeWithAttrib( "renderNclothAsParticles", $all_attribs_nodes );
 
   return DGA_renderNclothAsParticles( $object, $attribs_node );
@@ -4475,7 +4475,7 @@ DL_getGeoTypeData(string $types[],
   $plugin_requirements[6] = "";
   $cache_commands[6] = "delightCacheGeo";
   $output_commands[6] = "delightOutputGeo";
-  
+
   $types[7] = "FurFeedback";
   $plugin_requirements[7] = "Fur";
   $cache_commands[7] = "delightCacheFur";
@@ -4489,12 +4489,12 @@ DL_getGeoTypeData(string $types[],
   $types[9] = "shaveHair";
   $plugin_requirements[9] = "";
   $output_commands[9] = "";
-  
+
   string $plugin_name = "3dfm_shave" + getApplicationVersionAsFloat();
   if( getApplicationVersionAsFloat() < 8.5 )
     $plugin_name = "3dfm_shave8.0";
-  
-  if(`pluginInfo -query -loaded $plugin_name`)  
+
+  if(`pluginInfo -query -loaded $plugin_name`)
     $cache_commands[9] = "delightCacheShave";
   else if (`pluginInfo -query -loaded "shaveNode"`)
     $cache_commands[9] = "delightCacheShaveAsRib";
@@ -4510,7 +4510,7 @@ DL_getGeoTypeData(string $types[],
   $plugin_requirements[11] = "";
   $cache_commands[11] = "delightCacheGeo";
   $output_commands[11] = "delightOutputGeo";
-  
+
   $types[12] = "nCloth";
   $plugin_requirements[12] = "DL_nClothRenderableCallback";
   $cache_commands[12] = "delightCacheGeo";
@@ -4547,7 +4547,7 @@ DL_getGeoTypeData(string $types[],
   Update the global arrays which describe supported geometry types by calling
   DL_getGeoTypeData.
 */
-global proc 
+global proc
 DL_updateGeoTypeData()
 {
   global string $g_DL_geoTypes[];
@@ -4576,7 +4576,7 @@ DL_updateGeoTypeData()
   {
     if ($geoCacheCommands[$i] == "")
       continue;
-      
+
     string $req = $geoPluginRequirements[$i];
 
     if( $req != "" )
@@ -4703,7 +4703,7 @@ getGeoCacheCommand(string $geo)
 {
   global string $g_DL_geoTypes[];
   global string $g_DL_geoCacheCommands[];
-  
+
   int $i;
   for ($i = 0; $i < size($g_DL_geoTypes); $i++)
   {
@@ -4732,9 +4732,9 @@ getLightOutputCommand(string $light)
   string $illuminate_commands[];
 
   DL_getLightTypeData(
-    $types, 
-    $requirements_callbacks, 
-    $output_commands, 
+    $types,
+    $requirements_callbacks,
+    $output_commands,
     $illuminate_commands);
 
   string $output_command = "";
@@ -4746,7 +4746,7 @@ getLightOutputCommand(string $light)
       if (   $requirements_callbacks[$i] == ""
           || (   exists($requirements_callbacks[$i])
               && eval($requirements_callbacks[$i]) != 0))
-      {      
+      {
         $output_command = $output_commands[$i];
         break;
       }
@@ -4765,9 +4765,9 @@ getLightIlluminateCommand(string $light)
   string $illuminate_commands[];
 
   DL_getLightTypeData(
-    $types, 
-    $requirements_callbacks, 
-    $output_commands, 
+    $types,
+    $requirements_callbacks,
+    $output_commands,
     $illuminate_commands);
 
   string $illuminate_command = "";
@@ -4828,7 +4828,7 @@ isObjectRenderableType(string $object)
     }
 
     delightTable -setValueInt "is_renderable_type" $object $is_renderable_type;
-  
+
     return $is_renderable_type;
   }
 }
@@ -4843,8 +4843,8 @@ geoCastsShadows(string $geo)
 }
 
 proc string[]
-getShadowCastingGeometry(string $light_name, 
-                         string $all_geometry[], 
+getShadowCastingGeometry(string $light_name,
+                         string $all_geometry[],
                          string $shader_collection)
 {
   string  $linked_objects[];
@@ -4852,13 +4852,13 @@ getShadowCastingGeometry(string $light_name,
   string  $visible_linked_objects[];
   int     $use_light_linker = 1;
 
-  $attribs_node = 
-    DL_getHighestLightAttribsNodeFromShape($light_name, 
+  $attribs_node =
+    DL_getHighestLightAttribsNodeFromShape($light_name,
                                            $shader_collection);
 
   string $attr = "shadowObjects";
   $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
-  
+
   if ($node_with_attr != "")
   {
     string  $shadow_objects_set = DLA_getShadowObjectsSet($node_with_attr);
@@ -4900,7 +4900,7 @@ getShadowCastingGeometry(string $light_name,
         // we want the full path of the linked object
         $visible_linked_objects[size($visible_linked_objects)] = getFullPath($curr_object);
       }
-      
+
       string $connected_fur_feedbacks[];
       $connected_fur_feedback = `listConnections -type FurFeedback -sh on $curr_object`;
       $connected_fur_feedback = DL_stringArrayRemoveDuplicates($connected_fur_feedback);
@@ -4910,7 +4910,7 @@ getShadowCastingGeometry(string $light_name,
             && isObjectVisible($curr_fur)
             && (!$use_light_linker || geoCastsShadows($curr_fur)) )
         {
-          $visible_linked_objects[size($visible_linked_objects)] = 
+          $visible_linked_objects[size($visible_linked_objects)] =
             getFullPath($curr_fur);
         }
       }
@@ -4970,12 +4970,12 @@ getVisibleLights(string $light_set,
   string  $listed_lights[];
   string  $visible_lights[];
   string $all_light_types[] = `listNodeTypes light`;
-      
+
   if ($light_set != "")
   {
     string $set_members[] = DL_getFlattenedSetMembers($light_set);
     $set_members = getAllDescendantShapes($set_members);
-    
+
     for ($curr_light in $set_members)
     {
       string $light_type = `objectType $curr_light`;
@@ -5005,16 +5005,16 @@ getVisibleLights(string $light_set,
 proc string[]
 removeArchivedLights(string $dra_nodes_to_consider[], string $lights[])
 {
-  // Remove the lights to render listed in render passes associated with each 
+  // Remove the lights to render listed in render passes associated with each
   // RIB Archive node in the list we receive.
   string $lights_to_remove[];
   clear($lights_to_remove);
-  
+
   for ($curr_archive in $dra_nodes_to_consider)
   {
     // Find associated render passes and gather their lights
     string $connected_render_passes[];
-    $connected_render_passes = `listConnections -d false -s true 
+    $connected_render_passes = `listConnections -d false -s true
       -t "delightRenderPass" ($curr_archive + ".connectedRenderPass")`;
 
     for ($render_pass in $connected_render_passes)
@@ -5024,10 +5024,10 @@ removeArchivedLights(string $dra_nodes_to_consider[], string $lights[])
       {
         string $lights_to_render_set;
         $lights_to_render_set = DRP_getLightsToRenderSet($render_pass);
-        
+
         string $layer = DRP_getLayerToRender($render_pass);
         string $render_layer_shapes[] = getShapesInLayer($layer);
-        
+
         string $visible_lights[];
         $visible_lights = getVisibleLights(
           $lights_to_render_set,
@@ -5037,7 +5037,7 @@ removeArchivedLights(string $dra_nodes_to_consider[], string $lights[])
       }
     }
   }
-  
+
   return stringArrayRemove($lights_to_remove, $lights);
 }
 
@@ -5059,7 +5059,7 @@ getVisibleClippingPlanes(string $clipping_plane_set)
         $listed_planes[size($listed_planes)] = $curr_shape;
     }
   }
-  // Default behavior is to not use clipping planes 
+  // Default behavior is to not use clipping planes
   // if there's no clipping plane set.
 
   for ($curr_plane in $listed_planes)
@@ -5072,38 +5072,38 @@ getVisibleClippingPlanes(string $clipping_plane_set)
 }
 
 proc string[]
-removeArchivedClippingPlanes(string $dra_nodes_to_consider[], 
+removeArchivedClippingPlanes(string $dra_nodes_to_consider[],
                              string $clipping_planes[])
 {
-  // Remove the clipping planes in the render set of any render passes 
+  // Remove the clipping planes in the render set of any render passes
   // associated with each RIB Archive node in the list we receive.
   string $clippings_to_remove[];
   clear($clippings_to_remove);
-  
+
   for ($curr_archive in $dra_nodes_to_consider)
   {
     // Find associated render passes and gather their clipping planes
     string $connected_render_passes[];
-    $connected_render_passes = `listConnections -d false -s true 
+    $connected_render_passes = `listConnections -d false -s true
       -t "delightRenderPass" ($curr_archive + ".connectedRenderPass")`;
-      
+
     for ($render_pass in $connected_render_passes)
     {
       if (getAttr($render_pass + ".renderMode") == 2)
       {
         string $clipping_planes_to_render_set;
-        $clipping_planes_to_render_set = 
+        $clipping_planes_to_render_set =
           DRP_getClippingPlanesToRenderSet($render_pass);
-        
+
         string $visible_clippings[];
-        $visible_clippings = 
+        $visible_clippings =
           getVisibleClippingPlanes($clipping_planes_to_render_set);
-        
+
         DL_stringArrayAppend($clippings_to_remove, $visible_clippings);
       }
     }
   }
-  
+
   return stringArrayRemove($clippings_to_remove, $clipping_planes);
 }
 
@@ -5134,37 +5134,37 @@ getVisibleCoordinateSystems(string $coordinate_system_set)
 }
 
 proc string[]
-removeArchivedCoordinateSystems(string $dra_nodes_to_consider[], 
+removeArchivedCoordinateSystems(string $dra_nodes_to_consider[],
                                 string $coordinate_systems[])
 {
-  // Remove the coordinate system listed in the render set of render passes 
+  // Remove the coordinate system listed in the render set of render passes
   // associated with each RIB Archive node in the list we receive.
   string $coord_sys_to_remove[];
   clear($coord_sys_to_remove);
-  
+
   for ($curr_archive in $dra_nodes_to_consider)
   {
     // Find associated render passes and gather their coordinate systems
     string $connected_render_passes[];
-    $connected_render_passes = `listConnections -d false -s true 
+    $connected_render_passes = `listConnections -d false -s true
       -t "delightRenderPass" ($curr_archive + ".connectedRenderPass")`;
-      
+
     for ($render_pass in $connected_render_passes)
     {
       if (getAttr($render_pass + ".renderMode") == 2)
       {
         string $objects_to_render_set;
-        $objects_to_render_set = 
+        $objects_to_render_set =
           DRP_getObjectsToRenderSet($render_pass);
 
         string $visible_coord_sys[];
         $visible_coord_sys = getVisibleCoordinateSystems($objects_to_render_set);
-        
+
         DL_stringArrayAppend($coord_sys_to_remove, $visible_coord_sys);
       }
     }
   }
-  
+
   return stringArrayRemove($coord_sys_to_remove, $coordinate_systems);
 }
 
@@ -5200,7 +5200,7 @@ getRenderableGeometry(string $object_set, string $render_layer_shapes[])
 
   $sets_geometry = getGeometryInSet($object_set);
   $sets_geometry = DL_stringArrayIntersect($sets_geometry, $render_layer_shapes);
-  
+
   for ($curr_geo in $sets_geometry)
   {
     if (isObjectRenderableType($curr_geo))
@@ -5231,7 +5231,7 @@ global proc string[]
 getRenderableVisibleGeometry(string $object_set, string $layer)
 {
   string $render_layer_shapes[] = getShapesInLayer($layer);
-  
+
   return getAllRenderableVisibleGeometry(
            $object_set,
            $render_layer_shapes);
@@ -5250,28 +5250,28 @@ removeArchivedGeometry(string $dra_nodes_to_consider[],
   {
     // Find associated render passes and gather their geometry
     string $connected_render_passes[];
-    $connected_render_passes = `listConnections -d false -s true 
+    $connected_render_passes = `listConnections -d false -s true
       -t "delightRenderPass" ($curr_archive + ".connectedRenderPass")`;
-      
+
     for ($render_pass in $connected_render_passes)
     {
       if (getAttr($render_pass + ".renderMode") == 2)
       {
         string $objects_to_render_set;
         string $layer_to_render;
-        
+
         $objects_to_render_set = DRP_getObjectsToRenderSet($render_pass);
         $layer_to_render = DRP_getLayerToRender($render_pass);
-        
+
         string $render_layer_shapes[] = getShapesInLayer($layer_to_render);
-        
+
         string $renderable_geo[];
         $renderable_geo = getAllRenderableVisibleGeometry(
           $objects_to_render_set,
           $render_layer_shapes);
 
-        // The RIB Archive node connected to this render pass may be in its 
-        // objects to render list, but we do not want to remove it 
+        // The RIB Archive node connected to this render pass may be in its
+        // objects to render list, but we do not want to remove it
         string $keep_curr_archive[];
         $keep_cur_archive[0] = $curr_archive;
         $renderable_geo = stringArrayRemove($keep_cur_archive, $renderable_geo);
@@ -5280,7 +5280,7 @@ removeArchivedGeometry(string $dra_nodes_to_consider[],
       }
     }
   }
-  
+
   return stringArrayRemove($geometry_to_remove, $all_geometry);
 }
 
@@ -5344,8 +5344,8 @@ getInstancersInLayer(string $layer_name)
       // TODO: should we handle instancers that are not necessarily in the layer
       //       but whose ancestor transforms are?
 
-      // Note: we need -allPaths here. When an instanced object is directly 
-      //       in the layer, we can't tell which instance is actually in the 
+      // Note: we need -allPaths here. When an instanced object is directly
+      //       in the layer, we can't tell which instance is actually in the
       //       layer, so we treat all instances to be in the layer.
       $instancers = `ls -allPaths -long -type "instancer" $layer_members`;
     }
@@ -5355,9 +5355,9 @@ getInstancersInLayer(string $layer_name)
 }
 
 proc string[]
-getVisibleInstancers(string $object_set, 
-                     string $layer, 
-                     string $archived_instancers[], 
+getVisibleInstancers(string $object_set,
+                     string $layer,
+                     string $archived_instancers[],
                      string $renderable_instancer_geo[],
                      string $render_layer_shapes[])
 {
@@ -5385,10 +5385,10 @@ getVisibleInstancers(string $object_set,
       if (size($render_layer_shapes) != 0)
       {
         $curr_instancer_geo = DL_stringArrayIntersect(
-          $curr_instancer_geo, 
+          $curr_instancer_geo,
           $render_layer_shapes);
       }
-        
+
       for ($geo in $curr_instancer_geo)
       {
         int $is_valid_geo = 1;
@@ -5421,9 +5421,9 @@ getVisibleInstancers(string $object_set,
 }
 
 proc string[]
-getShadowCastingInstancers(string $light_name, 
-                           string $particle_instancers[], 
-                           string $shader_collection, 
+getShadowCastingInstancers(string $light_name,
+                           string $particle_instancers[],
+                           string $shader_collection,
                            string $shadow_casting_instancer_geo[])
 {
   string $shadow_casting_instancers[];
@@ -5436,16 +5436,16 @@ getShadowCastingInstancers(string $light_name,
 
   $instancers_to_consider = $particle_instancers;
 
-  $attribs_node = 
-    DL_getHighestLightAttribsNodeFromShape($light_name, 
+  $attribs_node =
+    DL_getHighestLightAttribsNodeFromShape($light_name,
                                            $shader_collection);
 
   $use_light_linker = 1;
 
   string $attr = "shadowCamera";
   string $node_with_attr = DLA_getNodeWithAttribute(
-    $attr, 
-    $attribs_node, 
+    $attr,
+    $attribs_node,
     $light_name);
 
   if ($node_with_attr != "")
@@ -5462,7 +5462,7 @@ getShadowCastingInstancers(string $light_name,
       //       but whose ancestor transforms are?
       $instancers_to_consider = `ls -long -type "instancer" $set_members`;
 
-      $instancers_to_consider = 
+      $instancers_to_consider =
         DL_stringArrayIntersect($instancers_to_consider, $particle_instancers);
     }
   }
@@ -5479,8 +5479,8 @@ getShadowCastingInstancers(string $light_name,
       string $obj_to_test = $geo;
       string $geo_type = `nodeType $geo`;
 
-      // FurFeedback nodes are not directly linked to lights (i.e. 
-      // they will not show up in a lightlink query), so we use 
+      // FurFeedback nodes are not directly linked to lights (i.e.
+      // they will not show up in a lightlink query), so we use
       // the geometry connected to them.
       if ($geo_type == "FurFeedback")
       {
@@ -5503,7 +5503,7 @@ getShadowCastingInstancers(string $light_name,
 
       if ($use_light_linker)
       {
-        string $lights_linked_to_geo[] = 
+        string $lights_linked_to_geo[] =
           `lightlink -q -transforms false -sets false -object $obj_to_test`;
 
         $lights_linked_to_geo = `ls -long $lights_linked_to_geo`;
@@ -5515,9 +5515,9 @@ getShadowCastingInstancers(string $light_name,
         string $sets_containing_geo[] = getAllSetMemberships($geo);
         $is_shadow_geo = stringArrayContains($shadow_objects_set, $sets_containing_geo);
 
-        // In getShadowCastingGeometry(), a FurFeedback can still be considered 
+        // In getShadowCastingGeometry(), a FurFeedback can still be considered
         // as long as its connected surface is in the shadow object set.
-        // Using this behavior to be consistent (even though it may or 
+        // Using this behavior to be consistent (even though it may or
         // may not be ideal).
         if (!$is_shadow_geo && $geo_type == "FurFeedback")
         {
@@ -5537,7 +5537,7 @@ getShadowCastingInstancers(string $light_name,
       $shadow_casting_instancers[size($shadow_casting_instancers)] = $instancer;
   }
 
-  $shadow_casting_instancer_geo = 
+  $shadow_casting_instancer_geo =
     DL_stringArrayRemoveDuplicates($shadow_casting_instancer_geo);
 
   return $shadow_casting_instancers;
@@ -5547,7 +5547,7 @@ proc string []
 getArchivedInstancers(string $dra_nodes_to_consider[],
                       string $render_layer_shapes[])
 {
-  // Get instancers in render passes associated with each 
+  // Get instancers in render passes associated with each
   // RIB Archive node in the list we receive.
   string $instancers_to_remove[];
 
@@ -5555,7 +5555,7 @@ getArchivedInstancers(string $dra_nodes_to_consider[],
   {
     // Find associated render passes and gather their instancers
     string $connected_render_passes[];
-    $connected_render_passes = `listConnections -d false -s true 
+    $connected_render_passes = `listConnections -d false -s true
       -t "delightRenderPass" ($curr_archive + ".connectedRenderPass")`;
 
     for ($render_pass in $connected_render_passes)
@@ -5575,7 +5575,7 @@ getArchivedInstancers(string $dra_nodes_to_consider[],
         $visible_instancers = getVisibleInstancers(
           $objects_to_render_set,
           $layer_to_render,
-          $archived_instancers_placeholder, 
+          $archived_instancers_placeholder,
           $instancer_geo_placeholder,
           $render_layer_shapes);
 
@@ -5588,7 +5588,7 @@ getArchivedInstancers(string $dra_nodes_to_consider[],
 }
 
 proc string[]
-DRP_getShadowMappedLights(string $visible_lights[], 
+DRP_getShadowMappedLights(string $visible_lights[],
                           string $shader_collection)
 {
   string $shadow_mapped_lights[];
@@ -5603,19 +5603,19 @@ DRP_getShadowMappedLights(string $visible_lights[],
 
     string $curr_attribs_node;
 
-    $curr_attribs_node = 
-      DL_getHighestLightAttribsNodeFromShape($curr_light, 
+    $curr_attribs_node =
+      DL_getHighestLightAttribsNodeFromShape($curr_light,
                                              $shader_collection);
 
     $attr = "generateShadowMaps";
     $node_with_attr = DLA_getNodeWithAttribute(
-      $attr, 
-      $curr_attribs_node, 
+      $attr,
+      $curr_attribs_node,
       $curr_light);
 
     if ($node_with_attr != "")
     {
-      int $generate_shads;      
+      int $generate_shads;
       $generate_shads = DLA_getGenerateShadowMaps($node_with_attr);
 
       if ($generate_shads)
@@ -5627,7 +5627,7 @@ DRP_getShadowMappedLights(string $visible_lights[],
     {
       int $create_shadow_map_file;
       $create_shadow_map_file = 0;
-      
+
       if (attributeExists("useDepthMapShadows", $curr_light))
       {
         if (getAttr($curr_light + ".useDepthMapShadows") == 1)
@@ -5640,7 +5640,7 @@ DRP_getShadowMappedLights(string $visible_lights[],
             {
               string $filename;
               $filename = getDepthMapFilename($curr_light);
-              
+
               if (`filetest -r $filename` == 1)
               {
                 $create_shadow_map_file = 0;
@@ -5650,7 +5650,7 @@ DRP_getShadowMappedLights(string $visible_lights[],
           }
         }
       }
-      
+
       if ($create_shadow_map_file == 1)
       {
         $shadow_mapped_lights[size($shadow_mapped_lights)] = $curr_light;
@@ -5663,9 +5663,9 @@ DRP_getShadowMappedLights(string $visible_lights[],
 
 
 proc int
-DRP_checkSceneForXformBlur(string $all_geos[], 
-                           string $all_lights[], 
-                           int $global_xform_blur, 
+DRP_checkSceneForXformBlur(string $all_geos[],
+                           string $all_lights[],
+                           int $global_xform_blur,
                            string $shader_collection)
 {
   int     $is_blurring;
@@ -5677,7 +5677,7 @@ DRP_checkSceneForXformBlur(string $all_geos[],
   // loop over all the geometry and stop once we hit any motion blurring geo
   for ($curr_geo in $all_geos)
   {
-    $curr_attribs_nodes = 
+    $curr_attribs_nodes =
       DL_getAllGeoAttribsNodesFromShape($curr_geo, $shader_collection);
 
     $curr_attribs_node = DL_highestNodeWithAttrib("transformationBlur",
@@ -5690,7 +5690,7 @@ DRP_checkSceneForXformBlur(string $all_geos[],
     }
     else if ( objExists($curr_geo + ".motionBlur") )
     {
-      $curr_blur_state = 
+      $curr_blur_state =
         $global_xform_blur && getAttr($curr_geo + ".motionBlur");
     }
     else
@@ -5708,7 +5708,7 @@ DRP_checkSceneForXformBlur(string $all_geos[],
   {
     for ($curr_light in $all_lights)
     {
-      $curr_attribs_nodes = 
+      $curr_attribs_nodes =
         DL_getAllLightAttribsNodesFromShape($curr_light, $shader_collection);
 
       $curr_attribs_node = DL_highestNodeWithAttrib("transformationBlur",
@@ -5733,8 +5733,8 @@ DRP_checkSceneForXformBlur(string $all_geos[],
 }
 
 proc int
-DRP_checkSceneForDeformBlur(string $all_geos[], 
-                            int $global_deform_blur, 
+DRP_checkSceneForDeformBlur(string $all_geos[],
+                            int $global_deform_blur,
                             string $shader_collection)
 {
   int     $is_blurring;
@@ -5747,7 +5747,7 @@ DRP_checkSceneForDeformBlur(string $all_geos[],
   // loop over all the geometry and stop once we hit any motion blurring geo
   for ($curr_geo in $all_geos)
   {
-    $curr_attribs_nodes = 
+    $curr_attribs_nodes =
       DL_getAllGeoAttribsNodesFromShape($curr_geo, $shader_collection);
 
     $curr_attribs_node = DL_highestNodeWithAttrib("deformationBlur",
@@ -5760,10 +5760,10 @@ DRP_checkSceneForDeformBlur(string $all_geos[],
     }
     else if ( objExists($curr_geo + ".motionBlur") )
     {
-      $curr_blur_state = 
+      $curr_blur_state =
         $global_deform_blur && getAttr($curr_geo + ".motionBlur");
     }
-    else 
+    else
       $curr_blur_state = $global_deform_blur;
 
     $is_blurring = $is_blurring || $curr_blur_state;
@@ -5792,54 +5792,54 @@ DRP_checkConnectToRenderGlobals(string $node_name)
     DRP_disconnectFromRenderGlobals($node_name);
   }
 }
- 
+
 global proc
 DRP_connectToRenderGlobals(string $node_name)
 {
   string $resolution_node[];
   $resolution_node = `listConnections -type "resolution" "defaultRenderGlobals"`;
-  
+
   string $src_attrib;
   string $dest_attrib;
-  
+
   $src_attrib = $resolution_node[0] + ".width";
   $dest_attrib = $node_name + ".resolutionX";
   if (!`isConnected $src_attrib $dest_attrib`)
   {
     connectAttr $src_attrib $dest_attrib;
   }
-  
+
   $src_attrib = $resolution_node[0] + ".height";
   $dest_attrib = $node_name + ".resolutionY";
   if (!`isConnected $src_attrib $dest_attrib`)
   {
     connectAttr $src_attrib $dest_attrib;
   }
-  
+
   string $connected_expr[];
   $dest_attrib = $node_name + ".pixelAspectRatio";
 
-  $connected_expr = `listConnections -type "expression" $dest_attrib`; 
+  $connected_expr = `listConnections -type "expression" $dest_attrib`;
   if (size($connected_expr) == 0)
   {
     string $expr_node_name = ($node_name + "_pixelRatioExpr");
-    
+
     if (objExists($expr_node_name))
     {
       connectAttr ($expr_node_name + ".output[0]") $dest_attrib;
     }
     else
     {
-      expression 
-        -name $expr_node_name 
-        -alwaysEvaluate false 
-        -s ($dest_attrib + 
-         " = " + 
-         $resolution_node[0] + 
+      expression
+        -name $expr_node_name
+        -alwaysEvaluate false
+        -s ($dest_attrib +
+         " = " +
+         $resolution_node[0] +
          ".height / " +
          $resolution_node[0] +
          ".width * " +
-         $resolution_node[0] + 
+         $resolution_node[0] +
          ".deviceAspectRatio");
     }
   }
@@ -5850,32 +5850,32 @@ DRP_disconnectFromRenderGlobals(string $node_name)
 {
   string $resolution_node[];
   $resolution_node = `listConnections -type "resolution" "defaultRenderGlobals"`;
-  
+
   string $src_attrib;
   string $dest_attrib;
-  
+
   $src_attrib = $resolution_node[0] + ".width";
   $dest_attrib = $node_name + ".resolutionX";
   if (`isConnected $src_attrib $dest_attrib`)
   {
     disconnectAttr $src_attrib $dest_attrib;
   }
-  
+
   $src_attrib = $resolution_node[0] + ".height";
   $dest_attrib = $node_name + ".resolutionY";
   if (`isConnected $src_attrib $dest_attrib`)
   {
     disconnectAttr $src_attrib $dest_attrib;
   }
-  
+
   string $connected_expr[];
   $dest_attrib = $node_name + ".pixelAspectRatio";
-  $connected_expr = `listConnections -type "expression" $dest_attrib`; 
-  
+  $connected_expr = `listConnections -type "expression" $dest_attrib`;
+
   if (size($connected_expr) != 0)
   {
     disconnectAttr ($connected_expr[0] + ".output[0]") $dest_attrib;
-    
+
     if (`referenceQuery -isNodeReferenced $connected_expr[0]` == 0)
     {
       delete $connected_expr[0];
@@ -5985,7 +5985,7 @@ incProgress( int $increment, int $console_output )
       {
         int $i;
         for( $i = $g_progress_value; $i < $new_value; $i++ )
-        { 
+        {
           if( $i % 2 )
           {
             print ".";
@@ -6023,38 +6023,38 @@ outputDisplayProgressMessage(string $render_pass, int $frame_number)
 {
   string $progress_message;
   $progress_message = ("Frame " + $frame_number + ": rendering displays");
-  
+
   setProgressMessage($progress_message, 0);
 
   if (!DL_haveMayaUI())
   {
     $progress_message += ": ";
-    
+
     int $display_indices[];
     $display_indices = DRP_getDisplayIndices($render_pass);
     int $primary_index = DRP_getDisplayPrimaryIndex($render_pass);
     int $render_secondary = DRP_getRenderSecondaryDisplays($render_pass);
-      
+
     for($i in $display_indices)
     {
       if ($i != $primary_index && !$render_secondary)
         continue;
-        
+
       if (!DRP_isDisplayRenderable($render_pass, $i))
         continue;
-      
+
       string $image_file = DRP_getDisplayFilename($render_pass, $i);
       $image_file = DRP_expandDisplayFilename($render_pass, $i,$image_file);
 
       if ($image_file == "")
       {
-        $image_file = 
+        $image_file =
           "<" + DRP_getDisplayDriver($render_pass, $i) + ">";
       }
-      
+
       $progress_message += (" " + $image_file);
     }
-     
+
     print ($progress_message + "\n");
   }
 }
@@ -6133,7 +6133,7 @@ mayaRenderWith3Delight()
 
   string $curr_renderer_attr = "defaultRenderGlobals.currentRenderer";
   string $curr_renderer = getAttr($curr_renderer_attr);
-  
+
   setAttr -type "string" $curr_renderer_attr "_3delight";
   RenderIntoNewWindow;
   setAttr -type "string" $curr_renderer_attr $curr_renderer;
@@ -6143,9 +6143,9 @@ global proc
 delightRenderViewRender( string $render_pass )
 {
   // The render pass node could have been deleted either by the user or because
-  // the redering was invoked with the default render pass node from the 
+  // the redering was invoked with the default render pass node from the
   // 3delight render globals
-  
+
   if (`objExists $render_pass`)
   {
     delightRender($render_pass);
@@ -6169,13 +6169,13 @@ delightRenderViewRenderRegion( string $render_pass )
   int $top = `getAttr( $globals[0] + ".top" )`;
 
   // The render pass node could have been deleted either by the user or because
-  // the redering was invoked with the default render pass node from the 
+  // the redering was invoked with the default render pass node from the
   // 3delight render globals
   int $render_pass_exists = `objExists $render_pass`;
-  
+
   float $x_res;
   float $y_res;
-  
+
   if ($render_pass_exists)
   {
     $x_res = getAttr( $render_pass + ".resolutionX" );
@@ -6220,7 +6220,7 @@ outputTransform(string $shape_name,
 {
   if( $is_rib_archiving_mode )
   {
-    RiIfBegin -e 
+    RiIfBegin -e
       (   "!defined(user:_3dfm_filter_transform) " +
       "|| $user:_3dfm_filter_transform == 0");
   }
@@ -6239,7 +6239,7 @@ outputTransform(string $shape_name,
     else
       delightCacheXform -emit $shape_name;
   }
-  
+
   if( $is_rib_archiving_mode )
     RiIfEnd;
 }
@@ -6273,12 +6273,12 @@ outputCameraTransform(
     string $transform;
     $transform = firstParentOf($camera_name);
     float $scale[] = getAttr($transform + ".scale");
-    
+
     if ($scale[0] != 1 || $scale[1] != 1 || $scale[2] != 1)
     {
       RiScale $scale[0] $scale[1] $scale[2];
     }
-  }  
+  }
 
   // Should we look at another face of the cube?
   switch( $cube_face )
@@ -6335,7 +6335,7 @@ outputIlluminateStatements(
   string $all_attribs_nodes[],
   string $visible_lights[],
   string $default_light_set_members[],
-  float $is_rib_archiving_mode) 
+  float $is_rib_archiving_mode)
 {
   // TODO: do we want to output Illuminate statements for all of the lights
   // in the scene or just the ones we need to turn off?
@@ -6346,7 +6346,7 @@ outputIlluminateStatements(
   string  $handle;
 
   $linked_lights = getLinkedLights(
-    $geo_name, 
+    $geo_name,
     $all_attribs_nodes,
     $visible_lights);
 
@@ -6355,7 +6355,7 @@ outputIlluminateStatements(
   string $lights_to_turn_off[] = DL_stringArrayIntersect(
     $non_linked_lights,
     $default_light_set_members);
-    
+
   string $lights_to_turn_on[] = DL_stringArrayDifference(
     $linked_lights,
     $default_light_set_members);
@@ -6367,15 +6367,15 @@ outputIlluminateStatements(
   }
 
   int $needs_illuminates = 0;
-  
+
   if(size($lights_to_turn_off) > 0 || size($lights_to_turn_on) > 0)
   {
     $needs_illuminates = 1;
   }
-  
+
   if ($needs_illuminates && $is_rib_archiving_mode)
   {
-    RiIfBegin -e 
+    RiIfBegin -e
       (   "!defined(user:_3dfm_filter_illuminate) " +
        "|| $user:_3dfm_filter_illuminate == 0");
   }
@@ -6414,7 +6414,7 @@ outputIlluminateStatements(
   {
     RiIfEnd;
   }
-  
+
   if (size($non_linked_lights) > 0 && $is_rib_archiving_mode != 0)
   {
     RiIfEnd;
@@ -6423,7 +6423,7 @@ outputIlluminateStatements(
 
 proc
 outputDefaultLightShader(
-  string $light_name, 
+  string $light_name,
 	string $attribs_node,
   string $shadowmap_name)
 {
@@ -6435,12 +6435,12 @@ outputDefaultLightShader(
 
   string $attr = "category";
   string $categories = "";
-	
+
   string $node_with_attr = DLA_getNodeWithAttribute(
-    $attr, 
-    $attribs_node, 
+    $attr,
+    $attribs_node,
     $light_name);
-  
+
   if ($node_with_attr != "")
     $categories = DLA_getCategory($node_with_attr);
 
@@ -6450,7 +6450,7 @@ outputDefaultLightShader(
     {
       if( $categories != "" )
         $categories += ",";
-        
+
       $categories += "specular";
     }
     else
@@ -6460,7 +6460,7 @@ outputDefaultLightShader(
     {
       if( $categories != "" )
         $categories += ",";
-        
+
       $categories += "diffuse";
     }
     else
@@ -6474,7 +6474,7 @@ outputDefaultLightShader(
     }
 
     $common_params += " -p \"shadowmapname\" \"string\" \"";
-    
+
 	/*
 		We must escape the backslashes in the shadowmap name because the
 		command will be evaluated as mel. Note that the left "\\\\" translate
@@ -6483,7 +6483,7 @@ outputDefaultLightShader(
 	*/
     $common_params += DL_substituteAll( "\\\\", $shadowmap_name, "\\\\" );
     $common_params += "\"";
-    
+
     $attr = "keyLight";
     int $key_light = 0;
 
@@ -6513,8 +6513,8 @@ outputDefaultLightShader(
   if (getAttr($light_name + ".useRayTraceShadows") == 1 && $shadowmap_name=="" )
   {
     $num_samples = getAttr($light_name + ".shadowRays");
-    RiAttribute 
-      -n "light" 
+    RiAttribute
+      -n "light"
       -p "shadows" "string" "on"
       -p "samples" "integer" $num_samples;
   }
@@ -6528,7 +6528,7 @@ outputDefaultLightShader(
   string $shader_command = "RiLightSource -n ";
 
   int $has_shadowmap = 1;
-  
+
   if ($light_type == "ambientLight")
   {
     $shader_command += ("maya_ambientlight " + $common_params);
@@ -6551,7 +6551,7 @@ outputDefaultLightShader(
   }
   else if ($light_type == "spotLight")
   {
-    $shader_command += ("maya_spotlight " + $common_params); 
+    $shader_command += ("maya_spotlight " + $common_params);
     $shader_command += " -p \"coneangle\" \"float\" \"";
     float $angle = getAttr($light_name + ".coneAngle");
     $shader_command += `deg_to_rad $angle`;
@@ -6666,7 +6666,7 @@ outputGeometryShaders(
   //  This procedure is called during the rendering process.
   //  This procedure outputs ReadArchive calls to read the archive of the
   //  shader assigned to the specified shape in the context of the specified
-  //  pass. 
+  //  pass.
   //  If the render currently being performed is a shadow map render,
   //  this procedure respects the user's choices regarding what types of
   //  geometry shaders to use when rendering shadow maps. The user's choices
@@ -6678,9 +6678,9 @@ outputGeometryShaders(
 
   if( !$is_shadow_render || $use_surface_shaders_in_shadows )
   {
-    RiIfBegin -e 
+    RiIfBegin -e
       "!defined(user:_3dfm_filter_surface) || $user:_3dfm_filter_surface == 0";
-    
+
     string $surface_shader =
       DL_getHighestAttribsNodeFromShape($shape, "surface", $collection);
 
@@ -6692,7 +6692,7 @@ outputGeometryShaders(
       {
         string $translated_shader;
         $translated_shader = getTranslatedMayaShaderName( $shape, "surface");
-        
+
         if ($translated_shader == "")
         {
           $translated_shader = getTranslatedMayaShaderName( $shape, "miMaterial");
@@ -6731,7 +6731,7 @@ outputGeometryShaders(
 
   if( !$is_shadow_render || $use_displacement_shaders_in_shadows )
   {
-    string $displacement_shader = 
+    string $displacement_shader =
       DL_getHighestAttribsNodeFromShape($shape, "displacement", $collection);
 
     if( $displacement_shader == "")
@@ -6749,24 +6749,24 @@ outputGeometryShaders(
 
     if ($displacement_shader != "")
     {
-      RiIfBegin -e 
+      RiIfBegin -e
         (   "!defined(user:_3dfm_filter_displacement) " +
          "|| $user:_3dfm_filter_displacement == 0");
-      
+
       RiReadArchive -archiveName ($displacement_shader + " displacement");
-      
+
       RiIfEnd;
     }
   }
 
   if( !$is_shadow_render || $use_atmosphere_shaders_in_shadows )
   {
-    string $atmosphere_shader = 
+    string $atmosphere_shader =
       DL_getHighestAttribsNodeFromShape($shape, "atmosphere", $collection);
 
     if ($atmosphere_shader != "")
     {
-      RiIfBegin -e 
+      RiIfBegin -e
         (   "!defined(user:_3dfm_filter_atmosphere) " +
          "|| $user:_3dfm_filter_atmosphere == 0");
 
@@ -6778,12 +6778,12 @@ outputGeometryShaders(
 
   if( !$is_shadow_render || $use_interior_shaders_in_shadows )
   {
-    string $interior_shader = 
+    string $interior_shader =
       DL_getHighestAttribsNodeFromShape($shape, "interior", $collection);
 
     if ($interior_shader != "")
     {
-      RiIfBegin -e 
+      RiIfBegin -e
         (   "!defined(user:_3dfm_filter_interior) " +
          "|| $user:_3dfm_filter_interior == 0");
 
@@ -6795,11 +6795,11 @@ outputGeometryShaders(
 }
 
 proc
-outputInstancer(string $instancer, 
+outputInstancer(string $instancer,
                 string $renderable_instancer_geo[],
-                string $render_pass, 
+                string $render_pass,
                 string $visible_lights[],
-                string $default_light_set_members[], 
+                string $default_light_set_members[],
                 int $is_shadow_render)
 {
   string $shader_collection;
@@ -6828,7 +6828,7 @@ outputInstancer(string $instancer,
   // that are casting shadows in the current map.
   if ($is_shadow_render)
   {
-    $curr_instancer_geo = 
+    $curr_instancer_geo =
       DL_stringArrayIntersect($curr_instancer_geo, $renderable_instancer_geo);
   }
 
@@ -6839,8 +6839,8 @@ outputInstancer(string $instancer,
     {
       RiAttributeBegin;
 
-        string $all_attribs_nodes[] = 
-          DL_getAllGeoAttribsNodesFromShape($geo, 
+        string $all_attribs_nodes[] =
+          DL_getAllGeoAttribsNodesFromShape($geo,
                                             $shader_collection);
 
         // we need to output these in reverse order so that the highest
@@ -6898,7 +6898,7 @@ outputGeometry(string $render_pass,
 	global int $ZHANG_curframe;
 	global float $ZHANG_shutterOpen;
 	global float $ZHANG_shutterClose;
-	
+
   int $output_geo_shaders;
   int $output_geo_attribs;
   int $output_transforms;
@@ -6913,14 +6913,14 @@ outputGeometry(string $render_pass,
   $output_transforms = 1;
   $concatenate_xforms = 0;
   $output_illuminate = !$is_shadow_render;
-  
+
   $is_rib_archiving_mode = DRP_isRIBArchivingMode($render_pass);
 
   if ($is_rib_archiving_mode)
   {
     $output_geo_shaders = getAttr($render_pass + ".archiveGeometryShaders");
-    $output_geo_attribs = getAttr($render_pass + ".archiveGeometryAttributes");    
-    $output_transforms = getAttr($render_pass + ".archiveTransforms");        
+    $output_geo_attribs = getAttr($render_pass + ".archiveGeometryAttributes");
+    $output_transforms = getAttr($render_pass + ".archiveTransforms");
     $output_illuminate = getAttr($render_pass + ".archiveLighting") > 0;
 
     $concatenate_xforms = DRP_getConcatenateGeoTransforms($render_pass);
@@ -6929,7 +6929,7 @@ outputGeometry(string $render_pass,
   $shader_collection = DRP_getShaderCollection($render_pass);
 
   string $default_light_set_members[] = getDefaultLightSetShapes(0);
-  
+
   int $num_geos = size($all_renderable_geos);
   int $curr_geo_num = 0;
   int $prev_progress = 0;
@@ -6938,7 +6938,7 @@ outputGeometry(string $render_pass,
   int $user_post_geo_mel_exists = `exists("DL_userPostGeoMel")`;
 
   int $use_translated_shaders = `DRP_getUseMayaShaders($render_pass)`;
-  int $use_surface_shaders_in_shadows = 
+  int $use_surface_shaders_in_shadows =
     `DRP_getUseSurfaceShadersInShadows($render_pass)`;
 
   int $use_displacement_shaders_in_shadows =
@@ -6947,14 +6947,14 @@ outputGeometry(string $render_pass,
   int $use_atmosphere_shaders_in_shadows =
     `DRP_getUseAtmosphereShadersInShadows($render_pass)`;
 
-  int $use_interior_shaders_in_shadows = 
+  int $use_interior_shaders_in_shadows =
     `DRP_getUseInteriorShadersInShadows($render_pass)`;
 
-  
+
   for ($curr_geo in $all_renderable_geos)
   {
-    string $all_attribs_nodes[] = 
-      DL_getAllGeoAttribsNodesFromShape($curr_geo, 
+    string $all_attribs_nodes[] =
+      DL_getAllGeoAttribsNodesFromShape($curr_geo,
                                         $shader_collection);
 
     // just to make sure that all object-related attributes are cleared
@@ -6969,7 +6969,7 @@ outputGeometry(string $render_pass,
       {
         if( $is_rib_archiving_mode )
         {
-          RiIfBegin -e 
+          RiIfBegin -e
             (   "!defined(user:_3dfm_filter_geo_attribs_node) " +
             "|| $user:_3dfm_filter_geo_attribs_node == 0");
         }
@@ -6978,7 +6978,7 @@ outputGeometry(string $render_pass,
         {
           RiReadArchive -archiveName $all_attribs_nodes[$i];
         }
-        
+
         if( $is_rib_archiving_mode )
           RiIfEnd;
       }
@@ -6986,11 +6986,11 @@ outputGeometry(string $render_pass,
       RiAttribute -n "identifier" -p "name" "string" $curr_geo;
 
       string $shortest_unique_names[] = `ls $curr_geo`;
-      string $shortest_unique_name = 
+      string $shortest_unique_name =
         DL_substituteAllString($shortest_unique_names[0], "|", "#");
 
-      RiAttribute 
-        -n "user" 
+      RiAttribute
+        -n "user"
         -p "delight_shortest_unique_name" "string" $shortest_unique_name;
 
       if ($output_transforms)
@@ -7012,11 +7012,11 @@ outputGeometry(string $render_pass,
       if ($user_pre_geo_mel_exists)
       {
         string $cmd = "DL_userPreGeoMel("
-          + "\"" + $render_pass + "\", " 
+          + "\"" + $render_pass + "\", "
           + "\"" + $curr_geo + "\", "
           + DL_stringArrayToStringForEval($visible_lights) + ", "
           + $is_shadow_render;
-        
+
         string $attribs_string = DL_stringArrayToStringForEval($all_attribs_nodes);
 
         // The next line may trigger an error message in Maya, To avoid it,
@@ -7057,7 +7057,7 @@ outputGeometry(string $render_pass,
           $default_light_set_members,
           $is_rib_archiving_mode);
       }
-        
+
       $highest_node = DL_highestNodeWithAttrib("outputGeometry",
                                                $all_attribs_nodes);
 
@@ -7079,18 +7079,18 @@ outputGeometry(string $render_pass,
 /* tampered by zhang */
 // emit custom procedural instead read archive here
 		string $zh_cmd;
-		
+
 		$zh_cmd = $geo_type+"CacheGeo -emit \""+$curr_geo+" "+ $ZHANG_curpass +" "+ $ZHANG_curframe +" "+ $ZHANG_shutterOpen +" "+ $ZHANG_shutterClose +" "+$is_shadow_render+" "+$fps+" "+$ZHANG_curcamera+"\"";
 		outputRIBcomment($geo_type+"CacheGeo emits "+$curr_geo);
 		eval($zh_cmd);
-// no read archive		
+// no read archive
 //            RiReadArchive -archiveName $geo_to_output;
           }
           else if ($geo_type == "instancer")
           {
-            outputInstancer($geo_to_output, 
+            outputInstancer($geo_to_output,
                             $instancer_geometry,
-                            $render_pass, 
+                            $render_pass,
                             $visible_lights,
                             $default_light_set_members,
                             $is_shadow_render);
@@ -7112,10 +7112,10 @@ outputGeometry(string $render_pass,
 
       if ($user_post_geo_mel_exists)
       {
-        DL_userPostGeoMel(          
-          $render_pass, 
-          $curr_geo, 
-          $visible_lights, 
+        DL_userPostGeoMel(
+          $render_pass,
+          $curr_geo,
+          $visible_lights,
           $is_shadow_render,
           $all_attribs_nodes);
       }
@@ -7126,7 +7126,7 @@ outputGeometry(string $render_pass,
         DGA_executePostGeoMelScript($render_pass, $highest_node, $curr_geo);
 
     RiAttributeEnd;
-    
+
     if ($progress_range > 0)
     {
       int $progress = $progress_range * ++$curr_geo_num / $num_geos;
@@ -7174,7 +7174,7 @@ outputCSGNodeObjects(
   int $is_shadow_render )
 {
   string $connections[] = `listConnections $csg_node_plug`;
-  
+
   for( $conn in $connections )
   {
     string $type = `nodeType $conn`;
@@ -7240,7 +7240,7 @@ outputCSGNodeObjects(
   that go inside it.
 
   PARAMETERS
-  
+
   csg_node
     The node to output.
 
@@ -7297,7 +7297,7 @@ outputCSGNode(
         $visible_lights,
         $instancer_geometry,
         $is_shadow_render );
-          
+
       RiSolidEnd;
 
       break;
@@ -7377,7 +7377,7 @@ outputGeometryAndCSG(
 
   // outputIlluminate calls expect the lights to have their short names
   string $visible_lights_short_names[] = `ls $visible_lights`;
-  
+
   outputRIBcomment("");
   outputRIBcomment("start geometry");
 
@@ -7467,20 +7467,20 @@ outputDisplays(string $render_pass)
   int $display_indices[] = DRP_getDisplayIndices($render_pass);
   int $primary_index = DRP_getDisplayPrimaryIndex($render_pass);
   int $is_first_display_output = 0;
-  
+
   for ($i in $display_indices)
   {
     int $renderable = DRP_isDisplayRenderable($render_pass, $i);
-    
+
     if (!$renderable)
       continue;
-      
+
     if ($i != $primary_index && !DRP_getRenderSecondaryDisplays($render_pass))
       continue;
 
     string $image_file = DRP_getDisplayFilename($render_pass, $i);
     $image_file = DRP_expandDisplayFilename($render_pass, $i, $image_file);
-    
+
     string $output_var = DRP_getDisplayOutputVariable($render_pass, $i);
 
     int $override_pixel_filter =
@@ -7488,7 +7488,7 @@ outputDisplays(string $render_pass)
 
     float $filter_width[];
     string $pixel_filter;
-    
+
     if ($override_pixel_filter)
     {
       $pixel_filter = DRP_getDisplayPixelFilter($render_pass, $i);
@@ -7499,7 +7499,7 @@ outputDisplays(string $render_pass)
     else
     {
       $pixel_filter = DRP_getPixelFilter($render_pass);
-      
+
       $filter_width = DRP_getFilterWidth($render_pass);
     }
 
@@ -7508,7 +7508,7 @@ outputDisplays(string $render_pass)
 
     float $gain = DRP_getDisplayGain($render_pass, $i);
     float $gamma = DRP_getDisplayGamma($render_pass, $i);
-    
+
     int $matte = DRP_getDisplayMatte($render_pass, $i);
     int $exclusive = DRP_getDisplayExclusive($render_pass, $i);
     int $assocalpha = DRP_getDisplayAssociateAlpha($render_pass, $i);
@@ -7524,7 +7524,7 @@ outputDisplays(string $render_pass)
     {
       int $primary_index = DRP_getDisplayPrimaryIndex($render_pass);
       string $primary_display_driver = DRP_getDisplayDriver(
-        $render_pass, 
+        $render_pass,
         $primary_index);
 
       if( $i != $primary_index && $primary_display_driver == $display_driver )
@@ -7540,10 +7540,10 @@ outputDisplays(string $render_pass)
     }
 
     string $display_cmd = "RiDisplay -n \"";
-    
+
     if ($is_first_display_output)
       $display_cmd += "+";
-    
+
     $display_cmd += $image_file + "\""
       + " -t \"" + $display_driver + "\""
       + " -m \"" + $output_var + "\""
@@ -7560,9 +7560,9 @@ outputDisplays(string $render_pass)
     $display_cmd = $display_cmd +
       DRP_getDisplayEdgeDetectionString($render_pass, $i);
 
-    $display_cmd = $display_cmd + 
+    $display_cmd = $display_cmd +
       DRP_getDisplaySubset($render_pass, $i);
-    
+
     $display_cmd = $display_cmd + " " + DL_getDisplayExtraParameters(
       $render_pass, $image_file, $display_driver, $output_var );
 
@@ -7579,7 +7579,7 @@ outputDisplays(string $render_pass)
     }
 
     eval $display_cmd;
-    
+
     $is_first_display_output = 1;
   }
 }
@@ -7591,7 +7591,7 @@ outputImageFormat(string $render_pass)
   float   $y_res;
   float   $resolution_scale;
   float   $pixelAspectRatio;
-  
+
   $x_res = getAttr($render_pass + ".resolutionX");
   $y_res = getAttr($render_pass + ".resolutionY");
 
@@ -7607,8 +7607,8 @@ outputImageFormat(string $render_pass)
 }
 
 proc
-outputCameraProjection(string $camera_name, 
-                       float $x_res, float $y_res, 
+outputCameraProjection(string $camera_name,
+                       float $x_res, float $y_res,
                        float $pixel_aspect_ratio)
 {
   int $is_ortho;
@@ -7616,14 +7616,14 @@ outputCameraProjection(string $camera_name,
   float $lens_squeeze_ratio;
   float $film_pre_scale;
   float $film_post_scale;
-  
+
   $film_pre_scale = getAttr($camera_name + ".preScale");
   $film_post_scale = getAttr($camera_name + ".postScale");
-  
-  $is_ortho = getAttr($camera_name + ".orthographic");  
+
+  $is_ortho = getAttr($camera_name + ".orthographic");
 
   $lens_squeeze_ratio = 1.0;
-  
+
   if ($is_ortho)
   {
     float $aspect_ratio;
@@ -7631,10 +7631,10 @@ outputCameraProjection(string $camera_name,
     float $screen_height;
 
     $aspect_ratio = (float)($x_res)/$y_res;
-    
+
     float $ortho_width;
     $ortho_width = getAttr($camera_name + ".orthographicWidth");
-    
+
     $screen_width = convertUIunitsToCM($ortho_width);
     $screen_height = $screen_width/$aspect_ratio;
 
@@ -7655,13 +7655,13 @@ outputCameraProjection(string $camera_name,
     float $vert_film_offset;
     int $film_fit;
     float $camera_scale;
-        
+
     $horiz_film_aperture = getAttr($camera_name + ".horizontalFilmAperture");
     $vert_film_aperture = getAttr($camera_name + ".verticalFilmAperture");
 
     $horiz_film_offset = getAttr($camera_name + ".horizontalFilmOffset");
     $vert_film_offset = getAttr($camera_name + ".verticalFilmOffset");
-    
+
     $horiz_film_offset = $horiz_film_offset * $film_pre_scale * $film_post_scale;
     $vert_film_offset = $vert_film_offset * $film_pre_scale * $film_post_scale;
 
@@ -7714,8 +7714,8 @@ outputCameraProjection(string $camera_name,
       $screen_window[0] = -1 + $horiz_film_offset;
       $screen_window[1] = 1 + $horiz_film_offset;
       $screen_window[2] = -(1 / $resolution_ratio) + $vert_film_offset;
-      $screen_window[3] = (1 / $resolution_ratio) + $vert_film_offset;   
-      
+      $screen_window[3] = (1 / $resolution_ratio) + $vert_film_offset;
+
       $lens_squeeze_ratio = getAttr($camera_name + ".lensSqueezeRatio");
     }
     else
@@ -7740,7 +7740,7 @@ outputCameraProjection(string $camera_name,
     RiProjection -p $fov;
   }
 
-  $camera_scale = getAttr($camera_name + ".cameraScale");    
+  $camera_scale = getAttr($camera_name + ".cameraScale");
   $camera_scale = $camera_scale * $lens_squeeze_ratio;
   $camera_scale = $camera_scale / ($film_pre_scale * $film_post_scale);
 
@@ -7759,7 +7759,7 @@ outputProjection(string $render_pass, string $camera)
   float $x_res;
   float $y_res;
   float $pixel_aspect_ratio;
-  
+
   $x_res = getAttr($render_pass + ".resolutionX");
   $y_res = getAttr($render_pass + ".resolutionY");
 
@@ -7869,9 +7869,9 @@ outputShutterEfficiency( string $render_pass )
   {
     $efficiency[0] = getAttr( $render_pass + ".shutterEfficiencyA" );
     $efficiency[1] = getAttr( $render_pass + ".shutterEfficiencyB" );
-    
+
     RiOption -n "shutter"
-             -p "efficiency" "float[2]" ($efficiency[0] + " " + $efficiency[1]); 
+             -p "efficiency" "float[2]" ($efficiency[0] + " " + $efficiency[1]);
   }
 }
 
@@ -7896,18 +7896,18 @@ outputShadowMapDisplay(
   string  $display_mode;
 
   $shader_collection = DRP_getShaderCollection($render_pass);
-  $attribs_node = 
-    DL_getHighestLightAttribsNodeFromShape($light_name, 
+  $attribs_node =
+    DL_getHighestLightAttribsNodeFromShape($light_name,
                                            $shader_collection);
 
   string $param_string;
-  
+
   string $attr = "shadowMapType";
   string $node_with_attr = DLA_getNodeWithAttribute(
-    $attr, 
-    $attribs_node, 
+    $attr,
+    $attribs_node,
     $light_name);
-  
+
   if ($node_with_attr != "")
   {
     $shadow_map_type = DLA_getShadowMapType($node_with_attr);
@@ -7918,10 +7918,10 @@ outputShadowMapDisplay(
     $param_string = "-p \"filter\" \"string\" \"box\"";
     $param_string += " -p \"filterwidth\" \"float[2]\" \"1 1\"";
   }
-  
+
   $attr = "shadowMapName";
   $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
-  
+
   if ($node_with_attr != "")
   {
     $image_file = DLA_getShadowMapFilename($node_with_attr);
@@ -7930,8 +7930,8 @@ outputShadowMapDisplay(
   if ($image_file != "")
   {
     $image_file = DL_getExpandedFilename(
-      $image_file, 
-      $light_name, 
+      $image_file,
+      $light_name,
       $render_pass,
       "shadowmap");
   }
@@ -7949,10 +7949,10 @@ outputShadowMapDisplay(
   {
     $display_driver = "dsm";
     $display_mode = "\"rgba, float __thickness\"";
-      
+
     $attr = "volumeInterpretation";
     $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
-  
+
     if ($node_with_attr != "")
     {
       $param_string += " -p \"volumeinterpretation\" \"string\" \"" +
@@ -7964,37 +7964,37 @@ outputShadowMapDisplay(
   {
     $param_string += " -p \"aggregate\" \"integer\" \"1\"";
   }
-  
-  string $cmd = "RiDisplay -n \"" + $image_file + "\" -t " + $display_driver 
+
+  string $cmd = "RiDisplay -n \"" + $image_file + "\" -t " + $display_driver
     + "-m " + $display_mode + $param_string;
 
   eval($cmd);
 }
 
 proc
-outputShadowMapHider(string $light_name, 
+outputShadowMapHider(string $light_name,
                      string $shader_collection)
 {
-  string $attribs_node = 
-    DL_getHighestLightAttribsNodeFromShape($light_name, 
+  string $attribs_node =
+    DL_getHighestLightAttribsNodeFromShape($light_name,
                                            $shader_collection);
 
   string $shadow_map_type = "normal";
   string $attr = "shadowMapType";
   string $node_with_attr = DLA_getNodeWithAttribute(
-    $attr, 
-    $attribs_node, 
+    $attr,
+    $attribs_node,
     $light_name);
-  
+
   if ($node_with_attr != "")
   {
     $shadow_map_type = DLA_getShadowMapType($node_with_attr);
   }
-  
+
   string  $depth_filter = "min";
   $attr = "shadowDepthFilter";
   $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
-  
+
   if ($node_with_attr != "")
   {
     $depth_filter = DLA_getShadowMapDepthFilter($node_with_attr);
@@ -8022,46 +8022,46 @@ outputShadowMapHider(string $light_name,
 }
 
 proc int[]
-outputShadowMapFormat(string $light_name, 
+outputShadowMapFormat(string $light_name,
                       string $shader_collection)
 {
   string  $attribs_node;
   int     $x_res = -1;
   int     $y_res = -1;
 
-  $attribs_node = 
-    DL_getHighestLightAttribsNodeFromShape($light_name, 
+  $attribs_node =
+    DL_getHighestLightAttribsNodeFromShape($light_name,
                                            $shader_collection);
 
   string $attr = "shadowMapResolutionX";
   string $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
-  
+
   if ($node_with_attr != "")
   {
     $x_res = DLA_getShadowMapResolutionX($node_with_attr);
   }
-  
+
   $attr = "shadowMapResolutionY";
   $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
-  
+
   if ($node_with_attr != "")
   {
     $y_res = DLA_getShadowMapResolutionY($node_with_attr);
   }
-  
+
   if ($x_res >= 0 && $y_res >= 0)
   {
     $attr = "shadowMapType";
     $node_with_attr = DLA_getNodeWithAttribute(
-      $attr, 
-      $attribs_node, 
+      $attr,
+      $attribs_node,
       $light_name);
-  
+
     if ($node_with_attr != "")
     {
       string $type;
       $type = DLA_getShadowMapType($node_with_attr);
-      
+
       if ($type == "deep")
       {
         // Deep shadow maps are required to be square
@@ -8075,7 +8075,7 @@ outputShadowMapFormat(string $light_name,
           {
             $y_res = $x_res;
           }
-          
+
           warning("Deep Shadow Maps are required to be square.  "
             + "Changing resolution of "
             + $attribs_node
@@ -8108,7 +8108,7 @@ outputShadowMapFormat(string $light_name,
 }
 
 proc
-outputShadowMapClipping(string $shadow_camera, 
+outputShadowMapClipping(string $shadow_camera,
                         string $shader_collection)
 {
   string  $light_name;
@@ -8124,10 +8124,10 @@ outputShadowMapClipping(string $shadow_camera,
   else
   {
     $light_name = $shadow_camera;
-    $attribs_node = 
-      DL_getHighestLightAttribsNodeFromShape($light_name, 
+    $attribs_node =
+      DL_getHighestLightAttribsNodeFromShape($light_name,
                                              $shader_collection);
-  
+
     string $attr = "nearClipPlane";
     string $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
 
@@ -8139,7 +8139,7 @@ outputShadowMapClipping(string $shadow_camera,
     {
       $near_clip = 0.001;
     }
-    
+
     $attr = "farClipPlane";
     $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
 
@@ -8167,10 +8167,10 @@ outputShadowMapShutter(string $render_pass, string $light_name)
   float   $shutter_close;
 
   $shader_collection = DRP_getShaderCollection($render_pass);
-  $attribs_node = 
-    DL_getHighestLightAttribsNodeFromShape($light_name, 
+  $attribs_node =
+    DL_getHighestLightAttribsNodeFromShape($light_name,
                                            $shader_collection);
-  
+
   string $attr = "generateWithMotionBlur";
   string $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
 
@@ -8196,14 +8196,14 @@ outputShadowMapShutter(string $render_pass, string $light_name)
 }
 
 proc
-outputShadowMapShadingRate(string $light_name, 
+outputShadowMapShadingRate(string $light_name,
                            string $shader_collection)
 {
   string  $attribs_node;
   float   $shading_rate;
 
-  $attribs_node = 
-    DL_getHighestLightAttribsNodeFromShape($light_name, 
+  $attribs_node =
+    DL_getHighestLightAttribsNodeFromShape($light_name,
                                            $shader_collection);
 
   string $attr = "shadowMapShadingRate";
@@ -8224,7 +8224,7 @@ outputShadowMapShadingRate(string $light_name,
 }
 
 proc
-outputShadowMapPixelSamples(string $light_name, 
+outputShadowMapPixelSamples(string $light_name,
                             string $shader_collection)
 {
   string  $attribs_node;
@@ -8232,10 +8232,10 @@ outputShadowMapPixelSamples(string $light_name,
   float   $pixel_samples_x = 1;
   float   $pixel_samples_y = 1;
 
-  $attribs_node = 
-    DL_getHighestLightAttribsNodeFromShape($light_name, 
+  $attribs_node =
+    DL_getHighestLightAttribsNodeFromShape($light_name,
                                            $shader_collection);
-  
+
   string $attr = "shadowMapShadingRate";
   string $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
 
@@ -8259,13 +8259,13 @@ outputShadowMapPixelSamples(string $light_name,
     $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
 
     if ($node_with_attr != "")
-    { 
+    {
       $pixel_samples_x = DLA_getShadowMapPixelSamplesX($node_with_attr);
     }
-    
+
     $attr = "shadowMapPixelSamplesY";
     $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
-    
+
     if ($node_with_attr != "")
     {
       $pixel_samples_y = DLA_getShadowMapPixelSamplesY($node_with_attr);
@@ -8275,10 +8275,10 @@ outputShadowMapPixelSamples(string $light_name,
   RiPixelSamples -s $pixel_samples_x $pixel_samples_y;
 }
 
-proc 
-outputShadowMapProjection(string $shadow_camera, 
-                          string $shadow_objects[], 
-                          int $resolution[], 
+proc
+outputShadowMapProjection(string $shadow_camera,
+                          string $shadow_objects[],
+                          int $resolution[],
                           string $shader_collection)
 {
   string $light_name;
@@ -8291,23 +8291,23 @@ outputShadowMapProjection(string $shadow_camera,
   else
   {
     $light_name = $shadow_camera;
-    $attribs_node = 
-      DL_getHighestLightAttribsNodeFromShape($light_name, 
+    $attribs_node =
+      DL_getHighestLightAttribsNodeFromShape($light_name,
                                              $shader_collection);
 
     int $gen_cube_shd = 0;
     string $attr = "generateCubeShadowMap";
     string $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light_name);
-    
+
     if ($node_with_attr != "")
     {
       $gen_cube_shd = DLA_getGenerateCubeShadowMap($node_with_attr);
     }
-    
+
     string $transform;
     $transform = firstParentOf($light_name);
     float $scale[] = getAttr($transform + ".scale");
-      
+
     if( objExists( $light_name + ".coneAngle" ) )
     {
       float $coneAngle = getAttr($light_name + ".coneAngle");
@@ -8321,8 +8321,8 @@ outputShadowMapProjection(string $shadow_camera,
       }
       RiProjection -p $coneAngle;
     }
-    else if(   nodeType($light_name) == "pointLight" 
-            || (   nodeType($light_name) == "volumeLight" 
+    else if(   nodeType($light_name) == "pointLight"
+            || (   nodeType($light_name) == "volumeLight"
                 && `getAttr -asString ($light_name + ".lightShape")` != "Cone" )
             || $gen_cube_shd)
     {
@@ -8348,10 +8348,10 @@ outputShadowMapProjection(string $shadow_camera,
         0, $scale[1], 0, 0;
         0, 0, $scale[2], 0;
         0, 0, 0, 1>>;
-      
+
       matrix $scaled_xform_mat[4][4] = $scale_mat * $lightXform_mat;
       float $scaledXform[] = matrix44ToFloat16($scaled_xform_mat);
-      
+
       float $worldBBox[6] = `exactWorldBoundingBox $shadow_objects`;
       float $cameraBBox[6] = transformBBox( $worldBBox, $scaledXform );
 
@@ -8404,7 +8404,7 @@ proc
 outputHider(string $render_pass)
 {
   string $hider = DRP_getHider($render_pass);
-  
+
   if ($hider == "photon")
   {
     RiHider -n "photon" -p "emit" "integer" `DRP_getNumberOfPhotons($render_pass)`;
@@ -8414,9 +8414,9 @@ outputHider(string $render_pass)
     string $cmd = "RiHider -n " + $hider;
     $cmd += " -p \"depthfilter\" \"string\" " + DRP_getDepthFilter($render_pass);
     $cmd += " -p \"jitter\" \"integer\" ";
-  
+
     int $primary_index = DRP_getDisplayPrimaryIndex($render_pass);
-    
+
     if (   $primary_index >= 0
         && DRP_isDisplayRenderable($render_pass, $primary_index)
         && DRP_getDisplayDriver($render_pass, $primary_index) == "shadowmap")
@@ -8490,8 +8490,8 @@ outputPhotonMapAttributes(string $render_pass)
   //
   string $global_map = DRP_getGlobalPhotonMap( $render_pass );
   string $caustic_map = DRP_getCausticPhotonMap( $render_pass );
-  
-  RiAttribute 
+
+  RiAttribute
     -n "photon"
     -p "globalmap" "string" $global_map
     -p "causticmap" "string" $caustic_map;
@@ -8560,9 +8560,9 @@ outputShadowMapImageOptions(
 
   $resolution = outputShadowMapFormat($light_name, $shader_collection);
 
-  outputShadowMapProjection($shadow_camera, 
-                            $shadow_objects, 
-                            $resolution, 
+  outputShadowMapProjection($shadow_camera,
+                            $shadow_objects,
+                            $resolution,
                             $shader_collection);
 
   outputShadowMapClipping($shadow_camera, $shader_collection);
@@ -8640,7 +8640,7 @@ outputRIBoptions(string $render_pass,
   int     $eye_splits;
 
   int     $texture_memory;
-  
+
   int     $grid_size;
 
   int     $bucket_size_x;
@@ -8662,7 +8662,7 @@ outputRIBoptions(string $render_pass,
   string  $shader_collection;
 
   int     $progress;
-  
+
   $shader_path = getAttr($render_pass + ".shaderPath");
   $texture_path = getAttr($render_pass + ".texturePath");
   $procedural_path = getAttr($render_pass + ".proceduralPath");
@@ -8691,11 +8691,11 @@ outputRIBoptions(string $render_pass,
 
   $standard_atmosphere = getAttr($render_pass + ".standardAtmosphere");
   $volume_shading_rate = getAttr($render_pass + ".volumeShadingRate");
-  
+
   $shader_collection = DRP_getShaderCollection($render_pass);
 
   $progress = getAttr($render_pass + ".outputRenderProgress");
-  
+
   if (objExists($render_pass + ".passName"))
     $pass_name = getAttr($render_pass + ".passName");
   else
@@ -8758,7 +8758,7 @@ outputRIBoptions(string $render_pass,
       "",
       $render_pass,
       "");
-      
+
     RiOption -n "netcache"
              -p "cachedir" "string" $netcache_dir
              -p "cachesize" "integer" $netcache_size;
@@ -8769,7 +8769,7 @@ outputRIBoptions(string $render_pass,
            -p "filename" "string" $statistics_file;
 
   RiOption -n "statistics" -p "progress" "integer" $progress;
-  
+
   RiOption -n "render" -p "standardatmosphere" "integer" $standard_atmosphere
     -p "volumeshadingrate" "float" $volume_shading_rate;
 
@@ -8787,17 +8787,17 @@ proc
 outputShadowMapUserAttribs(string $render_pass)
 {
   RiAttribute -n "user" -p "ShadowMapRendering" "float" "1";
-  
+
   if (!DRP_getUseDisplacementShadersInShadows($render_pass))
   {
     RiAttribute -n "user" -p "_3dfm_filter_displacement" "float" "1";
   }
-  
+
   if (!DRP_getUseSurfaceShadersInShadows($render_pass))
   {
     RiAttribute -n "user" -p "_3dfm_filter_surface" "float" "1";
   }
-    
+
   if (!DRP_getUseAtmosphereShadersInShadows($render_pass))
   {
     RiAttribute -n "user" -p "_3dfm_filter_atmosphere" "float" "1";
@@ -8843,7 +8843,7 @@ DRP_outputGeoAttribsArchives(
   }
 
   string $curr_frame = `delightRenderState -qf`;
-  
+
   int $num_attribs_to_archive = size($attribs_to_archive);
   beginProgressRange( 33, $num_attribs_to_archive );
 
@@ -8869,7 +8869,7 @@ DRP_outputGeoAttribsArchives(
 }
 
 proc
-outputInstancerGeometryArchives(string $render_pass, 
+outputInstancerGeometryArchives(string $render_pass,
                                 string $instancer_geometry[])
 {
   string $shader_collection;
@@ -8890,7 +8890,7 @@ outputInstancerGeometryArchives(string $render_pass,
 
   $shader_collection = DRP_getShaderCollection($render_pass);
   int $use_translated_shaders = `DRP_getUseMayaShaders($render_pass)`;
-  int $use_surface_shaders_in_shadows = 
+  int $use_surface_shaders_in_shadows =
     `DRP_getUseSurfaceShadersInShadows($render_pass)`;
 
   int $use_displacement_shaders_in_shadows =
@@ -8899,7 +8899,7 @@ outputInstancerGeometryArchives(string $render_pass,
   int $use_atmosphere_shaders_in_shadows =
     `DRP_getUseAtmosphereShadersInShadows($render_pass)`;
 
-  int $use_interior_shaders_in_shadows = 
+  int $use_interior_shaders_in_shadows =
     `DRP_getUseInteriorShadersInShadows($render_pass)`;
 
   int $user_pre_geo_mel_exists = `exists("DL_userPreGeoMel")`;
@@ -8907,8 +8907,8 @@ outputInstancerGeometryArchives(string $render_pass,
 
   for ($geo in $instancer_geometry)
   {
-    string $all_attribs_nodes[] = 
-      DL_getAllGeoAttribsNodesFromShape($geo, 
+    string $all_attribs_nodes[] =
+      DL_getAllGeoAttribsNodesFromShape($geo,
                                         $shader_collection);
 
     RiArchiveBegin -n ($geo + " instancer");
@@ -8918,11 +8918,11 @@ outputInstancerGeometryArchives(string $render_pass,
         RiAttribute -n "identifier" -p "name" "string" $geo;
 
         string $shortest_unique_names[] = `ls $geo`;
-        string $shortest_unique_name = 
+        string $shortest_unique_name =
           DL_substituteAllString($shortest_unique_names[0], "|", "#");
 
-        RiAttribute 
-          -n "user" 
+        RiAttribute
+          -n "user"
           -p "delight_shortest_unique_name" "string" $shortest_unique_name;
 
         outputTransform($geo, 0, 1, $is_rib_archiving_mode);
@@ -8936,16 +8936,16 @@ outputInstancerGeometryArchives(string $render_pass,
         if ($user_pre_geo_mel_exists)
         {
           string $cmd = "DL_userPreGeoMel("
-            + "\"" + $render_pass + "\", " 
+            + "\"" + $render_pass + "\", "
             + "\"" + $geo + "\", "
             + "{}, "
             + "-1";
-          
+
           string $attribs_string = DL_stringArrayToStringForEval($all_attribs_nodes);
 
           // The next line may trigger an error message in Maya, To avoid it,
           // update your DL_userPreGeoMel procedure to this syntax:
-          // DL_userPreGeoMel(string $pass, string $geo, string $vis_lights[], 
+          // DL_userPreGeoMel(string $pass, string $geo, string $vis_lights[],
           //                  int is_shadow, string $attribs[])
           //
           // The catch() makes this error harmless.
@@ -9024,11 +9024,11 @@ outputInstancerGeometryArchives(string $render_pass,
           //
           string $visible_lights[];
           clear($visible_lights);
-          
+
           DL_userPostGeoMel(
-            $render_pass, 
-            $geo, 
-            $visible_lights, 
+            $render_pass,
+            $geo,
+            $visible_lights,
             -1,
             $all_attribs_nodes);
         }
@@ -9045,7 +9045,7 @@ outputInstancerGeometryArchives(string $render_pass,
   }
 }
 
-proc 
+proc
 DRP_outputInstancerArchives(string $render_pass)
 {
   outputRIBcomment("");
@@ -9072,8 +9072,8 @@ DRP_outputInstancerArchives(string $render_pass)
 
   for ($instancer in $instancers_to_archive)
   {
-    // Instancers will output several archives (one for each of 
-    // its geo) and all the RiArchiveBegin and RiArchiveEnd calls 
+    // Instancers will output several archives (one for each of
+    // its geo) and all the RiArchiveBegin and RiArchiveEnd calls
     // will be done in the API.
     delightCacheInstancer -emit $instancer;
 
@@ -9098,10 +9098,10 @@ DRP_outputImagerShader(string $render_pass)
     string  $render_camera;
     string  $imager_shader;
     string  $collection;
-    
+
     $render_camera = DRP_getRenderCamera($render_pass);
     $collection = DRP_getShaderCollection($render_pass);
-    
+
     $imager_shader = DL_getShaderFromShape($render_camera, "imager", $collection);
 
     if ($imager_shader != "")
@@ -9125,11 +9125,11 @@ DRP_outputImagerShader(string $render_pass)
 
 proc
 outputLight(
-  string $light, 
+  string $light,
   int $output_xforms,
-  int $concatenate_xforms, 
+  int $concatenate_xforms,
   int $is_rib_archiving_mode,
-  string $shader_collection, 
+  string $shader_collection,
   string $area_light_plane,
   int $illuminate)
 {
@@ -9139,7 +9139,7 @@ outputLight(
   int     $is_key_light = 0;
 
   $attribs_node = DL_getHighestLightAttribsNodeFromShape(
-    $light, 
+    $light,
     $shader_collection);
 
   string $attr = "generateShadowMaps";
@@ -9151,17 +9151,17 @@ outputLight(
     {
       $attr = "shadowMapName";
       $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light);
-      
+
       if ($node_with_attr != "")
       {
         $shadowmap_name = DLA_getShadowMapFilename($node_with_attr);
       }
-      
+
       if ($shadowmap_name != "")
       {
         $shadowmap_name = DL_getExpandedFilename(
-          $shadowmap_name, 
-          $light, 
+          $shadowmap_name,
+          $light,
           `delightRenderState -qrn`,
           "shadowmap");
       }
@@ -9174,28 +9174,28 @@ outputLight(
   else if (attributeExists("useDepthMapShadows", $light) == 1)
   {
     if (getAttr($light + ".useDepthMapShadows") == 1)
-    {      
+    {
       $shadowmap_name = getDepthMapFilename($light);
     }
   }
 
   $attr = "emitPhotons";
   $node_with_attr = DLA_getNodeWithAttribute($attr, $attribs_node, $light);
-  
+
   if ($node_with_attr != "")
   {
     $emit_photons = DLA_emitPhotons($node_with_attr);
   }
- 
+
   string $shortest_paths[] = `ls $light`;
   string $shortest_path = $shortest_paths[0];
 
   // We need an attribute block here since the "shadows" attribute
-  // below has to be bound to this light only. Same goes for 
+  // below has to be bound to this light only. Same goes for
   // automatic photon mapping attribute...
   //
   RiAttributeBegin;
-  
+
     RiAttribute -n "identifier" -p "name" "string" $light;
 
     if ($shadowmap_name != "")
@@ -9208,20 +9208,20 @@ outputLight(
     {
       outputTransform($light, 0, $concatenate_xforms, $is_rib_archiving_mode);
     }
-   
-    // RenderMan light shaders usually look into the positive Z direction 
-    // (from=[0,0,0], to=[0,0,1]) but Maya lights look into the opposite way 
-    // (to=[0,0-1]). So I put this RiScale here and I cross my fingers not 
-    // to break anything! 
-    // More seriously, this could be bad if the light shader transforms 
-    // points or normals to its own "shader" space. But in my experience, 
-    // this is very rare. 
+
+    // RenderMan light shaders usually look into the positive Z direction
+    // (from=[0,0,0], to=[0,0,1]) but Maya lights look into the opposite way
+    // (to=[0,0-1]). So I put this RiScale here and I cross my fingers not
+    // to break anything!
+    // More seriously, this could be bad if the light shader transforms
+    // points or normals to its own "shader" space. But in my experience,
+    // this is very rare.
     //
     RiScale 1 1 -1;
 
     if ($emit_photons == 1)
     {
-      RiAttribute -n "light" -p "emitphotons" "string" "on"; 
+      RiAttribute -n "light" -p "emitphotons" "string" "on";
     }
 
     $node_with_attr = DLA_getNodeWithAttribute("samples", $attribs_node, $light);
@@ -9230,23 +9230,23 @@ outputLight(
       int $samples = DLA_getSamples($node_with_attr);
       RiAttribute -n "light" -p "samples" "integer" $samples;
     }
-    
+
     $node_with_attr = DLA_getNodeWithAttribute(
-      "samplingStrategy", 
-      $attribs_node, 
+      "samplingStrategy",
+      $attribs_node,
       $light);
-      
+
     if ($node_with_attr != "")
     {
       int $sampling_strategy = DLA_getSamplingStrategy($node_with_attr);
-      
-      RiAttribute 
-        -n "light" 
-        -p "samplingstrategy" "string" 
+
+      RiAttribute
+        -n "light"
+        -p "samplingstrategy" "string"
           ($sampling_strategy > 0 ? "illuminance" : "lightsource");
     }
-    
-    RiIfBegin -e 
+
+    RiIfBegin -e
       (   "!defined(user:_3dfm_filter_lightsource) " +
        "|| $user:_3dfm_filter_lightsource == 0");
 
@@ -9256,12 +9256,12 @@ outputLight(
       $light_output_cmd += "(\"" + $shortest_path;
       $light_output_cmd += "\", \"" + $shader_collection;
       $light_output_cmd +=  "\")";
-      
+
       eval($light_output_cmd);
     }
     else
     {
-      string $light_shader = 
+      string $light_shader =
         DL_getShaderFromShape($light, "light", $shader_collection);
 
       if ($light_shader != "")
@@ -9283,7 +9283,7 @@ outputLight(
     }
 
     RiIfEnd;
-    
+
   RiAttributeEnd;
 
   // We have to switch this light on since, by default, it is disabled
@@ -9306,8 +9306,8 @@ outputLight(
 proc
 DRP_outputLights(
   string $render_pass,
-  string $visible_lights[], 
-  int $output_transforms, 
+  string $visible_lights[],
+  int $output_transforms,
   string $area_light_plane)
 {
   outputRIBcomment("");
@@ -9325,25 +9325,25 @@ DRP_outputLights(
     {
       RiIfBegin -e "!defined(IgnoreArchivedLighting)";
     }
-    
+
     $concatenate_xforms = DRP_getConcatenateLightTransforms($render_pass);
   }
   else
   {
     $concatenate_xforms = 0;
   }
-  
+
   $shader_collection = DRP_getShaderCollection($render_pass);
 
-  string $default_light_set_members[] = getDefaultLightSetShapes(1);  
+  string $default_light_set_members[] = getDefaultLightSetShapes(1);
   string $vis_lights_in_default_light_set[] = DL_stringArrayIntersect(
-    $visible_lights, 
+    $visible_lights,
     $default_light_set_members);
-    
+
   string $vis_lights_not_in_default_light_set[] = DL_stringArrayDifference(
     $visible_lights,
     $vis_lights_in_default_light_set);
-  
+
   beginProgressRange( 25, size($visible_lights) );
   string $curr_frame = `delightRenderState -qf`;
   setProgressMessage( "Frame " + $curr_frame + ": outputting lights: ", 0 );
@@ -9351,9 +9351,9 @@ DRP_outputLights(
   for ($curr_light in $vis_lights_in_default_light_set)
   {
     outputLight(
-      $curr_light, 
-      $output_transforms, 
-      $concatenate_xforms, 
+      $curr_light,
+      $output_transforms,
+      $concatenate_xforms,
       $is_rib_archiving_mode,
       $shader_collection,
       $area_light_plane,
@@ -9365,11 +9365,11 @@ DRP_outputLights(
   for ($curr_light in $vis_lights_not_in_default_light_set)
   {
     outputLight(
-      $curr_light, 
-      $output_transforms, 
-      $concatenate_xforms, 
+      $curr_light,
+      $output_transforms,
+      $concatenate_xforms,
       $is_rib_archiving_mode,
-      $shader_collection, 
+      $shader_collection,
       $area_light_plane,
       0);
 
@@ -9387,19 +9387,19 @@ DRP_outputLights(
 
 proc
 DRP_outputGeometryShaderArchives(
-  string $render_pass, 
+  string $render_pass,
   string $all_renderable_geometry[])
 {
   float $start_time = `timerX`;
 
   int $use_maya_shaders;
   $use_maya_shaders = getAttr($render_pass + ".useMayaShaders");
-  
+
   // Get the shader collection used by the render pass
   //
   string $shader_collection = DRP_getShaderCollection($render_pass);
 
-  string $shader_types[] = 
+  string $shader_types[] =
     {"surface", "displacement", "atmosphere", "interior"};
 
   string $shaders_to_archive[];
@@ -9413,10 +9413,10 @@ DRP_outputGeometryShaderArchives(
     for ($shape in $all_renderable_geometry)
     {
       string $shader;
-      
+
       $shader = DL_getHighestAttribsNodeFromShape(
-        $shape, 
-        $shader_type, 
+        $shape,
+        $shader_type,
         $shader_collection);
 
       if ($shader == "")
@@ -9425,12 +9425,12 @@ DRP_outputGeometryShaderArchives(
         {
           string $maya_shader;
           $maya_shader = getTranslatedMayaShaderName($shape, $shader_type);
-          
+
           if ($shader_type == "surface" && $maya_shader == "")
           {
             $maya_shader = getTranslatedMayaShaderName($shape, "miMaterial");
           }
-          
+
           if ($maya_shader != "")
           {
             $maya_shaders_to_archive[size($maya_shaders_to_archive)] =
@@ -9440,7 +9440,7 @@ DRP_outputGeometryShaderArchives(
       }
       else
       {
-        $shaders_to_archive[size($shaders_to_archive)] = 
+        $shaders_to_archive[size($shaders_to_archive)] =
           ($shader + " " + $shader_type);
       }
     }
@@ -9452,11 +9452,11 @@ DRP_outputGeometryShaderArchives(
 
 
   string $curr_frame = `delightRenderState -qf`;
-  
+
   int $num_shaders_to_archive = size($shaders_to_archive);
   $num_shaders_to_archive += size($maya_shaders_to_archive);
   beginProgressRange( 33, $num_shaders_to_archive );
-  
+
   if (size($shaders_to_archive) != 0 || size($maya_shaders_to_archive) != 0)
   {
     outputRIBcomment("");
@@ -9560,7 +9560,7 @@ DRP_outputGeometryArchives(string $render_pass)
     outputRIBcomment("");
     outputRIBcomment("Start of RIB fragments.");
     outputRIBcomment("{");
-  
+
     for ($i in $fragment_indices)
     {
       int     $do_write = DRP_getFragmentWriteState($render_pass, $i);
@@ -9638,7 +9638,7 @@ DRP_outputGeometryArchives(string $render_pass)
     outputRIBcomment("\n");
   }
 
-  
+
   // now for the rest of the geometry in the scene
   $active_cache_commands = getActiveCacheCommands();
 
@@ -9686,8 +9686,8 @@ output_boundingBox(float $bbox[])
     outputRIBcomment($comment);
   }
 }
-  
-    
+
+
 // ----------------------------------------------------------------------------
 // High level procedures which perform a render
 //
@@ -9719,7 +9719,7 @@ DRP_cacheScene(string $render_pass,
   $is_cancelled = 0;
 
   setProgressMessage( "Frame " + $curr_frame + ": caching geometry: ", 1 );
-  
+
   // first build a list of all those shapes whose geometry we will be caching
   $geos_to_cache = stringArrayCatenate($first_instances,
                                        $noninstanced_geometry);
@@ -9762,7 +9762,7 @@ DRP_cacheScene(string $render_pass,
 
     if (!isInstanced($curr_geo))
     {
-      $curr_attribs_nodes = 
+      $curr_attribs_nodes =
         DL_getAllGeoAttribsNodesFromShape($curr_geo, $shader_collection);
 
       $curr_attribs_node = DL_highestNodeWithAttrib("outputGeometry",
@@ -9816,7 +9816,7 @@ DRP_cacheScene(string $render_pass,
 
   // Figure out the maximum number of elements to cache
   int $num_obj_to_cache;
-  
+
   $num_obj_to_cache = size($all_cameras) - $global_do_camera_blur +
                       size($visible_lights) * size($xform_sample_offsets) +
                       size($clipping_planes) +
@@ -9826,7 +9826,7 @@ DRP_cacheScene(string $render_pass,
                       size($geos_to_cache) * size($deform_sample_offsets);
 
   beginProgressRange( 100, $num_obj_to_cache );
-  
+
   $shutter_open_offset = `delightRenderState -qso`;
 
   $curr_time = $curr_frame + $shutter_open_offset;
@@ -9881,8 +9881,8 @@ DRP_cacheScene(string $render_pass,
 
       if (catch(`eval($geo_cache_command)`))
       {
-        warning(  "Could not cache geometry:" 
-                + $curr_geo 
+        warning(  "Could not cache geometry:"
+                + $curr_geo
                 + ". It will not be rendered.\n");
       }
     }
@@ -9925,7 +9925,7 @@ DRP_cacheScene(string $render_pass,
       break;
 
     float $new_time = $curr_frame + $sample_offset;
-  
+
     if( $new_time - $curr_time < 1e-14)
     {
       continue;
@@ -9949,7 +9949,7 @@ DRP_cacheScene(string $render_pass,
 
       incProgress( 1, 1 );
     }
-        
+
     if( $cs_xform + 1 < size($xform_sample_offsets) &&
         $xform_sample_offsets[$cs_xform + 1] - $sample_offset < 1e-14)
     {
@@ -9963,7 +9963,7 @@ DRP_cacheScene(string $render_pass,
           break;
         }
 
-        $curr_attribs_nodes = 
+        $curr_attribs_nodes =
           DL_getAllGeoAttribsNodesFromShape($curr_xform, $shader_collection);
 
         $curr_attribs_node = DL_highestNodeWithAttrib("transformationBlur",
@@ -9985,7 +9985,7 @@ DRP_cacheScene(string $render_pass,
         {
           $do_cache = 1;
         }
-        
+
         if( $do_cache )
         {
           if( $actual_time != $curr_time )
@@ -10008,7 +10008,7 @@ DRP_cacheScene(string $render_pass,
           break;
         }
 
-        $curr_attribs_nodes = 
+        $curr_attribs_nodes =
           DL_getAllLightAttribsNodesFromShape($curr_light, $shader_collection);
 
         $curr_attribs_node = DL_highestNodeWithAttrib("transformationBlur",
@@ -10036,7 +10036,7 @@ DRP_cacheScene(string $render_pass,
         incProgress( 1, 1 );
       }
     }
-    
+
     if( $cs_deform + 1 < size($deform_sample_offsets) &&
         $deform_sample_offsets[$cs_deform + 1] - $sample_offset < 1e-14)
     {
@@ -10053,7 +10053,7 @@ DRP_cacheScene(string $render_pass,
           break;
         }
 
-        $curr_attribs_nodes = 
+        $curr_attribs_nodes =
           DL_getAllGeoAttribsNodesFromShape($curr_geo, $shader_collection);
 
         $curr_attribs_node = DL_highestNodeWithAttrib("deformationBlur",
@@ -10092,8 +10092,8 @@ DRP_cacheScene(string $render_pass,
 
           if (catch(`eval($geo_cache_command)`))
           {
-            warning(  "Could not cache geometry:" 
-                    + $curr_geo 
+            warning(  "Could not cache geometry:"
+                    + $curr_geo
                     + ". It will not be rendered.\n");
           }
         }
@@ -10134,14 +10134,14 @@ checkRibFileName(string $rib_file, string $render_pass)
     {
       $directory_name = ".";
       warning(
-        "no path specified in RIB file in " 
-        + $render_pass 
+        "no path specified in RIB file in "
+        + $render_pass
         + ". Writing RIB to current directory ("
         + `pwd`
         + ").");
     }
 
-    if (`filetest -d $directory_name`) 
+    if (`filetest -d $directory_name`)
     {
       // directory exists
 
@@ -10194,7 +10194,7 @@ checkRibFileName(string $rib_file, string $render_pass)
       // directory doesn't exist
 
       int $dir_created;
-      
+
       $dir_created = `sysFile -makeDir $directory_name`;
 
       if ($dir_created)
@@ -10233,12 +10233,12 @@ DRP_isValid(string $render_pass)
 {
   //
   // Description:
-  //  This procedure is called from DL_render.mel to verify that the specified 
-  //  render pass is valid before attempting to render the scene using the 
+  //  This procedure is called from DL_render.mel to verify that the specified
+  //  render pass is valid before attempting to render the scene using the
   //  render pass.
   //
   // Returns:
-  //  True if the render pass is valid, false if not. 
+  //  True if the render pass is valid, false if not.
   //  However, it is important to note that if the render pass is not valid,
   //  most likely this procedure will issue an error, halting execution of the
   //  script, making the return value irrelevant.
@@ -10305,12 +10305,12 @@ DRP_isValid(string $render_pass)
     int $display_indices[] = DRP_getDisplayIndices($render_pass);
     int $primary_index = DRP_getDisplayPrimaryIndex($render_pass);
     int $render_secondary = DRP_getRenderSecondaryDisplays($render_pass);
-      
+
     for($i in $display_indices)
     {
       if ($i != $primary_index && !$render_secondary)
         continue;
-        
+
       if (!DRP_isDisplayRenderable($render_pass, $i))
         continue;
 
@@ -10329,14 +10329,14 @@ DRP_isValid(string $render_pass)
       $is_valid = 0;
     }
   }
-  
+
   if (   DRP_getHider($render_pass) == "photon"
       && DRP_getNumberOfPhotons($render_pass) == 0)
   {
     error("Need to specify number of photons > 0 with 'photon' hider.");
     $is_valid = 0;
   }
-  
+
   return $is_valid;
 }
 
@@ -10359,7 +10359,7 @@ getBuildOptForDisplayMode(string $mode)
 
 		$opts += " -DUSE_AOV_" + $var_name;
 	}
-	
+
 	return $opts;
 }
 
@@ -10369,7 +10369,7 @@ buildShaderdlAOVOpts( string $render_pass, string $all_renderable_geometry[] )
   string $opts;
   int $add_use_bgd_aov = 0;
   int $define_all_aovs = 0;
-  
+
   int $translated_shaders_aovs = getAttr($render_pass + ".translatedShadersAOVs");
 
   if (   (   $translated_shaders_aovs == 0
@@ -10398,17 +10398,17 @@ buildShaderdlAOVOpts( string $render_pass, string $all_renderable_geometry[] )
     // approach.
     //
     $add_use_bgd_aov = size(`ls -type "useBackground"`);
-    
+
     int $primary_index = DRP_getDisplayPrimaryIndex($render_pass);
-    
-    if (   $primary_index >= 0 
+
+    if (   $primary_index >= 0
         && DRP_isDisplayRenderable($render_pass, $primary_index))
     {
-      string $output_var = 
+      string $output_var =
         DRP_getDisplayOutputVariable($render_pass, $primary_index);
       $opts += getBuildOptForDisplayMode($output_var);
     }
-    
+
     if (DRP_getRenderSecondaryDisplays($render_pass))
     {
       int $display_indices[] = DRP_getDisplayIndices( $render_pass );
@@ -10416,7 +10416,7 @@ buildShaderdlAOVOpts( string $render_pass, string $all_renderable_geometry[] )
       {
         if ($i == $primary_index)
           continue;
-          
+
         string $output_var = DRP_getDisplayOutputVariable($render_pass, $i);
         $opts += getBuildOptForDisplayMode($output_var);
       }
@@ -10427,7 +10427,7 @@ buildShaderdlAOVOpts( string $render_pass, string $all_renderable_geometry[] )
   {
     $opts += " -DUSE_SHADER_usebackground";
   }
-  
+
   return $opts;
 }
 
@@ -10439,7 +10439,7 @@ DRP_buildShaders(string $render_pass)
 
   float $build_shaders_start_time = `timerX`;
 
-  beginProgress("Building Shaders ", 100);  
+  beginProgress("Building Shaders ", 100);
 
   string $all_renderable_geometry[];
   string $particle_instancers[];
@@ -10454,11 +10454,11 @@ DRP_buildShaders(string $render_pass)
   string $built_shaders;
 
   $shaders_path = DL_getExpandedAbsoluteOutputPath(
-    "", 
-    "", 
+    "",
+    "",
     $render_pass,
     DL_getShadersPath());
-    
+
   $sl_output_path = DL_createDir($shaders_path + "/src");
   $sdl_output_path = DL_createDir($shaders_path + "/OBJ");
 
@@ -10468,8 +10468,8 @@ DRP_buildShaders(string $render_pass)
   $object_set_to_render = DRP_getObjectsToRenderSet($render_pass);
   $shader_collection = DRP_getShaderCollection($render_pass);
 
-  $all_renderable_geometry = 
-    getAllRenderableVisibleGeometry($object_set_to_render, 
+  $all_renderable_geometry =
+    getAllRenderableVisibleGeometry($object_set_to_render,
                                     $render_layer_shapes);
 
   $shaderdl_opts = buildShaderdlAOVOpts( $render_pass, $all_renderable_geometry );
@@ -10485,7 +10485,7 @@ DRP_buildShaders(string $render_pass)
   // Don't compile geometry shaders if they're not needed.
   int $compile_geo_shaders = 1;
 
-  if(   DRP_isRIBArchivingMode($render_pass) 
+  if(   DRP_isRIBArchivingMode($render_pass)
      && getAttr($render_pass + ".archiveGeometryShaders") == 0)
   {
     $compile_geo_shaders = 0;
@@ -10495,15 +10495,15 @@ DRP_buildShaders(string $render_pass)
   {
     string $archived_instancers_placeholder[];
 
-    $particle_instancers = getVisibleInstancers($object_set_to_render, 
-                                                $layer_to_render, 
-                                                $archived_instancers_placeholder, 
+    $particle_instancers = getVisibleInstancers($object_set_to_render,
+                                                $layer_to_render,
+                                                $archived_instancers_placeholder,
                                                 $renderable_instancer_geo,
                                                 $render_layer_shapes);
 
     DL_stringArrayAppend($all_renderable_geometry, $renderable_instancer_geo);
 
-    $all_renderable_geometry = 
+    $all_renderable_geometry =
       DL_stringArrayRemoveDuplicates($all_renderable_geometry);
 
     beginProgressRange( 100, size($all_renderable_geometry) );
@@ -10521,14 +10521,14 @@ DRP_buildShaders(string $render_pass)
       string $displacement_shader_node;
 
       $surface_shader_node = DL_getHighestAttribsNodeFromShape(
-        $curr_geo, 
-        "surface", 
+        $curr_geo,
+        "surface",
         $shader_collection);
       $displacement_shader_node = DL_getHighestAttribsNodeFromShape(
-        $curr_geo, 
-        "displacement", 
+        $curr_geo,
+        "displacement",
         $shader_collection);
-      
+
       if ($surface_shader_node == "" || $displacement_shader_node == "")
       {
         string $shading_groups[] = getShadingGroups( $curr_geo );
@@ -10537,7 +10537,7 @@ DRP_buildShaders(string $render_pass)
         {
           string $type = "surface";
           string $shader = shadingGroupsShaderName( $shading_groups, $type );
-          
+
           if ($shader == "")
           {
             $type = "miMaterial";
@@ -10550,12 +10550,12 @@ DRP_buildShaders(string $render_pass)
             $built_shaders += (" " + $shader + " ");
 
             catch(buildShader($shader,
-                              $shading_groups, 
-                              $type, 
-                              $shaderdl_opts, 
-                              $sl_output_path, 
+                              $shading_groups,
+                              $type,
+                              $shaderdl_opts,
+                              $sl_output_path,
                               $sdl_output_path,
-                              $write_to_disk));       
+                              $write_to_disk));
           }
         }
 
@@ -10570,26 +10570,26 @@ DRP_buildShaders(string $render_pass)
             $built_shaders += (" " + $shader + " ");
 
             catch(buildShader($shader,
-                              $shading_groups, 
-                              $type, 
-                              $shaderdl_opts, 
-                              $sl_output_path, 
+                              $shading_groups,
+                              $type,
+                              $shaderdl_opts,
+                              $sl_output_path,
                               $sdl_output_path,
-                              $write_to_disk));       
+                              $write_to_disk));
           }
         }
       }
     }
   }
-  
+
   int $compile_light_shaders = 1;
-  
-  if(   DRP_isRIBArchivingMode($render_pass) 
+
+  if(   DRP_isRIBArchivingMode($render_pass)
      && getAttr($render_pass + ".archiveLighting") == 0)
   {
     $compile_light_shaders = 0;
   }
-  
+
   if ($compile_light_shaders)
   {
     string $visible_lights[] = getVisibleLights(
@@ -10597,7 +10597,7 @@ DRP_buildShaders(string $render_pass)
       $render_layer_shapes);
 
     $visible_lights = DL_stringArrayIntersect(
-      $visible_lights, 
+      $visible_lights,
       $render_layer_shapes);
 
     // Use short names if possible.
@@ -10623,12 +10623,12 @@ DRP_buildShaders(string $render_pass)
           string $shading_groups[] = { $curr_light };
 
           catch(buildShader($shader,
-                            $shading_groups, 
-                            "light", 
-                            $shaderdl_opts, 
-                            $sl_output_path, 
+                            $shading_groups,
+                            "light",
+                            $shaderdl_opts,
+                            $sl_output_path,
                             $sdl_output_path,
-                            $write_to_disk));       
+                            $write_to_disk));
         }
       }
     }
@@ -10642,29 +10642,29 @@ DRP_buildShaders(string $render_pass)
   if( $g_no_timing_comments == "" )
   {
     string $comment = (
-      "Hypershade shaders built in " 
+      "Hypershade shaders built in "
       + `timerX -startTime $build_shaders_start_time`
       + "s");
     print($comment + "\n");
   }
 }
- 
+
 proc int
 DRP_writeArchiveForFrame(string $archive_node,
                          int $frame)
 {
   int $ret_val;
   $ret_val = 0;
-  
+
   string $connected_render_pass;
-  $connected_render_pass = 
+  $connected_render_pass =
     getConnectedNode($archive_node + ".connectedRenderPass");
-  
+
   if ($connected_render_pass != "" && DRP_isValid($connected_render_pass))
   {
     string $rib_filename;
     $rib_filename = DL_getExpandedFilename(
-      getAttr($archive_node + ".ribFilename"), 
+      getAttr($archive_node + ".ribFilename"),
       "",
       $connected_render_pass,
       "rib");
@@ -10676,13 +10676,13 @@ DRP_writeArchiveForFrame(string $archive_node,
       int $prev_start_frame;
       int $prev_end_frame;
       int $prev_generate_rib_archives;
-      
+
       $prev_do_anim = DRP_getAnimation($connected_render_pass);
       $prev_start_frame = DRP_getStartFrame($connected_render_pass);
       $prev_end_frame = DRP_getEndFrame($connected_render_pass);
-      $prev_generate_rib_archives = 
+      $prev_generate_rib_archives =
         getAttr($connected_render_pass + ".generateRIBArchives");
-        
+
       setAttr($connected_render_pass + ".animation") 1;
       setAttr($connected_render_pass + ".startFrame") $frame;
       setAttr($connected_render_pass + ".endFrame") $frame;
@@ -10690,17 +10690,17 @@ DRP_writeArchiveForFrame(string $archive_node,
 
       // This is not very nice with the progress dialog
       DRP_render($connected_render_pass);
-      
+
       setAttr($connected_render_pass + ".animation") $prev_do_anim;
       setAttr($connected_render_pass + ".startFrame") $prev_start_frame;
       setAttr($connected_render_pass + ".endFrame") $prev_end_frame;
-      setAttr($connected_render_pass + ".generateRIBArchives") 
+      setAttr($connected_render_pass + ".generateRIBArchives")
         $prev_generate_rib_archives;
-    
+
       $ret_val = 1;
     }
   }
-  
+
   return $ret_val;
 }
 
@@ -10753,7 +10753,7 @@ DRP_render(string $render_pass)
 
   global string $gAEFocusNode;
   string $prev_ae_node = $gAEFocusNode;
-  
+
   // Update some global vars.
   DL_updateGeoTypeData();
 
@@ -10779,15 +10779,15 @@ DRP_render(string $render_pass)
   int     $num_deform_samples;
 
   // offsets from the current frame
-  float   $camera_blur_sample_offsets[];  
-  float   $xform_sample_offsets[];  
+  float   $camera_blur_sample_offsets[];
+  float   $xform_sample_offsets[];
   float   $deform_sample_offsets[];
 
   global int  $gInRiBeginEnd;
 
   $render_camera = DRP_getRenderCamera($render_pass);
 
-  $do_animation = DRP_getAnimation($render_pass); 
+  $do_animation = DRP_getAnimation($render_pass);
 
   if ($do_animation)
   {
@@ -10828,7 +10828,7 @@ DRP_render(string $render_pass)
   $clipping_planes_to_render_set = DRP_getClippingPlanesToRenderSet($render_pass);
   $layer_to_render = DRP_getLayerToRender($render_pass);
   $area_light_plane = createAreaLightPlane();
-  
+
   string  $visible_lights[];
   string  $shadow_mapped_lights[];
   string  $clipping_planes[];
@@ -10858,43 +10858,43 @@ DRP_render(string $render_pass)
   // Store currently displayed render layer and select the one we want to render
   int $current_layer_ID;
   $current_layer_ID = getAttr("renderLayerManager.currentRenderLayer");
-  
+
   string $all_layers[];
   $all_layers = listConnections("renderLayerManager.renderLayerId");
-  
+
   // Store currently displayed render layer and select the one we want to render
   string $current_layer;
   $current_layer = `editRenderLayerGlobals -q -currentRenderLayer`;
-  
+
   editRenderLayerGlobals -currentRenderLayer $layer_to_render;
-  
+
   string $render_layer_shapes[] = getShapesInLayer($layer_to_render);
-  
+
   int $is_rib_archiving_mode;
   int $output_geo_shaders;
   int $output_transforms;
   int $output_light_sources;
   int $ignore_archived_objects;
   int $generate_RIB_archive_nodes;
-  
+
   $is_rib_archiving_mode = DRP_isRIBArchivingMode($render_pass);
   $output_geo_shaders = 1;
   $output_geo_attribs = 1;
   $output_transforms = 1;
   $output_light_sources = 1;
   $ignore_archived_objects = getAttr($render_pass + ".ignoreArchivedObjects");
-  $generate_RIB_archives = getAttr($render_pass + ".generateRIBArchives");      
-  
+  $generate_RIB_archives = getAttr($render_pass + ".generateRIBArchives");
+
   string $connected_DRA_nodes[];
-  $connected_DRA_nodes = `listConnections -d true -s false -sh true 
+  $connected_DRA_nodes = `listConnections -d true -s false -sh true
     -t delightRibArchive ($render_pass + ".message")`;
-  
+
   if (size($connected_DRA_nodes) > 0)
   {
-    $connected_DRA_nodes = 
+    $connected_DRA_nodes =
       `ls -dag -allPaths -shapes -long -noIntermediate $connected_DRA_nodes`;
   }
-  
+
   $connected_DRA_nodes = DL_stringArrayRemoveDuplicates($connected_DRA_nodes);
 
   if ($is_rib_archiving_mode)
@@ -10902,17 +10902,17 @@ DRP_render(string $render_pass)
     $output_geo_shaders = getAttr($render_pass + ".archiveGeometryShaders");
     $output_geo_attribs = getAttr($render_pass + ".archiveGeometryAttributes");
     $output_transforms = getAttr($render_pass + ".archiveTransforms");
-    
+
     if (getAttr($render_pass + ".archiveLighting") != 2)
     {
       $output_light_sources = 0;
     }
   }
-  
+
   string $prev_ribfile;
-  
+
   int $get_visibility_at_shutter_open;
-  
+
   // Sample object visibility at shutter open time if motion blur is on
   if (   $global_do_camera_blur
       || $global_do_xform_blur
@@ -10929,10 +10929,10 @@ DRP_render(string $render_pass)
     // TODO: this is not, strictly speaking, correct since we are listing all
     // the geometry here and without reference to collections.. we should at
     // use the attribs on the set of geometry specified in the render
-    // sets/render layer... 
+    // sets/render layer...
     string $all_geo_attribs[];
     $all_geo_attribs = `ls -type delightGeoAttribs`;
-    
+
     for ($curr_attrib in $all_geo_attribs)
     {
       if (   (   `objExists ($curr_attrib + ".transformationBlur")`
@@ -10961,13 +10961,13 @@ DRP_render(string $render_pass)
       }
     }
   }
-  
+
   int $user_pre_frame_mel_exists = exists("DL_userPreFrameMel");
   int $user_post_frame_mel_exists = exists("DL_userPostFrameMel");
   int $user_post_option_mel_exists = exists("DL_userPostOptionMel");
   int $user_pre_world_mel_exists = exists("DL_userPreWorldMel");
   int $user_post_world_mel_exists = exists("DL_userPostWorldMel");
-  
+
   for ($curr_frame = $start_frame;
        $curr_frame <= $end_frame && !$is_cancelled;
        $curr_frame += $increment)
@@ -10980,32 +10980,32 @@ DRP_render(string $render_pass)
     {
       $time += $xform_sample_offsets[0];
     }
-    
+
     if (`currentTime -q` != $time)
     {
       currentTime $time;
     }
-    
+
     if ($user_pre_frame_mel_exists)
       DL_userPreFrameMel($render_pass);
 
     DRP_executePreFrameMelScript($render_pass);
-/* tampered by zhang */   
+/* tampered by zhang */
 // update frame and motion
 global string $ZHANG_curpass;
 	$ZHANG_curpass = `delightRenderState -qrn`;
 global int $ZHANG_curframe;
 	$ZHANG_curframe = $curr_frame;
-global float $ZHANG_shutterOpen;	
+global float $ZHANG_shutterOpen;
 	$ZHANG_shutterOpen = `delightRenderState -qso`;
 global float $ZHANG_shutterClose;
 	$ZHANG_shutterClose =`delightRenderState -qsc`;
-    
+
     // Proceed with rendering only if the render pass is not in RIB archiving
     // mode, or if the archive file requires writing.
     //
     int $do_render = 1;
-    
+
     if (   $is_rib_archiving_mode
         && getAttr($render_pass + ".archiveWriteMode") == 0)
     {
@@ -11013,23 +11013,23 @@ global float $ZHANG_shutterClose;
       // nothing to do
       //
       string $rib_filename = DL_getExpandedFilename(
-        getAttr($render_pass + ".ribFilename"), 
+        getAttr($render_pass + ".ribFilename"),
         "",
         $render_pass,
         "rib");
-  
+
       if (`filetest -f $rib_filename` == 1)
         $do_render = 0;
     }
-    
+
     if ($do_render)
     {
       string $all_dra_nodes[];
-      
+
       $all_dra_nodes = `ls -visible -type "delightRibArchive"`;
       if (size($all_dra_nodes) > 0)
       {
-        $all_dra_nodes = 
+        $all_dra_nodes =
           `ls -dag -allPaths -shapes -long -noIntermediate $all_dra_nodes`;
         $all_dra_nodes = stringArrayRemove($connected_DRA_nodes, $all_dra_nodes);
       }
@@ -11051,11 +11051,11 @@ global float $ZHANG_shutterClose;
         }
       }
 
-      $visible_geometry = 
-        getAllRenderableVisibleGeometry($objects_to_render_set, 
+      $visible_geometry =
+        getAllRenderableVisibleGeometry($objects_to_render_set,
                                         $render_layer_shapes);
       string $dra_nodes_to_consider[];
-      
+
       if ($ignore_archived_objects != 0)
       {
         // List the RIB archive nodes that are in this pass' render set
@@ -11067,7 +11067,7 @@ global float $ZHANG_shutterClose;
             $dra_nodes_to_consider[size($dra_nodes_to_consider)] = $curr_geo;
         }
 
-        $dra_nodes_to_consider = 
+        $dra_nodes_to_consider =
           stringArrayRemove($connected_DRA_nodes, $dra_nodes_to_consider);
 
         $visible_geometry = removeArchivedGeometry($dra_nodes_to_consider,
@@ -11077,14 +11077,14 @@ global float $ZHANG_shutterClose;
       $visible_lights = getVisibleLights(
         $lights_to_render_set,
         $render_layer_shapes);
-      
+
       if ($ignore_archived_objects != 0)
       {
         $visible_lights = removeArchivedLights($dra_nodes_to_consider,
                                                $visible_lights);
       }
 
-      $shadow_mapped_lights = 
+      $shadow_mapped_lights =
         DRP_getShadowMappedLights($visible_lights, $shader_collection);
 
       // If the render mode is immediate and there is nothing to render for this
@@ -11092,7 +11092,7 @@ global float $ZHANG_shutterClose;
       int $display_indices[] = DRP_getDisplayIndices($render_pass);
       int $at_least_one_display_renderable = 0;
       int $primary_display_index = DRP_getDisplayPrimaryIndex($render_pass);
-      
+
       for($index in $display_indices)
       {
         if (   $index != $primary_display_index
@@ -11100,23 +11100,23 @@ global float $ZHANG_shutterClose;
         {
             continue;
         }
-        
+
         $at_least_one_display_renderable = DRP_isDisplayRenderable(
-          $render_pass, 
+          $render_pass,
           $index);
-        
+
         if ($at_least_one_display_renderable)
           break;
       }
-          
+
       if (   !DRP_isImmediateRenderMode($render_pass)
           || (size($shadow_mapped_lights) != 0 || $at_least_one_display_renderable))
       {
         // TODO: we can optimize this if we are only rendering shadowmaps -- the
         // $all_renderable_geometry variable can be filled with the union of the
         // sets of objects casting shadows from our shadowmap lights
-        $visible_geometry = 
-          stringArrayRemove($connected_DRA_nodes, $visible_geometry); 
+        $visible_geometry =
+          stringArrayRemove($connected_DRA_nodes, $visible_geometry);
 
         string $archived_instancers[];
 
@@ -11129,11 +11129,11 @@ global float $ZHANG_shutterClose;
 
         $particle_instancers = getVisibleInstancers($objects_to_render_set,
                                                     $layer_to_render,
-                                                    $archived_instancers, 
+                                                    $archived_instancers,
                                                     $renderable_instancer_geo,
                                                     $render_layer_shapes);
 
-        $all_renderable_geometry = 
+        $all_renderable_geometry =
           stringArrayCatenate($visible_geometry, $renderable_instancer_geo);
 
         $all_renderable_geometry = DL_stringArrayRemoveDuplicates($all_renderable_geometry);
@@ -11153,16 +11153,16 @@ global float $ZHANG_shutterClose;
 
         if ($ignore_archived_objects != 0)
         {
-          $clipping_planes = 
+          $clipping_planes =
             removeArchivedClippingPlanes($dra_nodes_to_consider, $clipping_planes);
         }
-        
+
         $coordinate_systems = getVisibleCoordinateSystems("");
-        
+
         if ($ignore_archived_objects != 0)
         {
-          $coordinate_systems = 
-            removeArchivedCoordinateSystems($dra_nodes_to_consider, 
+          $coordinate_systems =
+            removeArchivedCoordinateSystems($dra_nodes_to_consider,
                                             $coordinate_systems);
         }
 
@@ -11171,7 +11171,7 @@ global float $ZHANG_shutterClose;
                                      $visible_lights,
                                      $global_do_xform_blur,
                                      $shader_collection);
-        
+
         $scene_is_deform_blurring =
           DRP_checkSceneForDeformBlur($objects_to_cache,
                                       $global_do_deform_blur,
@@ -11238,7 +11238,7 @@ global float $ZHANG_shutterClose;
           {
             float $bbox[];
             clear($bbox);
-            
+
             if (size($xforms) > 0)
             {
               if (getAttr($render_pass + ".archiveTransforms"))
@@ -11251,13 +11251,13 @@ global float $ZHANG_shutterClose;
                 $bbox[3] = -1.0e12;
                 $bbox[4] = -1.0e12;
                 $bbox[5] = -1.0e12;
-                
+
                 $bbox = getObjectSpaceBboxUnion($particle_instancers, $bbox);
                 $bbox = getObjectSpaceBboxUnion($first_instances, $bbox);
                 $bbox = getObjectSpaceBboxUnion($noninstanced_geometry, $bbox);
               }
             }
-            
+
             output_boundingBox($bbox);
 
             for ($DRA_node in $connected_DRA_nodes)
@@ -11267,12 +11267,12 @@ global float $ZHANG_shutterClose;
           }
           else
           {
-            // This should go with other RiOptions when 3Delight will not 
+            // This should go with other RiOptions when 3Delight will not
             // require to know about the offset before all motion blocks
             //
             outputShutterOffset();
           }
-          
+
           setProgressMessage(
             "Frame " + $curr_frame + ": outputting archives: ", 0 );
 
@@ -11285,7 +11285,7 @@ global float $ZHANG_shutterClose;
           {
             beginProgressRange( 33, 0 );
           }
-          
+
           if ($output_geo_attribs)
           {
             DRP_outputGeoAttribsArchives($render_pass, $objects_to_cache);
@@ -11302,7 +11302,7 @@ global float $ZHANG_shutterClose;
             outputRIBoptions($render_pass, $curr_frame);
           }
 
-          if (   DRP_getRenderShadowMaps($render_pass) 
+          if (   DRP_getRenderShadowMaps($render_pass)
               && !$is_rib_archiving_mode)
           {
             //
@@ -11311,10 +11311,10 @@ global float $ZHANG_shutterClose;
             //
             beginProgressRange( 100, 100 * size($shadow_mapped_lights) );
 
-            int $user_light_pre_render_mel_exists = 
+            int $user_light_pre_render_mel_exists =
               `exists("DL_userLightPreRenderMel")`;
 
-            int $user_light_post_render_mel_exists = 
+            int $user_light_post_render_mel_exists =
               `exists("DL_userLightPostRenderMel")`;
 
             for ($curr_light in $shadow_mapped_lights)
@@ -11323,14 +11323,14 @@ global float $ZHANG_shutterClose;
               string  $shadow_camera;
               int     $generate_map;
 
-              $attribs_node = 
-                DL_getHighestLightAttribsNodeFromShape($curr_light, 
+              $attribs_node =
+                DL_getHighestLightAttribsNodeFromShape($curr_light,
                                                        $shader_collection);
 
               string $attr = "generateFirstFrameOnly";
               string $node_with_attr = DLA_getNodeWithAttribute(
-                $attr, 
-                $attribs_node, 
+                $attr,
+                $attribs_node,
                 $curr_light);
 
               if ($node_with_attr != "")
@@ -11361,13 +11361,13 @@ global float $ZHANG_shutterClose;
               }
 
               $shadow_camera = $curr_light;
-              
+
               $attr = "shadowCamera";
               $node_with_attr = DLA_getNodeWithAttribute(
-                $attr, 
-                $attribs_node, 
+                $attr,
+                $attribs_node,
                 $curr_light);
-                
+
               if ($node_with_attr != "")
               {
                 $shadow_camera = DLA_getShadowCamera($node_with_attr);
@@ -11400,10 +11400,10 @@ global float $ZHANG_shutterClose;
 
                 $attr = "preRenderMEL";
                 $node_with_attr = DLA_getNodeWithAttribute(
-                  $attr, 
-                  $attribs_node, 
+                  $attr,
+                  $attribs_node,
                   $curr_light);
-                  
+
                 if ($node_with_attr != "")
                 {
                   DLA_executePreRenderMelScript($node_with_attr, $curr_light);
@@ -11413,11 +11413,11 @@ global float $ZHANG_shutterClose;
                 string $curr_shadow_instancers[];
                 string $curr_shadow_instancer_geo[];
 
-                $curr_shadow_objects = 
-                  getShadowCastingGeometry($curr_light, 
-                                           $visible_geometry, 
+                $curr_shadow_objects =
+                  getShadowCastingGeometry($curr_light,
+                                           $visible_geometry,
                                            $shader_collection);
-                  
+
 /*
 //  tampered by zhang begin
 //  append aCacheMesh and particleViz to $curr_shadow_objects
@@ -11434,15 +11434,15 @@ global float $ZHANG_shutterClose;
 //  tampered by zhang end
 */
 
-                $curr_shadow_instancers = 
-                  getShadowCastingInstancers($curr_light, 
-                                             $particle_instancers, 
-                                             $shader_collection, 
+                $curr_shadow_instancers =
+                  getShadowCastingInstancers($curr_light,
+                                             $particle_instancers,
+                                             $shader_collection,
                                              $curr_shadow_instancer_geo);
 
-                $curr_shadow_objects = 
+                $curr_shadow_objects =
                   stringArrayCatenate($curr_shadow_objects, $curr_shadow_instancers);
-                
+
                 if (size($curr_shadow_objects) == 0)
                 {
                   continue;
@@ -11450,29 +11450,29 @@ global float $ZHANG_shutterClose;
 
                 int $maps[];
                 clear($maps);
-                 
+
                 $attr = "generateCubeShadowMap";
                 $node_with_attr = DLA_getNodeWithAttribute(
                   $attr,
                   $attribs_node,
                   $curr_light);
-              
+
                 string $curr_light_type;
-                $curr_light_type = `nodeType $curr_light`;            
+                $curr_light_type = `nodeType $curr_light`;
 
                 if( $curr_light_type == "volumeLight" || $node_with_attr != "" )
                 {
                   $maps[0] = 0;
-                  
+
                   int $cube_shw_vol_light;
                   $cube_shw_vol_light = 1;
-                  
+
                   if( $curr_light_type == "volumeLight" )
                   {
                     string $light_shape;
-                    $light_shape = 
+                    $light_shape =
                       `getAttr -asString ($curr_light + ".lightShape")`;
-                      
+
                     if( $light_shape == "Cone" )
                     {
                       // Cone volume lights require only 1 shadow map; the light
@@ -11483,7 +11483,7 @@ global float $ZHANG_shutterClose;
                   }
                   else
                     $cube_shw_vol_light = 0;
-                  
+
                   if(   $cube_shw_vol_light != 0
                      || DLA_getGenerateCubeShadowMap($node_with_attr) )
                   {
@@ -11559,11 +11559,11 @@ global float $ZHANG_shutterClose;
                 }
 
                 int $output_geo_prog_incr = 100 / (2 * size($maps));
-                                  
+
                 for( $map_index = 0; $map_index < size($maps); $map_index++ )
                 {
                   setProgressMessage(
-                    "Frame " + $curr_frame 
+                    "Frame " + $curr_frame
                     + ": shadow map for " + $light_short_name
                     + ": outputting world: ",
                     0 );
@@ -11584,7 +11584,7 @@ global float $ZHANG_shutterClose;
 
                     if ($user_post_option_mel_exists)
                       DL_userPostOptionMel($render_pass);
-                    
+
                     DRP_executePostOptionMelScript($render_pass);
 
                     outputCameraTransform($shadow_camera, $maps[$map_index]);
@@ -11592,7 +11592,7 @@ global float $ZHANG_shutterClose;
                     outputClippingPlanes($clipping_planes);
 
                     outputShadowMapUserAttribs($render_pass);
-                    
+
                     RiWorldBegin;
 
                       outputCoordinateSystems($coordinate_systems);
@@ -11608,13 +11608,13 @@ $ZHANG_curcamera = $shadow_camera;
                         $curr_shadow_instancer_geo,
                         1, // shadow render
                         $output_geo_prog_incr);
-                        
+
                       setProgressMessage(
-                        "Frame " + $curr_frame 
+                        "Frame " + $curr_frame
                         + ": shadow map for " + $light_short_name
                         + ": Rendering ",
                         0 );
-                      
+
                     RiWorldEnd;
 
                   RiFrameEnd;
@@ -11624,7 +11624,7 @@ $ZHANG_curcamera = $shadow_camera;
 
                 // Correct for rounding when computing $output_geo_prog_incr
                 incProgress( 100 - (2*size($maps)) * $output_geo_prog_incr, 0 );
-                
+
                 if ($user_light_post_render_mel_exists)
                 {
                   string $attribs_node_array[];
@@ -11634,16 +11634,16 @@ $ZHANG_curcamera = $shadow_camera;
 
                 $attr = "postRenderMEL";
                 $node_with_attr = DLA_getNodeWithAttribute(
-                  $attr, 
-                  $attribs_node, 
+                  $attr,
+                  $attribs_node,
                   $curr_light);
-                
+
                 if ($node_with_attr != "")
                   DLA_executePostRenderMelScript($node_with_attr, $curr_light);
               }
             }
           }
-          
+
           if (!$is_cancelled && $at_least_one_display_renderable)
           {
             outputDisplayProgressMessage($render_pass, $curr_frame);
@@ -11687,7 +11687,7 @@ $ZHANG_curcamera = $shadow_camera;
                     if( 1 == `getAttr( $camera + ".orthographic" )` )
                       continue;
 
-                    string $cam_parents[] = 
+                    string $cam_parents[] =
                       `listRelatives -parent -path $camera`;
                     float $fov = `camera -q -hfv $camera`;
 
@@ -11730,7 +11730,7 @@ $ZHANG_curcamera = $shadow_camera;
 
                   DRP_executePreWorldMelScript($render_pass);
               }
-              
+
                   float $world_output_start_time = `timerX`;
 
               if (!$is_rib_archiving_mode)
@@ -11755,7 +11755,7 @@ $ZHANG_curcamera = $shadow_camera;
               beginProgressRange( 25, 25 );
 
               setProgressMessage(
-                "Frame " + $curr_frame 
+                "Frame " + $curr_frame
                 + ": outputting geometry: ", 0 );
 /* tampered by zhang */
 // update current camera
@@ -11823,21 +11823,21 @@ $ZHANG_curcamera = $render_camera;
 
     DRP_executePostFrameMelScript($render_pass);
   }
-  
+
 //  print("outputIlluminateStatements() time: " + $g_illuminateStatementsTime + "s\n");
 
   if ($area_light_plane != "")
     delete `firstParentOf $area_light_plane`;
 
-  editRenderLayerGlobals -currentRenderLayer $current_layer; 
-   
+  editRenderLayerGlobals -currentRenderLayer $current_layer;
+
   endProgress();
-	
+
   if (DRP_isBackgroundRenderMode($render_pass))
   {
     startBackgroundRender($render_pass);
   }
-  
+
   // Restore previous selection and node shown in the AE
   //
   select $prev_selection;

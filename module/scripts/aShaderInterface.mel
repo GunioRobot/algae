@@ -17,9 +17,9 @@ global proc anm_downstreamConnAttrs( string $connected[], string $nodedotattr)
 {
 	clear($connected);
 	int $i = 0;
-	
+
 	string $conn[] =`listConnections -p on -scn on -d on -s off $nodedotattr`;
-	
+
 	string $aconn;
 	string $nt;
 	for($aconn in $conn) {
@@ -40,9 +40,9 @@ global proc anm_downstreamConn( string $connected[], string $node)
 	clear($connected);
 	int $i = 0;
 	string $outattr = $node + ".output";
-	
+
 	string $conn[] =`listConnections -scn on -d on -s off $outattr`;
-	
+
 	string $aconn;
 	string $nt;
 	for($aconn in $conn) {
@@ -56,7 +56,7 @@ global proc anm_downstreamConn( string $connected[], string $node)
 	if(`attributeExists "outputC" $node`) {
 		$outattr = $node + ".outputC";
 		$conn =`listConnections -scn on -d on -s off $outattr`;
-	
+
 		for($aconn in $conn) {
 			$nt = `nodeType $aconn`;
 			if($nt != "transform" && $nt != "aCacheMesh") {
@@ -65,11 +65,11 @@ global proc anm_downstreamConn( string $connected[], string $node)
 			}
 		}
 	}
-	
+
 	if(`attributeExists "outputS" $node`) {
 		$outattr = $node + ".outputS";
 		$conn =`listConnections -scn on -d on -s off $outattr`;
-	
+
 		for($aconn in $conn) {
 			$nt = `nodeType $aconn`;
 			if($nt != "transform" && $nt != "aCacheMesh") {
@@ -87,7 +87,7 @@ point cloud file expression
 global proc anm_fieldOptTxt(string $opt)
 {
 	string $fld = `optionMenuGrp -q -ann $opt`;
-	
+
 	string $fileexp[];
 	$fileexp[0] = "";
 	$fileexp[1] = "";
@@ -104,14 +104,14 @@ global proc anm_fieldOptTxt(string $opt)
 		string $attr = `textFieldButtonGrp -q -ann $fld`;
 		setAttr -type "string" $attr $fileexp[$i];
 	}
-	
+
 	optionMenuGrp -e -sl 1 $opt;
 }
 
 global proc anm_appendPointCloudEpr(string $txtgrp)
 {
 	string $opt = `optionMenuGrp -ann $txtgrp`;
-	
+
 	menuItem -l "Select Template:";
 	menuItem -l "point cloud per scene";
 	menuItem -l "point cloud per object";
@@ -119,7 +119,7 @@ global proc anm_appendPointCloudEpr(string $txtgrp)
 	menuItem -l "brick map per scene";
 	menuItem -l "brick map per object";
 	menuItem -l "brick map SSS per object";
-	
+
 	optionMenuGrp -e -cc ("anm_fieldOptTxt(\""+$opt+"\")") $opt;
 }
 
@@ -130,7 +130,7 @@ rib box template options
 global proc anm_scrollAppendTxt(string $opt)
 {
 	string $scl = `optionMenuGrp -q -ann $opt`;
-	
+
 	string $ribstat[];
 	$ribstat[0] = "";
 	$ribstat[1] = "";
@@ -143,7 +143,7 @@ global proc anm_scrollAppendTxt(string $opt)
 	if($i>1) {
 		scrollField -e -it $ribstat[$i] $scl;
 	}
-	
+
 	optionMenuGrp -e -sl 1 $opt;
 }
 
@@ -151,13 +151,13 @@ global proc anm_scrollAppendTxt(string $opt)
 global proc anm_appendRIBStateOpt(string $txtgrp)
 {
 	string $opt = `optionMenuGrp -ann $txtgrp`;
-	
+
 	menuItem -l "Select Template:";
 	menuItem -l "visible in transmission";
 	menuItem -l "hidden in primary";
 	menuItem -l "matte object";
 	menuItem -l "visible in photon";
-	
+
 	optionMenuGrp -e -cc ("anm_scrollAppendTxt(\""+$opt+"\")") $opt;
 }
 
@@ -178,7 +178,7 @@ popupMenu;
 	}
 	menuItem -l "Goto";
 	for($aconn in $conn) menuItem -l $aconn -c ("anm_updateAttrib(\"" + $aconn + "\")") ;
-	menuItem -divider true;		
+	menuItem -divider true;
 }
 
 /*
@@ -195,7 +195,7 @@ global proc anm_menuGoUpMenu(string $name)
 	menuItem -p anm_attrpngoupopt -l "Goto";
 	for($aconn in $conn) menuItem -p anm_attrpngoupopt -l $aconn -c ("anm_updateAttrib(\"" + $aconn + "\")") ;
 	menuItem -p anm_attrpngoupopt -divider true;
-			
+
 }
 
 /*
@@ -210,33 +210,33 @@ global proc int anm_checkAnyLoopBack(string $a, string $b)
 // end when read mesh
 	if($tb == "aCacheMesh"||$tb == "transform") {
 		return 0;
-	}	
+	}
 	string $outattr = $b + ".output";
-	
+
 	string $conn[] =`listConnections -scn on -d on -s off $outattr`;
-	
+
 	string $aconn;
 	int $res = 0;
 	for($aconn in $conn) {
 		$res = anm_checkAnyLoopBack($a, $aconn);
 		if($res == 1) return 1;
 	}
-	
+
 	if($tb == "aShaderPiece" || $tb == "aShaderVariable" || $tb == "aShaderAdaptVariable") {
-		
+
 		$outattr = $b + ".outputC";
-		
+
 		$conn =`listConnections -scn on -d on -s off $outattr`;
-		
+
 		for($aconn in $conn) {
 			$res = anm_checkAnyLoopBack($a, $aconn);
 			if($res == 1) return 1;
 		}
-		
+
 		$outattr = $b + ".outputS";
-		
+
 		$conn =`listConnections -scn on -d on -s off $outattr`;
-		
+
 		for($aconn in $conn) {
 			$res = anm_checkAnyLoopBack($a, $aconn);
 			if($res == 1) return 1;
@@ -341,11 +341,11 @@ global proc anm_sdr_makeTexture(string $textfield)
 		}
 		$tdl = $tdl + "tdl";
 		system("tdlmake -mode black "+$file+" "+$tdl);
-		
+
 		textFieldButtonGrp -e -text $tdl $textfield;
-		 
+
 		string $attr = `textFieldButtonGrp -q -ann $textfield`;
-		
+
 		setAttr -type "string" $attr $tdl;
 	}
 }
@@ -362,9 +362,9 @@ global proc anm_setTextFieldButtonTextBySelection(string $textfield)
 		string $val = $sel[0];
 		int $i;
 		for($i=1; $i<size($sel); $i++) $val = $val + " " + $sel[$i];
-			
+
 		textFieldButtonGrp -e -text $val $textfield;
-		
+
 		string $attr = `textFieldButtonGrp -q -ann $textfield`;
 		setAttr -type "string" $attr $val;
 	}
@@ -494,7 +494,7 @@ global proc anm_dropcallbackPiece(string $dragControl, string $dropControl, stri
 			disconnectAttr ($node + ".outputS") $aconn;
 		}
 	}
-	
+
 	delete $node;
 // hide it not delete
 	rowLayout -e -vis false $msgs[0];
@@ -530,7 +530,7 @@ global proc anm_adaptEnsembleConnectDropcallback(string $dragControl, string $dr
 		return;
 	}
 	//if($dstnode != $node) {
-		
+
 		if(`nodeType $node` == "aShaderEnsemble" || `nodeType $node` == "aShaderAdaptEnsemble") {
 			connectAttr -f ($node + ".output") `textFieldButtonGrp -q -ann $dropControl`;
 			textFieldButtonGrp -e -text $node $dropControl;
@@ -652,7 +652,7 @@ global proc anm_aShaderConnectTypedAttrDropcallback(string $dragControl, string 
 		if($paramsh[0] == "string") connectAttr -f ($node + ".outputS") `textFieldButtonGrp -q -ann $dropControl`;
 		else if($paramsh[0] == "double3" || $paramsh[0] == "color") connectAttr -f ($node + ".outputC") `textFieldButtonGrp -q -ann $dropControl`;
 		else connectAttr -f ($node + ".output") `textFieldButtonGrp -q -ann $dropControl`;
-		
+
 		textFieldButtonGrp -e -text $node $dropControl;
 	}
 	else print("self connection is not allowed");
@@ -736,7 +736,7 @@ get objects connected to piece
 global proc anm_affectbyPiece(string $row)
 {
 	string $node = `rowLayout -q -ann $row`;
-	
+
 	string $conn[] =`listConnections -scn on ($node+".output")`;
 	string $sel[];
 	int $i;
@@ -745,12 +745,12 @@ global proc anm_affectbyPiece(string $row)
 		if($i==0) select -r $conn[$i];
 		else select -tgl $conn[$i];
 	}
-	
+
 	$conn =`listConnections -scn on ($node+".outputC")`;
 	for($i=0; $i<size($conn); $i++) {
 		select -tgl $conn[$i];
 	}
-	
+
 	$conn =`listConnections -scn on ($node+".outputS")`;
 	for($i=0; $i<size($conn); $i++) {
 		select -tgl $conn[$i];
@@ -770,19 +770,19 @@ proc anm_shoAdaptEnsemble(string $name)
     -columnAttach 1 "both"     0
     -columnAttach 2 "both"  0
     -ann $name`;
-    
+
     string $img = "anm_ensembleCtx.xpm";
     if(`getAttr ($name + ".handle")` == "objname") $img = "anm_ensembleObj.xpm";
-    
-    iconTextButton -ann $anm_piecerow 
-    		-style "iconOnly" 
+
+    iconTextButton -ann $anm_piecerow
+    		-style "iconOnly"
     		-image1 $img
     		-height 36
     		-c ("anm_SelnListItem(\"" + $anm_piecerow + "\")")
     		-dgc anm_dragcallbackPiece;
-    		
+
     		anm_popupGoUpMenu($name);
-    		
+
     string $anm_piecetx = `textField -w 125 -text $name`;
     setParent..;
     textField -e -cc ("anm_renameAPiece(\""+$anm_piecerow+"\", \""+$anm_piecetx+"\")") $anm_piecetx;
@@ -801,16 +801,16 @@ proc anm_shoEnsemble(string $name)
     -columnAttach 1 "both"     0
     -columnAttach 2 "both"  0
     -ann $name`;
-    
-    iconTextButton -ann $anm_piecerow 
+
+    iconTextButton -ann $anm_piecerow
     		-height 36
-    		-style "iconOnly" 
-    		-image1 "anm_ensemble.xpm" 
+    		-style "iconOnly"
+    		-image1 "anm_ensemble.xpm"
     		-c ("anm_SelnListItem(\"" + $anm_piecerow + "\")")
     		-dgc anm_dragcallbackPiece;
-    		
+
     		anm_popupGoUpMenu($name);
-    		
+
     string $anm_piecetx = `textField -w 125 -text $name`;
     setParent..;
     textField -e -cc ("anm_renameAPiece(\""+$anm_piecerow+"\", \""+$anm_piecetx+"\")") $anm_piecetx;
@@ -829,19 +829,19 @@ proc anm_shoPiece(string $name)
     -columnAttach 1 "both"     0
     -columnAttach 2 "both"  0
     -ann $name`;
-    
+
     string $node =`rowLayout -q -ann $anm_piecerow`;
     string $diagsh[] = `aShaderDiagnose -n $node -ic 1`;
-    
-    iconTextButton -ann $anm_piecerow 
-    		-style "iconOnly" 
+
+    iconTextButton -ann $anm_piecerow
+    		-style "iconOnly"
     		-height 36
-    		-image1 $diagsh[0] 
+    		-image1 $diagsh[0]
     		-c ("anm_SelnListItem(\"" + $anm_piecerow + "\")")
     		-dgc anm_dragcallbackPiece;
-    		
+
     		 anm_popupGoUpMenu($name);
-    		
+
     string $anm_piecetx = `textField -w 125 -text $name`;
 
     //button -l "affect" -c ("anm_affectbyPiece(\"" + $anm_piecerow + "\")");
@@ -863,26 +863,26 @@ proc anm_shoVariable(string $name)
     -columnAttach 1 "both"     0
     -columnAttach 2 "both"  0
     -ann $name`;
-    
+
     string $img = "anm_variableC.xpm";
     if(`getAttr ($name+".handle")`=="float") $img = "anm_variableF.xpm";
     if(`getAttr ($name+".handle")`=="string") $img = "anm_variableS.xpm";
-    
+
     string $usr_ico = `getAttr ($name+".iconfile")`;
     if($usr_ico != "") $img = $usr_ico;
-    
-    iconTextButton -ann $anm_varrow 
-    		-style "iconOnly" 
+
+    iconTextButton -ann $anm_varrow
+    		-style "iconOnly"
     		-height 36
     		-image1 $img
     		-c ("anm_SelnListItem(\"" + $anm_varrow + "\")")
     		-dgc anm_dragcallbackPiece;
-    		
+
     		anm_popupGoUpMenu($name);
-    		
+
     string $anm_vartx = `textField -w 125 -text $name`;
     //button -l "affect" -c ("anm_affectbyPiece(\"" + $anm_varrow + "\")");
-    
+
     setParent..;
     textField -e -cc ("anm_renameAPiece(\""+$anm_varrow+"\", \""+$anm_vartx+"\")") $anm_vartx;
 }
@@ -900,7 +900,7 @@ proc anm_shoAdaptVariable(string $name)
     -columnAttach 1 "both"     0
     -columnAttach 2 "both"  0
     -ann $name`;
-    
+
     string $img = "anm_variableF.xpm";
     if(`getAttr ($name+".handle")`=="float") {
     	    if(`getAttr ($name+".opt")`=="context") $img = "anm_variableCtxF.xpm";
@@ -917,16 +917,16 @@ proc anm_shoAdaptVariable(string $name)
     	    else if(`getAttr ($name+".opt")`=="objname") $img = "anm_variableObjS.xpm";
     	    else $img = "anm_variableS.xpm";
     }
-    
-    iconTextButton -ann $anm_varrow 
+
+    iconTextButton -ann $anm_varrow
     		-style "iconOnly"
     		-height 36
-    		-image1 $img 
+    		-image1 $img
     		-c ("anm_SelnListItem(\"" + $anm_varrow + "\")")
     		-dgc anm_dragcallbackPiece;
-    		
+
     		anm_popupGoUpMenu($name);
-    		
+
     string $anm_vartx = `textField -w 125 -text $name`;
     //button -l "affect" -c ("anm_affectbyPiece(\"" + $anm_varrow + "\")");
     setParent..;
@@ -974,13 +974,13 @@ proc anm_listAdaptEnsembleAttrib(string $name)
                 -borderStyle "in"
                 -collapsable 1`;
         columnLayout;
-        	textFieldGrp 
+        	textFieldGrp
         		-ed off
         		-l "handle"
         		-cw 1 70
         		-cw 2 70
         		-text `getAttr ($name+".handle")`;
-        	
+
         	int $num_line = `getAttr ($name+".numCondition")`;
         	button -l "Create Ensemble" -c ("anm_adaptEnsembleAdd(\""+$name+"\")");
         	button -l "Delete Ensemble" -c ("anm_adaptEnsembleMinus(\""+$name+"\")");
@@ -996,7 +996,7 @@ proc anm_listAdaptEnsembleAttrib(string $name)
         			`;
         		textFieldButtonGrp -e -cc ("anm_connectTextFieldButtonToStringAttr(\""+$tfb+"\")") $tfb;
         		textFieldButtonGrp -e -bc ("anm_setTextFieldButtonTextBySelection(\""+$tfb+"\")") $tfb;
-        		
+
         		string $attrens = $name+".ensemble["+$i+"]";
         		string $tfbens = `textFieldButtonGrp
         			-cw3 75 115 50
@@ -1007,7 +1007,7 @@ proc anm_listAdaptEnsembleAttrib(string $name)
         			-dpc anm_adaptEnsembleConnectDropcallback
         			//-bc ("anm_aShaderNaviConnected( \""+ $name +".ensemble["+$i+"]\")")
         			`;
-        			
+
 				textFieldButtonGrp -e -text `anm_aShaderGetConnected($attrens)` $tfbens;
 				textFieldButtonGrp -e -bc ("anm_aShaderNaviConnected(\""+ $attrens +"\")") $tfbens;
 				popupMenu;
@@ -1042,12 +1042,12 @@ global proc anm_adaptVariableMinus(string $name)
 		if(size($conn)>0) {
 			disconnectAttr $conn[0] ($name+".input["+ $n +"]");
 		}
-		
+
 		$conn =`listConnections -p on -scn on ($name+".inputC["+ $n +"]")`;
 		if(size($conn)>0) {
 			disconnectAttr $conn[0] ($name+".inputC["+ $n +"]");
 		}
-		
+
 		$conn =`listConnections -p on -scn on ($name+".inputS["+ $n +"]")`;
 		if(size($conn)>0) {
 			disconnectAttr $conn[0] ($name+".inputS["+ $n +"]");
@@ -1066,7 +1066,7 @@ global proc anm_surfaceConnectDropcallback(string $dragControl, string $dropCont
 	string $node = `rowLayout -q -ann $msgs[0]`;
 // avoid self connection
 	string $dstnode = anm_cutByFirstDot(`textFieldButtonGrp -q -ann $dropControl`);
-		
+
 	if(`nodeType $node` == "aShaderPiece") {
 		string $diagsh[] = `aShaderDiagnose -n $node -t 1`;
 		if($diagsh[0]=="surface") {
@@ -1088,7 +1088,7 @@ global proc anm_displacementConnectDropcallback(string $dragControl, string $dro
 	string $node = `rowLayout -q -ann $msgs[0]`;
 // avoid self connection
 	string $dstnode = anm_cutByFirstDot(`textFieldButtonGrp -q -ann $dropControl`);
-		
+
 	if(`nodeType $node` == "aShaderPiece") {
 		string $diagsh[] = `aShaderDiagnose -n $node -t 1`;
 		if($diagsh[0]=="displacement") {
@@ -1110,9 +1110,9 @@ global proc anm_ribboxConnectDropcallback(string $dragControl, string $dropContr
 	string $node = `rowLayout -q -ann $msgs[0]`;
 // avoid self connection
 	string $dstnode = anm_cutByFirstDot(`textFieldButtonGrp -q -ann $dropControl`);
-		
+
 	if(`nodeType $node` == "aShaderVariable") {
-		
+
 		if(`getAttr ($node+".handle")`=="string" && `getAttr ($node+".detail")`=="rib") {
 			connectAttr -f ($node + ".outputS") `textFieldButtonGrp -q -ann $dropControl`;
 			textFieldButtonGrp -e -text $node $dropControl;
@@ -1148,7 +1148,7 @@ proc anm_listEnsembleAttrib(string $name)
         	string $attrsurf = $name+".surfaceShader";
 		string $tfbsurf = `textFieldButtonGrp
 			-ann $attrsurf
-			-label "Surface" -ed false 
+			-label "Surface" -ed false
 			-buttonLabel "->"
 			-cw3 115 115 50
 			-dpc anm_surfaceConnectDropcallback
@@ -1157,11 +1157,11 @@ proc anm_listEnsembleAttrib(string $name)
 			textFieldButtonGrp -e -bc ("anm_aShaderNaviConnected(\""+ $attrsurf +"\")") $tfbsurf;
 			popupMenu;
 				menuItem -l "Disconnect" -c ("anm_disconnectAttrAny(\""+$tfbsurf+"\")");
-				
-		string $attrdisp = $name+".displacementShader";		
+
+		string $attrdisp = $name+".displacementShader";
 		string $tfbdisp = `textFieldButtonGrp
 			-ann $attrdisp
-			-label "Displacement" -ed false 
+			-label "Displacement" -ed false
 			-buttonLabel "->"
 			-cw3 115 115 50
 			-dpc anm_displacementConnectDropcallback
@@ -1170,12 +1170,12 @@ proc anm_listEnsembleAttrib(string $name)
 			textFieldButtonGrp -e -bc ("anm_aShaderNaviConnected(\""+ $attrdisp +"\")") $tfbdisp;
 			popupMenu;
 				menuItem -l "Disconnect" -c ("anm_disconnectAttrAny(\""+$tfbdisp+"\")");
-		
-		
+
+
 		string $attrrbx = $name+".rbx";
 		string $tfbrbx = `textFieldButtonGrp
 			-ann $attrrbx
-			-label "RIB Box" -ed false 
+			-label "RIB Box" -ed false
 			-buttonLabel "->"
 			-cw3 115 115 50
 			-dpc anm_ribboxConnectDropcallback
@@ -1184,7 +1184,7 @@ proc anm_listEnsembleAttrib(string $name)
 			textFieldButtonGrp -e -bc ("anm_aShaderNaviConnected(\""+ $attrrbx +"\")") $tfbrbx;
 			popupMenu;
 				menuItem -l "Disconnect" -c ("anm_disconnectAttrAny(\""+$tfbrbx+"\")");
-				
+
 		string $attropt = $name+".operation";
 		string $ensopt = `optionMenu -ann $name -label "Operation"`;
 			menuItem -l "Render";
@@ -1195,14 +1195,14 @@ proc anm_listEnsembleAttrib(string $name)
 		int $ensusropt = `getAttr $attropt` + 1;
 		optionMenu -e -sl $ensusropt $ensopt;
 		optionMenu -e -cc ("anm_sdr_onChangeEnsembleOpt(\""+$ensopt+"\")") $ensopt;
-		
+
 		string $attrtbs = $name+".tbs";
 		attrControlGrp -attribute $attrtbs;
-		
+
 		string $attrdpb = $name+".dpb";
 		attrControlGrp -attribute $attrdpb;
 		setParent..;
-		
+
 	setParent..;
 }
 
@@ -1218,29 +1218,29 @@ global proc anm_listVariableAttrib(string $name)
                 -collapsable 1`;
         columnLayout;
         	string $handle = `getAttr ($name+".handle")`;
-        	textFieldGrp 
+        	textFieldGrp
         		-ed off
         		-l "handle"
         		-cw 1 70
         		-cw 2 70
         		-text $handle;
-        	string $access = `getAttr ($name+".access")`;	
-        	textFieldGrp 
+        	string $access = `getAttr ($name+".access")`;
+        	textFieldGrp
         		-ed off
         		-l " "
         		-cw 1 10
         		-cw 2 70
         		-text $access;
-        		
+
         	if($access != "varying") {
 			string $dtl = `getAttr ($name+".detail")`;
-			if($dtl != "nil") textFieldGrp 
+			if($dtl != "nil") textFieldGrp
 				-ed off
 				-l " "
 				-cw 1 10
 				-cw 2 70
 				-text $dtl;
-				
+
 			if($handle == "float") {
 				 attrControlGrp -attribute ($name+".value");
 			}
@@ -1250,11 +1250,11 @@ global proc anm_listVariableAttrib(string $name)
 			else if($handle == "string") {
 				string $scur =`getAttr ($name+".value")`;
 				if($dtl=="texture") {
-					
+
 					string $txctr = `textFieldButtonGrp -cw 1 50 -cw 2 200 -cw 3 40
-								-l "Value" 
+								-l "Value"
 								-bl "<...>"
-								-text $scur 
+								-text $scur
 								-ann ($name+".value")`;
 					textFieldButtonGrp -e -cc ("anm_connectTextFieldButtonToStringAttr(\""+$txctr+"\")") $txctr;
 		// pick up a file
@@ -1270,9 +1270,9 @@ global proc anm_listVariableAttrib(string $name)
 						-wordWrap off
 						-ip 1
 						-ann ($name+".value")`;
-						
+
 					anm_appendRIBStateOpt($sclcur);
-						
+
 					scrollField -e -cc ("anm_stringAttrByScrollField(\""+$sclcur+"\")") $sclcur;
 					rowLayout -numberOfColumns 2
 						-columnWidth2 80 80
@@ -1285,24 +1285,24 @@ global proc anm_listVariableAttrib(string $name)
 				else if($dtl=="pointcloud") {
 
 					string $txctr = `textFieldButtonGrp -cw 1 50 -cw 2 200 -cw 3 40
-								-l "Value" 
+								-l "Value"
 								-bl "<...>"
-								-text $scur 
+								-text $scur
 								-ann ($name+".value")`;
 					textFieldButtonGrp -e -cc ("anm_connectTextFieldButtonToStringAttr(\""+$txctr+"\")") $txctr;
 		// pick up a file
 					textFieldButtonGrp -e -bc ("anm_pickupFileAsStringAttr(\""+$txctr+"\")") $txctr;
-						
+
 					anm_appendPointCloudEpr($txctr);
-						
+
 					//scrollField -e -cc ("anm_stringAttrByScrollField(\""+$sclcur+"\")") $sclcur;
-					
+
 				}
-				else 
+				else
 					textField -text $scur;
 			}
 		}
-        		
+
 		setParent..;
 	setParent..;
 }
@@ -1318,42 +1318,42 @@ proc anm_listAdaptVariableAttrib(string $name)
                 -borderStyle "in"
                 -collapsable 1`;
         columnLayout;
-        	
+
         	string $operation = `getAttr ($name+".opt")`;
         	string $handle = `getAttr ($name+".handle")`;
-        	
-        	textFieldGrp 
+
+        	textFieldGrp
         		-ed off
         		-l "handle"
         		-cw 1 70
         		-cw 2 70
         		-text $handle;
-        		
+
         	if($operation == "context")
-        		textFieldGrp 
+        		textFieldGrp
         		-ed off
         		-l ""
         		-cw 1 20
         		-cw 2 120
         		-text "switch by context";
         	else if($operation == "objname")
-        		textFieldGrp 
+        		textFieldGrp
         		-ed off
         		-l ""
         		-cw 1 20
         		-cw 2 120
         		-text "switch by objname";
         	else
-        		textFieldGrp 
+        		textFieldGrp
         		-ed off
         		-l ""
         		-cw 1 20
         		-cw 2 120
         		-text "combine";
-        	
+
         	int $unconditional = 0;
         	if($operation != "context" && $operation != "objname") $unconditional = 1;
-        	
+
         	int $num_line = `getAttr ($name+".numCondition")`;
         	button -l "Create Variable" -c ("anm_adaptVariableAdd(\""+$name+"\")");
         	button -l "Delete Variable" -c ("anm_adaptVariableMinus(\""+$name+"\")");
@@ -1371,14 +1371,14 @@ proc anm_listAdaptVariableAttrib(string $name)
 				textFieldButtonGrp -e -cc ("anm_connectTextFieldButtonToStringAttr(\""+$tfb+"\")") $tfb;
 				textFieldButtonGrp -e -bc ("anm_setTextFieldButtonTextBySelection(\""+$tfb+"\")") $tfb;
 			}
-			
+
 			string $sattr;
 			string $tfbattr;
-			
+
 			if($handle == "float") {
-				
+
 				$sattr = $name+".input["+$i+"]";
-				
+
 				$tfbattr = `textFieldButtonGrp
 					-cw3 75 115 50
 					-l ("Float["+$i+"]")
@@ -1390,9 +1390,9 @@ proc anm_listAdaptVariableAttrib(string $name)
 					`;
         		}
         		else if($handle == "color") {
-        			
+
         			$sattr = $name+".inputC["+$i+"]";
-        			
+
 				$tfbattr = `textFieldButtonGrp
 					-cw3 75 115 50
 					-l ("Color["+$i+"]")
@@ -1404,9 +1404,9 @@ proc anm_listAdaptVariableAttrib(string $name)
 					`;
         		}
         		else if($handle == "string") {
-        			
+
         			$sattr = $name+".inputS["+$i+"]";
-        			
+
 				$tfbattr = `textFieldButtonGrp
 					-cw3 75 115 50
 					-l ("String["+$i+"]")
@@ -1417,7 +1417,7 @@ proc anm_listAdaptVariableAttrib(string $name)
 					//-bc ("anm_aShaderNaviConnected( \""+ $sattr +"\")")
 					`;
         		}
-        		
+
         		textFieldButtonGrp -e -text `anm_aShaderGetConnected($sattr)` $tfbattr;
 			textFieldButtonGrp -e -bc ("anm_aShaderNaviConnected(\""+$sattr+"\")") $tfbattr;
 			popupMenu;
@@ -1434,16 +1434,16 @@ list piece attrib
 proc anm_listPieceAttrib(string $name)
 {
 	string $theframe = `frameLayout -p anm_curattribclm
-		-label $name 
+		-label $name
 		-labelAlign "bottom"
                 -borderStyle "in"
                 -collapsable 1`;
-			
+
         columnLayout;
         	string $diagsh[] = `aShaderDiagnose -n $name -nm 1 -t 1`;
         	textFieldGrp -cw 1 50 -cw 2 100 -height 32 -l "name" -text $diagsh[0] -ed off;
         	textFieldGrp -cw 1 50 -cw 2 100 -height 32 -l "type" -text $diagsh[1] -ed off;
-        	
+
         	if($diagsh[1] =="surface" || $diagsh[1] == "displacement") {
         		button -l "Test SL" -width 250 -c ("translateAShader -e "+$name);
         	}
@@ -1455,7 +1455,7 @@ proc anm_listPieceAttrib(string $name)
         		if($acspm != "output" && $acspm != "varying") { // hide output and varying
 // create non-exist attrib to node
 				if(!`attributeExists $paramsh[$i] $name`) {
-					
+
 					if($paramsh[$i+1]=="double3") {
 						addAttr -ln $paramsh[$i] -attributeType double3 $name;
 						addAttr -ln ($paramsh[$i]+"X") -attributeType double -p $paramsh[$i] $name;
@@ -1463,20 +1463,20 @@ proc anm_listPieceAttrib(string $name)
 						addAttr -ln ($paramsh[$i]+"Z") -attributeType double -p $paramsh[$i] $name;
 						string $xyz[] = `anm_splitbyspace($paramsh[$i+2])`;
 						string $cmd="setAttr "+$name+"."+$paramsh[$i]+"X "+$xyz[0];
-						
+
 						eval($cmd);
 						string $cmd="setAttr "+$name+"."+$paramsh[$i]+"Y "+$xyz[1];
-						
+
 						eval($cmd);
 						string $cmd="setAttr "+$name+"."+$paramsh[$i]+"Z "+$xyz[2];
-						
+
 						eval($cmd);
 					}
 					else if($paramsh[$i+1]=="double") {
 						addAttr -ln $paramsh[$i] -attributeType double $name;
 						string $xyz[] = `anm_splitbyspace($paramsh[$i+2])`;
 						string $cmd="setAttr "+$name+"."+$paramsh[$i]+" "+$xyz[0];
-						
+
 						eval($cmd);
 					}
 					else {
@@ -1486,26 +1486,26 @@ proc anm_listPieceAttrib(string $name)
 				}
 // parse controls
 				if($paramsh[$i+3] == "connection") {
-					
+
 					string $sattr = $name+"."+$paramsh[$i];
-					
+
 					string $tfbattr = `textFieldButtonGrp
 						-ann $sattr
-						-label $paramsh[$i] -ed false 
+						-label $paramsh[$i] -ed false
 						-buttonLabel "->"
 						-cw3 115 115 50
 						-dpc anm_pieceConnectDropcallback
 						`;
-						
+
 					textFieldButtonGrp -e -text `anm_aShaderGetConnected($sattr)` $tfbattr;
 					textFieldButtonGrp -e -bc ("anm_aShaderNaviConnected(\""+$sattr+"\")") $tfbattr;
 // popup menus
 						popupMenu;
 							menuItem -l "Disconnect" -c ("anm_disconnectAttrAny(\""+$tfbattr+"\")");
-							
+
 				}
 				else if($paramsh[$i+3] == "switch") {
-					
+
 					string $chkctr;
 					if(`getAttr ($name+"."+$paramsh[$i])` == 1.0) $chkctr = `checkBox -l $paramsh[$i] -v on`;
 					else $chkctr = `checkBox -l $paramsh[$i] -v off`;
@@ -1531,9 +1531,9 @@ proc anm_listPieceAttrib(string $name)
         	scrollField -width 250 -height 120 -ed off -wordWrap true -text $pdes[0];
         	setParent..;
 		setParent..;
-		
-		
-		
+
+
+
 	setParent..;
 }
 
@@ -1544,7 +1544,7 @@ create ensemble
 global proc anm_createEnsemble(int $type)
 {
 	string $dummy = `createNode -n "dummy" transform`;
-	
+
 	string $node;
 	if($type==0) {
 		$node =`createNode -n "ensemble" aShaderEnsemble`;
@@ -1559,7 +1559,7 @@ global proc anm_createEnsemble(int $type)
 	}
 	connectAttr -f ($node + ".output") ($dummy+".translateX");
 	anm_updateExisting;
-	
+
 	string $dummyGrp = "dummyGrp";
 	if( !`objExists dummyGrp` ) $dummyGrp = `group -em -n dummyGrp`;
 	parent $dummy $dummyGrp;
@@ -1574,12 +1574,12 @@ global proc anm_createPiece(string $name)
 	string $node =`createNode -n $name aShaderPiece`;
 	string $rootpath = `anm_getMasterPath`;
 	setAttr -type "string" ($node + ".xslPath") ($rootpath+"/"+$name+".xrsl");
-	
+
 	string $dummy = `createNode -n "dummy" transform`;
 
 	connectAttr -f ($node + ".output") ($dummy+".translateX");
 	anm_updateExisting;
-	
+
 	string $dummyGrp = "dummyGrp";
 	if( !`objExists dummyGrp` ) $dummyGrp = `group -em -n dummyGrp`;
 	parent $dummy $dummyGrp;
@@ -1592,21 +1592,21 @@ create variable with handle, acess, and detail
 global proc anm_createVariable(string $handle, string $access, string $detail, string $icon)
 {
 	string $dummy = `createNode -n "dummy" transform`;
-	
-	
-	
+
+
+
 	string $defnm = "fvar";
 	if($handle == "color") $defnm = "cvar";
 	else if($handle == "string") $defnm = "svar";
-	
+
 	if($access=="varying") $defnm += "prim";
-	
+
 	string $node = `createNode -n $defnm aShaderVariable`;
 	setAttr -type "string" ($node+".handle") $handle;
 	setAttr -type "string" ($node+".access") $access;
 	setAttr -type "string" ($node+".detail") $detail;
 	setAttr -type "string" ($node+".iconfile") $icon;
-	
+
 	if($handle == "float") {
 		addAttr -ln "value" -attributeType double $node;
 		setAttr ($node +".value") 1.0;
@@ -1621,10 +1621,10 @@ global proc anm_createVariable(string $handle, string $access, string $detail, s
 	else {
 		addAttr -ln "value" -dt "string" $node;
 	}
-	
+
 	connectAttr -f ($node + ".output") ($dummy+".translateX");
 	anm_updateExisting;
-	
+
 	string $dummyGrp = "dummyGrp";
 	if( !`objExists dummyGrp` ) $dummyGrp = `group -em -n dummyGrp`;
 	parent $dummy $dummyGrp;
@@ -1637,23 +1637,23 @@ create adapt variable with handle and operation
 global proc anm_createAdaptVariable(string $handle, string $operation)
 {
 	string $dummy = `createNode -n "dummy" transform`;
-		
+
 	string $defnm;
 	if($handle=="float") $defnm = "fvar";
 	else if($handle == "color") $defnm = "cvar";
 	else $defnm = "svar";
-	
+
 	if($operation=="context") $defnm += "bctx";
 	else if($operation == "objname") $defnm += "bobj";
 	else $defnm += "comb";
-	
+
 	string $node = `createNode -n $defnm aShaderAdaptVariable`;
 	setAttr -type "string" ($node+".handle") $handle;
 	setAttr -type "string" ($node+".opt") $operation;
 
 	connectAttr -f ($node + ".output") ($dummy+".translateX");
 	anm_updateExisting;
-	
+
 	string $dummyGrp = "dummyGrp";
 	if( !`objExists dummyGrp` ) $dummyGrp = `group -em -n dummyGrp`;
 	parent $dummy $dummyGrp;
@@ -1675,58 +1675,58 @@ global proc anm_updateExisting()
 	global string $ANM_ShoFilterMenu;
 	if($ANM_ShoFilterMenu != "") $flt = `optionMenu -q -sl $ANM_ShoFilterMenu`;
 // find pieces
-	
-	if($flt == 1) {	
+
+	if($flt == 1) {
 
 	$node = `ls -type aShaderAdaptEnsemble`;
-	
+
 	for($an in $node) {
-		
+
 		 anm_shoAdaptEnsemble($an);
 	}
-	
+
 	$node = `ls -type aShaderEnsemble`;
-	
+
 	for($an in $node) {
-		
+
 		 anm_shoEnsemble($an);
 	}
-	
+
 	$node = `ls -type aShaderPiece`;
-	
+
 	for($an in $node) {
-		
+
 		 anm_shoPiece($an);
 	}
-	
+
 	$node = `ls -type aShaderVariable`;
-	
+
 	for($an in $node) {
-		
+
 		 anm_shoVariable($an);
 	}
-	
+
 	$node = `ls -type aShaderAdaptVariable`;
-	
+
 	for($an in $node) {
-		
+
 		 anm_shoAdaptVariable($an);
 	}
 	}
 	else if($flt == 2) {
 		text -p anm_existingclm -l "Existing Ensemble";
 		$node = `ls -type aShaderAdaptEnsemble`;
-	
+
 		for($an in $node) anm_shoAdaptEnsemble($an);
 
 		$node = `ls -type aShaderEnsemble`;
-	
+
 		for($an in $node) anm_shoEnsemble($an);
 	}
 	else if($flt == 3) {
 		text -p anm_existingclm -l "Existing Surface";
 		$node = `ls -type aShaderPiece`;
-	
+
 		for($an in $node) {
 			string $diagsh[] = `aShaderDiagnose -n $an -t 1`;
 			if($diagsh[0] == "surface") anm_shoPiece($an);
@@ -1735,7 +1735,7 @@ global proc anm_updateExisting()
 	else if($flt == 4) {
 		text -p anm_existingclm -l "Existing Displacement";
 		$node = `ls -type aShaderPiece`;
-	
+
 		for($an in $node) {
 			string $diagsh[] = `aShaderDiagnose -n $an -t 1`;
 			if($diagsh[0] == "displacement") anm_shoPiece($an);
@@ -1744,20 +1744,20 @@ global proc anm_updateExisting()
 	else if($flt == 5) {
 		text -p anm_existingclm -l "Existing Color";
 		$node = `ls -type aShaderPiece`;
-	
+
 		for($an in $node) {
 			string $diagsh[] = `aShaderDiagnose -n $an -t 1`;
 			if($diagsh[0] == "color") anm_shoPiece($an);
 		}
-		
+
 		$node = `ls -type aShaderVariable`;
-	
+
 		for($an in $node) {
 			if(`getAttr ($an+".handle")` == "color") anm_shoVariable($an);
 		}
-		
+
 		$node = `ls -type aShaderAdaptVariable`;
-		
+
 		for($an in $node) {
 			if(`getAttr ($an+".handle")` == "color") anm_shoAdaptVariable($an);
 		}
@@ -1765,20 +1765,20 @@ global proc anm_updateExisting()
 	else if($flt == 6) {
 		text -p anm_existingclm -l "Existing Float";
 		$node = `ls -type aShaderPiece`;
-	
+
 		for($an in $node) {
 			string $diagsh[] = `aShaderDiagnose -n $an -t 1`;
 			if($diagsh[0] == "float") anm_shoPiece($an);
 		}
-		
+
 		$node = `ls -type aShaderVariable`;
-	
+
 		for($an in $node) {
 			if(`getAttr ($an+".handle")` == "float") anm_shoVariable($an);
 		}
-		
+
 		$node = `ls -type aShaderAdaptVariable`;
-		
+
 		for($an in $node) {
 			if(`getAttr ($an+".handle")` == "float") anm_shoAdaptVariable($an);
 		}
@@ -1786,20 +1786,20 @@ global proc anm_updateExisting()
 	else if($flt == 7) {
 		text -p anm_existingclm -l "Existing String";
 		$node = `ls -type aShaderPiece`;
-	
+
 		for($an in $node) {
 			string $diagsh[] = `aShaderDiagnose -n $an -t 1`;
 			if($diagsh[0] == "string") anm_shoPiece($an);
 		}
-		
+
 		$node = `ls -type aShaderVariable`;
-	
+
 		for($an in $node) {
 			if(`getAttr ($an+".handle")` == "string") anm_shoVariable($an);
 		}
-		
+
 		$node = `ls -type aShaderAdaptVariable`;
-		
+
 		for($an in $node) {
 			if(`getAttr ($an+".handle")` == "string") anm_shoAdaptVariable($an);
 		}
@@ -1823,12 +1823,12 @@ global proc anm_updateAttrib(string $name)
 	else if(`nodeType $name` == "aShaderVariable") anm_listVariableAttrib($name);
 	else if(`nodeType $name` == "aShaderAdaptVariable") anm_listAdaptVariableAttrib($name);
 
-// history of select	
+// history of select
 	global int $ANM_NUMItem;
 	global int $ANM_CURItem;
 	global string $ANM_PreservedItems[];
-	
-	if($ANM_NUMItem < 16) {	
+
+	if($ANM_NUMItem < 16) {
 		$ANM_PreservedItems[$ANM_NUMItem] = $name;
 		$ANM_CURItem = $ANM_NUMItem;
 		$ANM_NUMItem++;
@@ -1859,7 +1859,7 @@ global proc anm_updateHistoryAttrib(int $offset)
 	if($ANM_CURItem <0) $ANM_CURItem =0;
 	else if($ANM_CURItem >16) $ANM_CURItem = 16;
 	if($ANM_CURItem == $oldcur) return;
-	
+
 	string $name = $ANM_PreservedItems[$ANM_CURItem];
 	if($name == "") return;
 
@@ -1867,7 +1867,7 @@ global proc anm_updateHistoryAttrib(int $offset)
 	string $node[] =`columnLayout -q -childArray anm_curattribclm`;
 	string $an;
 	for($an in $node) deleteUI $an;
-	
+
 	if(`nodeType $name` == "aShaderAdaptEnsemble") anm_listAdaptEnsembleAttrib($name);
 	else if(`nodeType $name` == "aShaderEnsemble") anm_listEnsembleAttrib($name);
 	else if(`nodeType $name` == "aShaderPiece") anm_listPieceAttrib($name);
@@ -1879,17 +1879,17 @@ global proc anm_updateHistoryAttrib(int $offset)
 main window
 */
 
-global proc anm_openAShaderManWin() 
+global proc anm_openAShaderManWin()
 {
 //create shader path
 	string $shader_path = `workspace -q -fn`+"/rmanshaders/";
-	
+
 	system("mkdir \""+$shader_path +"\"");
 // create tmp path
 	string $tmp_path = `workspace -q -fn`+"/rmantmp/";
-	
+
 	system("mkdir \""+$tmp_path +"\"");
-	
+
 // get scene name
 	string $scnname = `file -q -sceneName`;
 	if($scnname == "") $scnname = "untitled";
@@ -1900,10 +1900,10 @@ global proc anm_openAShaderManWin()
 		$numTokens = `tokenize $scnname "." $buffer`;
 		$scnname = $buffer[0];
 	}
-	
+
 	global string $ANM_ShaderPath;
-	global string $ANM_TmpPath; 
-	
+	global string $ANM_TmpPath;
+
 	$ANM_ShaderPath = $shader_path + "/" + $scnname;
 	$ANM_TmpPath = $tmp_path + "/" + $scnname;
 
@@ -1913,24 +1913,24 @@ global proc anm_openAShaderManWin()
 
 //If such a window already exists, destory it.
  if ( (`window -exists anm_AShaderManWin`) == true ) deleteUI anm_AShaderManWin;
- 
+
 //Create the window.
  window -title "anemone 4.3 - Shader Management" -wh 400 300  -mb on anm_AShaderManWin;
- 
+
  menu -label "Show" -tearOff false;
  	menuItem -label "Workspace" -c "anm_openShowWorkSpaceWin";
 
 //Layout
 string $form = `formLayout -numberOfDivisions 100`;
-string $row = `rowColumnLayout -numberOfColumns 5 
-			-columnWidth 1 120 
-			-columnWidth 2 160 
-			-columnWidth 3 160 
+string $row = `rowColumnLayout -numberOfColumns 5
+			-columnWidth 1 120
+			-columnWidth 2 160
+			-columnWidth 3 160
 			-columnWidth 4 80
-			-columnWidth 5 80  
+			-columnWidth 5 80
 			//-columnAttach 1 "both" 0 -columnAttach 2 "both" 0 -columnAttach 3 "both" 0
 			`;
-    
+
 //columnLayout -adjustableColumn true;
 
 //column begin
@@ -1940,33 +1940,33 @@ string $row = `rowColumnLayout -numberOfColumns 5
     columnLayout -adjustableColumn true;
      frameLayout -label "Ensemble" -labelAlign "center"
                 -borderStyle "in" -collapsable 1 ;
-                
+
         columnLayout;
-        
-        iconTextButton -width 150 -style "iconAndTextHorizontal" 
+
+        iconTextButton -width 150 -style "iconAndTextHorizontal"
         	-image1 "anm_ensemble.xpm"
         	-height 36
-        	-l "Simple" 
+        	-l "Simple"
         	-c "anm_createEnsemble(0)";
-        iconTextButton -width 150  -style "iconAndTextHorizontal" 
-        	-image1 "anm_ensembleCtx.xpm" 
+        iconTextButton -width 150  -style "iconAndTextHorizontal"
+        	-image1 "anm_ensembleCtx.xpm"
         	-height 36
-        	-l "AdaptByContext"  
+        	-l "AdaptByContext"
         	-c "anm_createEnsemble(1)";
-        iconTextButton -width 150  -style "iconAndTextHorizontal" 
+        iconTextButton -width 150  -style "iconAndTextHorizontal"
         	-image1 "anm_ensembleObj.xpm"
         	-height 36
-        	-l "AdaptByObject"  
+        	-l "AdaptByObject"
         	-c "anm_createEnsemble(2)";
-        
+
         	setParent..;
         setParent..;
-        
+
         frameLayout -label "Surface" -labelAlign "center"
                 -borderStyle "in" -collapsable 1 ;
 
         columnLayout;
-        
+
         	string $surfs[] = `anm_getSurfaceFiles`;
                 int $surfit;
                 string $surfimg;
@@ -1974,19 +1974,19 @@ string $row = `rowColumnLayout -numberOfColumns 5
 			$surfimg = "anm_surface.xpm";
 			if($surfs[$surfit+1] != "") $surfimg = $surfs[$surfit+1];
 			iconTextButton -width 150 -height 36
-				-style "iconAndTextHorizontal" 
+				-style "iconAndTextHorizontal"
 				-image1 $surfimg
-				-l $surfs[$surfit] 
+				-l $surfs[$surfit]
 				-c ("anm_createPiece(\""+$surfs[$surfit]+"\")");
 		}
         	setParent..;
         setParent..;
-        
+
         frameLayout -label "Displacement" -labelAlign "center"
                 -borderStyle "in" -collapsable 1 ;
-                
+
         columnLayout;
-        
+
         	string $disps[] = `anm_getDisplacementFiles`;
                 int $dispit;
                 string $dispimg;
@@ -1994,19 +1994,19 @@ string $row = `rowColumnLayout -numberOfColumns 5
 			$dispimg = "anm_displacement.xpm";
 			if($disps[$surfit+1] != "") $dispimg = $disps[$dispit+1];
 			iconTextButton -width 150 -height 36
-				-style "iconAndTextHorizontal" 
+				-style "iconAndTextHorizontal"
 				-image1 $dispimg
-				-l $disps[$dispit] 
+				-l $disps[$dispit]
 				-c ("anm_createPiece(\""+$disps[$dispit]+"\")");
 		}
         	setParent..;
         setParent..;
-        
+
         frameLayout -label "Color" -labelAlign "center"
                 -borderStyle "in" -collapsable 1 ;
-                
+
         columnLayout;
-        
+
         	string $colrs[] = `anm_getColorFiles`;
 
 		int $colrit;
@@ -2015,48 +2015,48 @@ string $row = `rowColumnLayout -numberOfColumns 5
 			$colrimg = "anm_color.xpm";
 			if($colrs[$colrit+1] != "") $colrimg = $colrs[$colrit+1];
 			iconTextButton -width 150 -height 36
-				-style "iconAndTextHorizontal" 
+				-style "iconAndTextHorizontal"
 				-image1 $colrimg
-				-l $colrs[$colrit] 
+				-l $colrs[$colrit]
 				-c ("anm_createPiece(\""+$colrs[$colrit]+"\")");
 		}
-        
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableC.xpm" 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableC.xpm"
         		-l "Variable"
         		-c "anm_createVariable(\"color\",\"uniform\",\"nil\", \"anm_variableC.xpm\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_primC.xpm" 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_primC.xpm"
         		-l "Primitve"
         		-c "anm_createVariable(\"color\",\"varying\",\"nil\", \"anm_primC.xpm\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableCtxC.xpm" 
-        		-height 36 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableCtxC.xpm"
+        		-height 36
         		-l "byContext"
         		-c "anm_createAdaptVariable(\"color\",\"context\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableObjC.xpm" 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableObjC.xpm"
         		-height 36
         		-l "byObjname"
         		-c "anm_createAdaptVariable(\"color\",\"objname\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableCmbC.xpm" 
-        		-height 36 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableCmbC.xpm"
+        		-height 36
         		-l "Combine"
         		-c "anm_createAdaptVariable(\"color\",\"combine\")";
-        
+
         	setParent..;
         setParent..;
-        
+
         frameLayout -label "Float" -labelAlign "center"
                 -borderStyle "in" -collapsable 1 ;
-                
+
         columnLayout;
-        
+
         string $flots[] = `anm_getFloatFiles`;
 
 		int $flotit;
@@ -2065,85 +2065,85 @@ string $row = `rowColumnLayout -numberOfColumns 5
 			$flotimg = "anm_float.xpm";
 			if($flots[$flotit+1] != "") $flotimg = $flots[$flotit+1];
 			iconTextButton -width 150 -height 36
-				-style "iconAndTextHorizontal" 
+				-style "iconAndTextHorizontal"
 				-image1 $flotimg
-				-l $flots[$flotit] 
+				-l $flots[$flotit]
 				-c ("anm_createPiece(\""+$flots[$flotit]+"\")");
 		}
-        
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableF.xpm" 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableF.xpm"
         		-height 36
         		-l "Variable"
         		-c "anm_createVariable(\"float\",\"uniform\",\"nil\",\"anm_variableF.xpm\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_primF.xpm" 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_primF.xpm"
         		-height 36
         		-l "Primitive"
         		-c "anm_createVariable(\"float\",\"varying\",\"nil\",\"anm_primF.xpm\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableCtxF.xpm" 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableCtxF.xpm"
         		-height 36
         		-l "byContext"
         		-c "anm_createAdaptVariable(\"float\",\"context\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableObjF.xpm" 
-        		-height 36 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableObjF.xpm"
+        		-height 36
         		-l "byObjname"
         		-c "anm_createAdaptVariable(\"float\",\"objname\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableCmbF.xpm" 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableCmbF.xpm"
         		-height 36
         		-l "Combine"
         		-c "anm_createAdaptVariable(\"float\",\"combine\")";
-        
+
         	setParent..;
         setParent..;
-        
+
         frameLayout -label "String" -labelAlign "center"
                 -borderStyle "in" -collapsable 1 ;
-                
+
         columnLayout;
-        
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_sfile.xpm" 
-        		-height 36 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_sfile.xpm"
+        		-height 36
         		-l "Texture"
         		-c "anm_createVariable(\"string\",\"uniform\",\"texture\",\"anm_sfile.xpm\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_srib.xpm" 
-        		-height 36 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_srib.xpm"
+        		-height 36
         		-l "RIB Box"
         		-c "anm_createVariable(\"string\",\"uniform\",\"rib\",\"anm_srib.xpm\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_sbake.xpm" 
-        		-height 36 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_sbake.xpm"
+        		-height 36
         		-l "Bake File"
         		-c "anm_createVariable(\"string\",\"uniform\",\"pointcloud\",\"anm_sbake.xpm\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableCtxS.xpm" 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableCtxS.xpm"
         		-height 36
         		-l "byContext"
         		-c "anm_createAdaptVariable(\"string\",\"context\")";
-        		
-        	iconTextButton -width 100  -style "iconAndTextHorizontal" 
-        		-image1 "anm_variableObjS.xpm" 
+
+        	iconTextButton -width 100  -style "iconAndTextHorizontal"
+        		-image1 "anm_variableObjS.xpm"
         		-height 36
         		-l "byObjname"
         		-c "anm_createAdaptVariable(\"string\",\"objname\")";
-        
+
         	setParent..;
         setParent..;
     setParent..;
-    
-   
+
+
     setParent..;
 
     scrollLayout;
@@ -2151,37 +2151,37 @@ string $row = `rowColumnLayout -numberOfColumns 5
         text -l "Existing";
         anm_updateExisting();
         setParent..;
-    setParent..;    
+    setParent..;
 	scrollLayout;
 		columnLayout;
-			
-		textField -ed off -text "" anm_attrpntxtopt;	
+
+		textField -ed off -text "" anm_attrpntxtopt;
 			popupMenu anm_attrpngoupopt;
             /*menuItem -label "Yellow";
             menuItem -label "Purple";
             menuItem -label "Orange";*/
-					
+
 			columnLayout anm_curattribclm;
-			
+
 			setParent..;
 		setParent..;
     setParent..;
-	
+
 //row begin
 //button -l "Reload" -c "anm_openAShaderManWin"-p $row;
 //button -l "Apply" -c "doImportanemone" -p $row;
 //button -l "Close" -c "deleteUI anm_AShaderManWin" -p $row;
 	global int $ANM_NUMItem;
 	$ANM_NUMItem = 0;
-	
+
 	iconTextButton -height 36
 		-c "global string $ANM_ShoFilterMenu; $ANM_ShoFilterMenu = \"\";anm_openAShaderManWin"
 		-p $row -style "iconOnly" -image1 "anm_reload.xpm";
-	
+
 	global string $ANM_ShoFilterMenu;
-	$ANM_ShoFilterMenu = `optionMenu 
-		-p $row 
-		-label " " //-columnWidth 1 40 -columnWidth 2 120 
+	$ANM_ShoFilterMenu = `optionMenu
+		-p $row
+		-label " " //-columnWidth 1 40 -columnWidth 2 120
 		-cc anm_updateExisting`;// anm_shofilteroptmenu;
 
 				menuItem -l "All";
@@ -2192,15 +2192,15 @@ string $row = `rowColumnLayout -numberOfColumns 5
 				menuItem -l "Float";
 				menuItem -l "String";
 				menuItem -l "Selected";
-	setParent..; 		
+	setParent..;
 iconTextButton -dpc anm_dropcallbackPiece  -height 36
 	-c anm_updateExisting
 	-p $row -style "iconOnly" -image1 "anm_trashBin.xpm";
-	
+
 	//iconTextButton -height 36
 	//-c "anm_updateHistoryAttrib(-1)"
 	//-p $row -style "iconOnly" -image1 "anm_network.xpm";
-	
+
 	//iconTextButton -height 36
 	//-c "anm_updateHistoryAttrib(1)"
 	//-p $row -style "iconOnly" -image1 "anm_forward.xpm";
@@ -2239,7 +2239,7 @@ string $scroll = `scrollLayout -p $form`;
 columnLayout -adjustableColumn true;
 
 global string $ANM_ShaderPath;
-global string $ANM_TmpPath; 
+global string $ANM_TmpPath;
 
 textFieldGrp -cw2 48 300 -label "Shader" -text $ANM_ShaderPath;
 textFieldGrp -cw2 48 300 -label "Tmp" -text $ANM_TmpPath;

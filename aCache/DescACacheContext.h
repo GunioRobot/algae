@@ -23,7 +23,7 @@ public:
     virtual MStatus         writeBinary( ostream& out );
 
 	virtual void			copy( const MPxData& );
-	MTypeId                 typeId() const; 
+	MTypeId                 typeId() const;
 	MString                 name() const;
 
     	ACacheContextData* getDesc() const { return _pDesc; }
@@ -35,6 +35,6 @@ public:
 	static void*            creator();
 
 private:
-    ACacheContextData* _pDesc; 
+    ACacheContextData* _pDesc;
 };
 #endif

@@ -45,14 +45,14 @@ class GLSLACache
 public:
 	GLSLACache();
 	~GLSLACache();
-	
+
 	char initProgram();
 	char isValid() const {return m_isValid;}
 	void enable();
 	void disable();
 	void setParam(GLSLACachePARAM& param);
 	GLuint getProgram() const {return program;}
-	
+
 private:
 	GLuint program;
 	char m_isValid;

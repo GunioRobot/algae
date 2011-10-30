@@ -1,7 +1,7 @@
 #include "PieceAShader.h"
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MFnTypedAttribute.h>
-#include <maya/MTypeId.h> 
+#include <maya/MTypeId.h>
 #include <maya/MPlug.h>
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
@@ -9,11 +9,11 @@
 
 MTypeId     PieceAShaderNode::id( 0x00026251 );
 MObject		PieceAShaderNode::axslpath;
-MObject     PieceAShaderNode::output;  
+MObject     PieceAShaderNode::output;
 MObject     PieceAShaderNode::outputc;
-MObject     PieceAShaderNode::outputs;       
+MObject     PieceAShaderNode::outputs;
 
-PieceAShaderNode::PieceAShaderNode() 
+PieceAShaderNode::PieceAShaderNode()
 {
 	m_rsl = new XRSLPiece();
 }
@@ -22,9 +22,9 @@ PieceAShaderNode::~PieceAShaderNode() {}
 
 MStatus PieceAShaderNode::compute( const MPlug& plug, MDataBlock& data )
 {
-	
+
 	MStatus returnStatus;
- 
+
 	if( plug == output ) {
 		m_xsl_path = data.inputValue( axslpath).asString();
 		MGlobal::displayInfo(m_xsl_path);
@@ -39,7 +39,7 @@ MStatus PieceAShaderNode::compute( const MPlug& plug, MDataBlock& data )
 		MDataHandle outputHandle = data.outputValue( PieceAShaderNode::output );
 		outputHandle.set( result );
 		data.setClean(plug);
-		
+
 	} else {
 		return MS::kUnknownParameter;
 	}
@@ -57,28 +57,28 @@ MStatus PieceAShaderNode::initialize()
 	MFnNumericAttribute numAttr;
 	MFnTypedAttribute tAttr;
 	MStatus				stat;
-	
+
 	axslpath = tAttr.create( "xslPath", "xsp", MFnData::kString );
 	numAttr.setStorable(true);
 	numAttr.setInternal(true);
 	addAttribute( axslpath );
-	
+
 	output = numAttr.create( "output", "out", MFnNumericData::kFloat, 0.0 );
 	numAttr.setWritable(false);
 	numAttr.setStorable(false);
 	stat = addAttribute( output );
 		if (!stat) { stat.perror("addAttribute"); return stat;}
-		
+
 	outputc = numAttr.createColor( "outputC", "outc");
 	numAttr.setWritable(false);
 	numAttr.setStorable(false);
 	addAttribute( outputc );
-	
+
 	outputs = tAttr.create( "outputS", "outs", MFnData::kString);
 	tAttr.setWritable(false);
 	tAttr.setStorable(false);
 	addAttribute( outputs );
-		
+
 	attributeAffects( axslpath, output );
 	attributeAffects( axslpath, outputc );
 	attributeAffects( axslpath, outputs );
@@ -87,7 +87,7 @@ MStatus PieceAShaderNode::initialize()
 }
 
 /* virtual */
-bool 
+bool
 PieceAShaderNode::setInternalValueInContext( const MPlug& plug,
 												  const MDataHandle& handle,
 												  MDGContext&)
@@ -127,6 +127,6 @@ PieceAShaderNode::getInternalValueInContext( const MPlug& plug,
 		handledAttribute = true;
 		handle.set( m_xsl_path );
 	}
-	
+
 	return handledAttribute;
 }

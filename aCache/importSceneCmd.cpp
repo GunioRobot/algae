@@ -25,13 +25,13 @@
 // cache file generation Command Class
 //
 ////////////////////////////////////////
- 
-  
+
+
 XMLSceneCmd::XMLSceneCmd() {}
 
 XMLSceneCmd::~XMLSceneCmd() {}
 
-MSyntax XMLSceneCmd::newSyntax() 
+MSyntax XMLSceneCmd::newSyntax()
 {
 	MSyntax syntax;
 
@@ -40,21 +40,21 @@ MSyntax XMLSceneCmd::newSyntax()
 	syntax.addFlag("-t", "-transform", MSyntax::kBoolean);
 	syntax.addFlag("-i", "-info", MSyntax::kBoolean);
 	syntax.addFlag("-u", "-uvinfo", MSyntax::kBoolean);
-	
+
 	syntax.enableQuery(false);
 	syntax.enableEdit(false);
 
 	return syntax;
 }
 
-MStatus XMLSceneCmd::doIt( const MArgList& args ) 
+MStatus XMLSceneCmd::doIt( const MArgList& args )
 {
 	MStatus status = parseArgs( args );
-	
+
 	if( status != MS::kSuccess ) return status;
-	
+
 	MArgDatabase argData(syntax(), args);
-	
+
 	//MAnimControl timeControl;
 	//MTime time = timeControl.currentTime();
 	if (argData.isFlagSet("-i")) return getSceneInfo();
@@ -62,23 +62,23 @@ MStatus XMLSceneCmd::doIt( const MArgList& args )
 
 	MString proj;
 	MGlobal::executeCommand( MString ("string $p = `workspace -q -fn`"), proj );
-	
+
 	MSelectionList selList;
 	MGlobal::getActiveSelectionList ( selList );
 	MItSelectionList iter( selList );
 
 	MString cache_path = proj + "/data/";
 	if (argData.isFlagSet("-p")) argData.getFlagArgument("-p", 0, cache_path);
-	
+
 	ZXMLDoc doc;
-	if(doc.load(cache_path.asChar()) != 1) 
+	if(doc.load(cache_path.asChar()) != 1)
 	{
 		MGlobal::displayError(MString("Cannot open ")+cache_path);
 		return MS::kSuccess;
 	}
-	
+
 	doc.setChildren();
-	
+
 	if(argData.isFlagSet("-m"))
 	{
 		while(doc.isLastNode() != 1)
@@ -90,7 +90,7 @@ MStatus XMLSceneCmd::doIt( const MArgList& args )
 			doc.nextNode();
 		}
 	}
-	
+
 	if(argData.isFlagSet("-t"))
 	{
 		while(doc.isLastNode() != 1)
@@ -98,19 +98,19 @@ MStatus XMLSceneCmd::doIt( const MArgList& args )
 			if(doc.checkNodeName("camera") == 1)
 			{
 				appendToResult(doc.getAttribByName("name"));
-				
+
 				MFnCamera ccam;
 				MObject ocam = ccam.create();
-				
+
 				if(doc.isEmpty() != 1)
 				{
 					MDagPath pcam;
 					MDagPath::getAPathTo(ocam, pcam);
 					pcam.extendToShape();
-					
+
 					MFnCamera fcam = MFnCamera(pcam);
 					doc.setChildren();
-					
+
 					while(doc.isLastNode() != 1)
 					{
 						if(doc.checkNodeName("attribute") == 1)
@@ -138,120 +138,120 @@ MStatus XMLSceneCmd::doIt( const MArgList& args )
 						}
 						doc.nextNode();
 					}
-					
+
 					doc.setParent();
 				}
-				
+
 				appendToResult(MFnDependencyNode(ocam).name());
 				appendToResult(" 1 1 1 ");
 			}
 			else if(doc.checkNodeName("transform") == 1)
 			{
 				appendToResult(doc.getAttribByName("name"));
-				
+
 				XYZ scale;
 				doc.getFloat3AttribByName("scale", scale.x, scale.y, scale.z);
-				
+
 				doc.getChildByName("nurbs_surface");
-				
+
 				int degreeU = doc.getIntAttribByName("degreeU");
 				int degreeV = doc.getIntAttribByName("degreeV");
-				
+
 				int formU = doc.getIntAttribByName("formU");
 				int formV = doc.getIntAttribByName("formV");
-				
+
 				MFnNurbsSurface::Form fmu;
 				MFnNurbsSurface::Form fmv;
-				
+
 				if(formU ==0) fmu = MFnNurbsSurface::kOpen;
 				else if(formU ==1) fmu = MFnNurbsSurface::kClosed;
 				else fmu = MFnNurbsSurface::kPeriodic;
-				
+
 				if(formV ==0) fmv = MFnNurbsSurface::kOpen;
 				else if(formV ==1) fmv = MFnNurbsSurface::kClosed;
 				else fmv = MFnNurbsSurface::kPeriodic;
-				
+
 				std::string staticName = cache_path.asChar();
 				SHelper::cutByFirstDot(staticName);
 				staticName += ".sta";
-				
+
 				std::ifstream ffin;
 				ffin.open(staticName.c_str(), ios::in | ios::binary);
-				
+
 				doc.getChildByName("static");
-				
+
 				doc.getChildByName("cvs");
-					
+
 					int n_cvs = doc.getIntAttribByName("count");
 					int pos = doc.getIntAttribByName("loc");
 					int size = doc.getIntAttribByName("size");
-					
+
 					XYZ* cvs = new XYZ[n_cvs];
 					ffin.seekg( pos, ios::beg );
 					ffin.read((char*)cvs, size);
-					
+
 					MPointArray pcvs; pcvs.setLength(n_cvs);
-					
+
 					for(unsigned i=0; i<n_cvs; i++) pcvs[i] = MPoint(cvs[i].x, cvs[i].y, cvs[i].z);
-					
+
 					delete[] cvs;
-					
+
 				doc.setParent();
-				
+
 				doc.getChildByName("knotu");
-					
+
 					int n_knotu = doc.getIntAttribByName("count");
 					pos = doc.getIntAttribByName("loc");
 					size = doc.getIntAttribByName("size");
-					
+
 					float* knotu = new float[n_knotu];
 					ffin.seekg( pos, ios::beg );
 					ffin.read((char*)knotu, size);
-					
+
 					MDoubleArray pknotu; pknotu.setLength(n_knotu);
-					
+
 					for(unsigned i=0; i<n_knotu; i++) pknotu[i] = knotu[i];
-					
+
 					delete[] knotu;
-					
+
 				doc.setParent();
-				
+
 				doc.getChildByName("knotv");
-					
+
 					int n_knotv = doc.getIntAttribByName("count");
 					pos = doc.getIntAttribByName("loc");
 					size = doc.getIntAttribByName("size");
-					
+
 					float* knotv = new float[n_knotv];
 					ffin.seekg( pos, ios::beg );
 					ffin.read((char*)knotv, size);
-					
+
 					MDoubleArray pknotv; pknotv.setLength(n_knotv);
-					
+
 					for(unsigned i=0; i<n_knotv; i++) pknotv[i] = knotv[i];
-					
+
 					delete[] knotv;
-					
+
 				ffin.close();
-					
+
 				doc.setParent();
 
 				MFnNurbsSurface fnurbs;
 				MObject onurbs = fnurbs.create(pcvs, pknotu, pknotv, degreeU, degreeV,  fmu,  fmv, 0, MObject::kNullObj);
 				MString nurbsn = MFnDependencyNode(onurbs).name();
-	
+
 				appendToResult(nurbsn);
-				
+
 				MString outscale = MString(" ") +scale.x +" "+scale.y +" "+scale.z;
 				appendToResult(outscale);
-				
+
 				doc.setParent();
 				doc.setParent();
 			}
 			doc.nextNode();
 		}
 	}
-	
+
 	doc.setParent();
 	doc.free();
 
@@ -261,7 +261,7 @@ MStatus XMLSceneCmd::doIt( const MArgList& args )
 void* XMLSceneCmd::creator() {
  return new XMLSceneCmd;
  }
- 
+
 MStatus XMLSceneCmd::parseArgs( const MArgList& args )
 {
 	// Parse the arguments.
@@ -278,12 +278,12 @@ MStatus XMLSceneCmd::getSceneInfo()
 	MItSelectionList iter( selList );
 	for ( ; !iter.isDone(); iter.next() )
 	{
-		MDagPath vizPath;		
+		MDagPath vizPath;
 		iter.getDagPath( vizPath );
 		vizPath.extendToShape();
-	
+
 		MFnDagNode pf(vizPath.node());
-		
+
 		ACacheMeshViz* pNode = (ACacheMeshViz*)pf.userNode();
 		if(pNode)
 		{
@@ -310,7 +310,7 @@ MStatus XMLSceneCmd::getSceneInfo()
 			}
 		}
 	}
-	
+
 	return MS::kSuccess;
 }
 
@@ -324,10 +324,10 @@ MStatus XMLSceneCmd::getSelectedUV()
 		MGlobal:: displayError ( "Nothing is selected!" );
 		return MS::kSuccess;
 	}
-	
+
 	MItSelectionList iter( selList );
-	
-	MDagPath nodePath;		
+
+	MDagPath nodePath;
 	iter.getDagPath( nodePath );
 	nodePath.extendToShape();
 	MFnDagNode pf(nodePath);

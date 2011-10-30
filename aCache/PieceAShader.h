@@ -1,18 +1,18 @@
-#include <maya/MPxNode.h> 
+#include <maya/MPxNode.h>
 #include "XRSLPiece.h"
 
- 
+
 class PieceAShaderNode : public MPxNode
 {
 public:
 						PieceAShaderNode();
-	virtual				~PieceAShaderNode(); 
+	virtual				~PieceAShaderNode();
 
 	virtual MStatus		compute( const MPlug& plug, MDataBlock& data );
 
 	static  void*		creator();
 	static  MStatus		initialize();
-	
+
 		virtual bool getInternalValueInContext( const MPlug&,
 											  MDataHandle&,
 											  MDGContext&);
@@ -26,9 +26,9 @@ public:
 	static  MObject		outputc;
 	static  MObject		outputs;
 	static	MTypeId		id;
-	
+
 	XRSLPiece* getPiece() const {return m_rsl;}
-private:	
+private:
 	MString m_xsl_path;
 	XRSLPiece *m_rsl;
 };

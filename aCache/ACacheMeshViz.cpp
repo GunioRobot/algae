@@ -34,7 +34,7 @@ ACacheMeshViz::~ACacheMeshViz()
 }
 
 MStatus ACacheMeshViz::compute( const MPlug& plug, MDataBlock& data )
-{ 
+{
 	if(plug == aoutval)
 	{
 		/*int hascoe = 0;
@@ -64,7 +64,7 @@ MStatus ACacheMeshViz::compute( const MPlug& plug, MDataBlock& data )
 		else {
 			m_cachename =  data.inputValue( acachename ).asString();
 			m_meshname =  data.inputValue( ameshname ).asString();
-			
+
 			if(m_cachename != "" && m_meshname != "") {
 				m_pMesh = new FXMLMesh(m_cachename.asChar(), m_meshname.asChar());
 
@@ -78,24 +78,24 @@ MStatus ACacheMeshViz::compute( const MPlug& plug, MDataBlock& data )
 	return MS::kUnknownParameter;
 }
 
-void ACacheMeshViz::draw( M3dView & view, const MDagPath & /*path*/, 
+void ACacheMeshViz::draw( M3dView & view, const MDagPath & /*path*/,
 							 M3dView::DisplayStyle style,
 							 M3dView::DisplayStatus status )
-{ 
+{
 	MObject thisNode = thisMObject();
 	MPlug csplug( thisNode, asurfacecolor );
-	
+
 	MObject ocs;
 	csplug.getValue(ocs);
-	
+
 	float scr, csg, csb;
 	MFnNumericData dcs(ocs);
 	dcs.getData(scr, csg, csb);
-	
-	view.beginGL(); 
-	
+
+	view.beginGL();
+
 	if(m_program) {
-		
+
 	}
 
 	if(m_pMesh) {
@@ -107,35 +107,35 @@ void ACacheMeshViz::draw( M3dView & view, const MDagPath & /*path*/,
 				m_pRender = new RenderACache();
 				m_pRender->initialize();
 			}
-			
+
 			m_pRender->setTriangles( m_pMesh->triangles(), m_pMesh->getNumTriangle()*3);
 			m_pRender->setP( m_pMesh->points(), m_pMesh->getNumVertex());
 			m_pRender->enableProgram(m_program);
-			
+
 			glUniform3f(glGetUniformLocation(m_program, "baseColor"), scr, csg, csb);
-			
+
 			m_pRender->draw();
 			m_pRender->disableProgram();
 		}
 		if(m_mode < 0) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glPopAttrib();
 		GHelper::drawBoundingBox( m_pMesh->getBBox0X(), m_pMesh->getBBox0Y(), m_pMesh->getBBox0Z(), m_pMesh->getBBox1X(), m_pMesh->getBBox1Y(), m_pMesh->getBBox1Z());
-	
+
 	}
 
 	view.endGL();
 }
 
 bool ACacheMeshViz::isBounded() const
-{ 
+{
 	return true;
 }
 
 MBoundingBox ACacheMeshViz::boundingBox() const
-{ 
+{
 	MPoint corner1( 0,0,0 );
 	MPoint corner2( 1,1,1 );
-	
+
 	//if(m_mode>-3) {
 		if(m_pMesh) {
 			corner1.x = m_pMesh->getBBox0X();
@@ -156,48 +156,48 @@ void* ACacheMeshViz::creator()
 }
 
 MStatus ACacheMeshViz::initialize()
-{ 
+{
 	MStatus				stat;
 	MFnNumericAttribute numAttr;
-	
+
 	aframe = numAttr.create( "currentTime", "ct", MFnNumericData::kDouble, 1.0 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	addAttribute( aframe );
-	
+
 	aminframe = numAttr.create( "minFrame", "mnf", MFnNumericData::kInt, 1 );
 	numAttr.setStorable(true);
 	//numAttr.setKeyable(true);
 	addAttribute( aminframe );
-	
+
 	amaxframe = numAttr.create( "maxFrame", "mxf", MFnNumericData::kInt, 24 );
 	numAttr.setStorable(true);
 	//numAttr.setKeyable(true);
 	addAttribute( amaxframe );
-	
+
 	aoutval = numAttr.create( "outval", "ov", MFnNumericData::kInt, 1 );
 	numAttr.setStorable(false);
 	numAttr.setWritable(false);
 	numAttr.setKeyable(false);
 	addAttribute( aoutval );
-	
+
 	MFnTypedAttribute   stringAttr;
 	acachename = stringAttr.create( "cachePath", "cp", MFnData::kString );
  	stringAttr.setStorable(true);
 	stringAttr.setInternal(true);
 	addAttribute( acachename );
-	
+
 	ameshname = stringAttr.create( "meshName", "mn", MFnData::kString );
  	stringAttr.setStorable(true);
 	stringAttr.setInternal(true);
 	addAttribute(ameshname);
-	
+
 	amode = numAttr.create( "drawMode", "dm", MFnNumericData::kInt, -1 );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
 	numAttr.setInternal(true);
 	addAttribute( amode );
-	
+
 	asurfacecolor = numAttr.createColor( "surfaceColor", "cs" );
 	numAttr.setStorable(true);
 	numAttr.setKeyable(true);
@@ -205,22 +205,22 @@ MStatus ACacheMeshViz::initialize()
 	numAttr.setMax(1.f, 1.f, 1.f);
 	numAttr.setDefault(1.f, 1.f, 1.f);
 	addAttribute( asurfacecolor );
-	
+
 	MFnTypedAttribute tAttr;
-	
+
 	aindesc = tAttr.create("inDesc", "inDesc", MFnData::kPlugin);
 	tAttr.setStorable(false);
 	tAttr.setConnectable(true);
 	addAttribute(aindesc);
-	
+
 	attributeAffects( aframe, aoutval );
 	attributeAffects( aindesc, aoutval );
-    	
+
 	return MS::kSuccess;
 }
 
 /* virtual */
-bool 
+bool
 ACacheMeshViz::setInternalValueInContext( const MPlug& plug,
 												  const MDataHandle& handle,
 												  MDGContext&)
@@ -229,7 +229,7 @@ ACacheMeshViz::setInternalValueInContext( const MPlug& plug,
 	if (plug == acachename) {
 		handledAttribute = true;
 		m_cachename = (MString) handle.asString();
-		
+
 		if(m_pMesh) delete m_pMesh;
 		m_pMesh = new FXMLMesh(m_cachename.asChar(), m_meshname.asChar());
 
@@ -239,12 +239,12 @@ ACacheMeshViz::setInternalValueInContext( const MPlug& plug,
 		}
 		//else m_pMesh->updateColor(m_mode);
 	}
-	
+
 	if (plug == ameshname) {
 		handledAttribute = true;
 		m_meshname = (MString) handle.asString();
 	}
-	
+
 	if (plug == amode)
 	{
 		handledAttribute = true;
@@ -267,19 +267,19 @@ ACacheMeshViz::getInternalValueInContext( const MPlug& plug,
 		handledAttribute = true;
 		handle.set( m_cachename );
 	}
-	
+
 	if (plug == ameshname)
 	{
 		handledAttribute = true;
 		handle.set( m_meshname );
 	}
-	
+
 	if (plug == amode)
 	{
 		handledAttribute = true;
 		handle.set( m_mode );
 	}
-	
+
 	return handledAttribute;
 }
 

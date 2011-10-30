@@ -53,7 +53,7 @@ public:
 	~XRSLPiece();
 	char isValid() const {return m_isValid;}
 	char load(const char* filename);
-	
+
 // query
 	const char* getName() const {return m_name.c_str();}
 	const char* getType() const {return m_type.c_str();}

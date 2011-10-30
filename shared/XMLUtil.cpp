@@ -13,19 +13,19 @@ char XMLUtil::readDynBBox(const char* filename, XYZ& bbmin, XYZ& bbmax)
 {
 	ZXMLDoc doc;
 	if(doc.load(filename) != 1) return 0;
-	
+
 	char res = 0;
 		doc.getChildByName("dynamic");
-		
+
 			if(doc.getChildByName("bbox") != 0)
 			{
 				doc.getFloat3AttribByName("low", bbmin.x, bbmin.y, bbmin.z);
 				doc.getFloat3AttribByName("high", bbmax.x, bbmax.y, bbmax.z);
 				res = 1;
 			}
-			
+
 		doc.setParent();
-		
+
 	doc.free();
 
 	return res;
@@ -35,19 +35,19 @@ char XMLUtil::readBBox(const char* filename, XYZ& bbmin, XYZ& bbmax)
 {
 	ZXMLDoc doc;
 	if(doc.load(filename) != 1) return 0;
-	
+
 	char res = 0;
-		
-		
+
+
 			if(doc.getChildByName("bbox") != 0)
 			{
 				doc.getFloat3AttribByName("low", bbmin.x, bbmin.y, bbmin.z);
 				doc.getFloat3AttribByName("high", bbmax.x, bbmax.y, bbmax.z);
 				res = 1;
 			}
-			
-		
-		
+
+
+
 	doc.free();
 
 	return res;
@@ -63,7 +63,7 @@ void XMLUtil::getMeshes(const char* filename, vector<string>& res)
 		if(doc.checkNodeName("mesh") ==1) res.push_back(doc.getAttribByName("path"));
 		doc.nextNode();
 	}
-		
+
 	doc.free();
 
 	return;
@@ -71,7 +71,7 @@ void XMLUtil::getMeshes(const char* filename, vector<string>& res)
 
 char XMLUtil::findByNameAndType(const char* filename, const char* name, const char* type, ZXMLDoc& doc)
 {
-	
+
 	if(doc.load(filename) != 1) return 0;
 	doc.setChildren();
 	while(doc.isLastNode() != 1)
@@ -82,7 +82,7 @@ char XMLUtil::findByNameAndType(const char* filename, const char* name, const ch
 		}
 		doc.nextNode();
 	}
-	
+
 	return 0;
 }
 
@@ -103,7 +103,7 @@ char XMLUtil::findByNameAndType(const char* name, const char* type, ZXMLDoc& doc
 char XMLUtil::readBBox(XYZ& bbmin, XYZ& bbmax, ZXMLDoc& doc)
 {
 	if(doc.getChildByName("bbox") == 0) return 0;
-	
+
 	doc.getFloat3AttribByName("low", bbmin.x, bbmin.y, bbmin.z);
 	doc.getFloat3AttribByName("high", bbmax.x, bbmax.y, bbmax.z);
 

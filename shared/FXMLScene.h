@@ -25,7 +25,7 @@ class FXMLScene
 public:
 	FXMLScene();
 	~FXMLScene();
-/*writing*/	
+/*writing*/
 	void begin(const char* path, int frame, char bfirst);
 	void end(const char* path);
 	void meshBegin(const char* name, char bNoChange);
@@ -101,7 +101,7 @@ private:
 
 	float m_scene_area, m_light_area;
 	int m_scene_numtri, m_light_numtri;
-	
+
 	ofstream static_mesh_file, dynamic_mesh_file;
 	int pos_s, pos_d, m_frame;
 	int m_numFace, m_numFaceVertex, m_numVertex, m_numTriangle;

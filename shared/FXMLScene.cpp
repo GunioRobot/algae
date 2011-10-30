@@ -13,7 +13,7 @@
 
 FXMLScene::FXMLScene() {}
 
-FXMLScene::~FXMLScene() 
+FXMLScene::~FXMLScene()
 {
 	for(unsigned i=0; i<m_mesh.size(); i++) delete m_mesh[i];
 	m_mesh.clear();
@@ -26,9 +26,9 @@ void FXMLScene::begin(const char* filename, int frame, char bfirst)
 	m_model_path = filename;
 	SHelper::cutByLastSlash(m_model_path);
 	m_model_path.append("/models/");
-	
+
 	m_frame = frame;
-	
+
 	doc.begin();
 	doc.elementBegin("scene");
 	doc.addAttribute("frame", frame);
@@ -44,30 +44,30 @@ void FXMLScene::meshBegin(const char* name, char bNoChange)
 {
 	doc.elementBegin("mesh");
 	doc.addAttribute("name", name);
-	
+
 	string static_path = m_model_path;
 	static_path.append(name);
-	
+
 	static_mesh_file.open(static_path.c_str(), ios::out | ios::binary);
-	
+
 	string dynamic_path = static_path;
 	char sbuf[8];
 	sprintf(sbuf, ".%i", m_frame);
 	dynamic_path.append(sbuf);
-	
+
 	if(!bNoChange) dynamic_mesh_file.open(dynamic_path.c_str(), ios::out | ios::binary);
-	
+
 	pos_s = pos_d = 0;
 	/*else {
 // check file size
 		ifstream ifile;
 		ifile.open(dynamic_path.c_str(), ios::in | ios::binary | ios::ate);
 		ifstream::pos_type size = ifile.tellg();
-		
+
 		pos_d = (int)size;
-		
+
 		ifile.close();
-	
+
 		dynamic_file.open(dynamic_path.c_str(), ios::out | ios::binary | ios::app );
 	}*/
 }
@@ -97,7 +97,7 @@ void FXMLScene::addAttribute(const char* name, float val)
 void FXMLScene::meshEnd(char bNoChange)
 {
 	doc.elementEnd();
-	
+
 	static_mesh_file.close();
 	if(!bNoChange) dynamic_mesh_file.close();
 }
@@ -110,7 +110,7 @@ void FXMLScene::staticBegin()
 void FXMLScene::staticEnd()
 {
 	doc.elementEnd();
-	
+
 }
 
 void FXMLScene::addFaceCount(int val, const int* data)
@@ -121,9 +121,9 @@ void FXMLScene::addFaceCount(int val, const int* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", val);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, val*sizeof(int));
 }
 
@@ -135,9 +135,9 @@ void FXMLScene::addFaceConnection(int val, const int* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", val);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, val*sizeof(int));
 }
 
@@ -149,11 +149,11 @@ void FXMLScene::addTriangleConnection(int val, int* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", val);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, val*sizeof(int));
-			
+
 }
 
 void FXMLScene::uvSetBegin(const char* name)
@@ -176,9 +176,9 @@ void FXMLScene::addS(const char* name, int num, const float* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, num*sizeof(float));
 }
 
@@ -191,9 +191,9 @@ void FXMLScene::addT(const char* name, int num, const float* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, num*sizeof(float));
 }
 
@@ -206,9 +206,9 @@ void FXMLScene::addVertexColor(const char* name, int num, const XYZ* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, sizeof(XYZ)*num);
 }
 
@@ -220,9 +220,9 @@ void FXMLScene::addStaticP(int num, const XYZ* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, sizeof(XYZ)*num);
 }
 
@@ -234,9 +234,9 @@ void FXMLScene::addStaticN(int num, const XYZ* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, sizeof(XYZ)*num);
 }
 
@@ -248,9 +248,9 @@ void FXMLScene::addStaticGridSize(int num, const float* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, sizeof(float)*num);
 }
 
@@ -262,9 +262,9 @@ void FXMLScene::addStaticFaceN(int num, const XYZ* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, sizeof(XYZ)*num);
 }
 
@@ -286,9 +286,9 @@ void FXMLScene::addP(int num, const XYZ* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_d += offset;
-	
+
 	dynamic_mesh_file.write((char*)data, sizeof(XYZ)*num);
 }
 
@@ -300,9 +300,9 @@ void FXMLScene::addN(int num, const XYZ* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_d += offset;
-	
+
 	dynamic_mesh_file.write((char*)data, sizeof(XYZ)*num);
 }
 
@@ -314,9 +314,9 @@ void FXMLScene::addFaceN(int num, const XYZ* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_d += offset;
-	
+
 	dynamic_mesh_file.write((char*)data, sizeof(XYZ)*num);
 }
 /*
@@ -328,9 +328,9 @@ void FXMLScene::addTangent(int num, const XYZ* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_d += offset;
-	
+
 	dynamic_file.write((char*)data, sizeof(XYZ)*num);
 }
 */
@@ -342,9 +342,9 @@ void FXMLScene::addGridSize(int num, const float* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_d += offset;
-	
+
 	dynamic_mesh_file.write((char*)data, sizeof(float)*num);
 }
 
@@ -364,7 +364,7 @@ void FXMLScene::transformBegin(const char* name, float space[4][4])
 	doc.addAttribute("Y", space[1][0], space[1][1], space[1][2]);
 	doc.addAttribute("Z", space[2][0], space[2][1], space[2][2]);
 	doc.addAttribute("W", space[3][0], space[3][1], space[3][2]);
-	
+
 }
 
 void FXMLScene::transformEnd()
@@ -400,9 +400,9 @@ void FXMLScene::addStaticVec(const char* name, int num, const XYZ* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, sizeof(XYZ)*num);
 }
 
@@ -414,9 +414,9 @@ void FXMLScene::addStaticFloat(const char* name, int num, const float* data)
 	doc.addAttribute("size", offset);
 	doc.addAttribute("count", num);
 	doc.elementEnd();
-	
+
 	pos_s += offset;
-	
+
 	static_mesh_file.write((char*)data, sizeof(float)*num);
 }
 
@@ -428,7 +428,7 @@ void FXMLScene::cameraBegin(const char* name, float space[4][4])
 	doc.addAttribute("Y", space[1][0], space[1][1], space[1][2]);
 	doc.addAttribute("Z", space[2][0], space[2][1], space[2][2]);
 	doc.addAttribute("W", space[3][0], space[3][1], space[3][2]);
-	
+
 }
 
 void FXMLScene::cameraEnd()
@@ -454,20 +454,20 @@ int FXMLScene::load(const char* filename)
 	m_light_numtri = 0;
 	m_xml_name = filename;
 	if(doc.load(filename) != 1) return 0;
-	
+
 	m_frame = doc.getIntAttribByName("frame");
-	
+
 	doc.setChildren();
-	
+
 	while(doc.isLastNode() != 1)
 	{
 		if(doc.checkNodeName("mesh") == 1)
 		{
 			FXMLMesh* pmesh = new FXMLMesh(filename, doc.getAttribByName("name"));
-			
+
 			//pmesh->load(filename, doc.getAttribByName("name"));
-			
-			if(pmesh->hasAttrib("asLightsource") !=1 && pmesh->hasAttrib("invisible") !=1) 
+
+			if(pmesh->hasAttrib("asLightsource") !=1 && pmesh->hasAttrib("invisible") !=1)
 			{
 				m_scene_area += pmesh->getArea();
 				m_scene_numtri += pmesh->getNumTriangle();
@@ -492,13 +492,13 @@ int FXMLScene::load(const char* filename)
 		doc.getFloat3AttribByName("W", m_backscat_space[3][0], m_backscat_space[3][1], m_backscat_space[3][2]);
 	}
 	doc.free();
-	
+
 	return 1;
 }
 /*
 void FXMLScene::dice(int n_cell)
 {
-	for(unsigned i=0; i<m_mesh.size(); i++) 
+	for(unsigned i=0; i<m_mesh.size(); i++)
 	{
 		if(m_mesh[i]->hasAttrib("noShadow") !=1)
 		{
@@ -506,18 +506,18 @@ void FXMLScene::dice(int n_cell)
 
 			int estimate_ncell = m_mesh[i]->getNumTriangle()*n_cell*2;
 			estimate_ncell += estimate_ncell/9;
-			
+
 			pcdSample* samp = new pcdSample[estimate_ncell];
 			int n_samp = 0;
-		
+
 			float epsilon = sqrt(m_mesh[i]->getArea()/m_mesh[i]->getNumTriangle()/2/n_cell);
 			m_mesh[i]->dice(epsilon, samp, n_samp);
-			
+
 			printf(" n samples: %i",n_samp);
-			
+
 			FQSPLAT* psplat = new FQSPLAT();
 			psplat->createNoColor(samp, n_samp);
-			
+
 			m_shadow_tree.push_back(psplat);
 			delete[] samp;
 		}
@@ -528,12 +528,12 @@ void FXMLScene::diceWithRTandColor(int n_cell)
 {
 	int estimate_ncell = m_scene_numtri*n_cell*2;
 	estimate_ncell += estimate_ncell/9;
-	
+
 	pcdSample* samp = new pcdSample[estimate_ncell];
 	CoeRec* coe_samp = new CoeRec[estimate_ncell];
-	
+
 	int n_samp = 0;
-	for(unsigned i=0; i<m_mesh.size(); i++) 
+	for(unsigned i=0; i<m_mesh.size(); i++)
 	{
 		if(m_mesh[i]->hasAttrib("noShadow") !=1)
 		{
@@ -541,29 +541,29 @@ void FXMLScene::diceWithRTandColor(int n_cell)
 
 			//int estimate_ncell = m_mesh[i]->getNumTriangle()*n_cell*2;
 			//estimate_ncell += estimate_ncell/9;
-			
+
 			//pcdSample* samp = new pcdSample[estimate_ncell];
 			//CoeRec* coe_samp = new CoeRec[estimate_ncell];
 			//int n_samp = 0;
-		
+
 			float epsilon = sqrt(m_mesh[i]->getArea()/m_mesh[i]->getNumTriangle()/2/n_cell);
 			m_mesh[i]->diceWithRT(epsilon, samp, coe_samp, n_samp);
-			
-			
-			
+
+
+
 			//FQSPLAT* psplat = new FQSPLAT();
 			//psplat->createRTandColor(samp, coe_samp, n_samp);
-			
+
 			//m_shadow_tree.push_back(psplat);
 			//delete[] samp;
 			//delete[] coe_samp;
 		}
 	}
 	printf(" n samples: %i",n_samp);
-	
+
 	m_rt_tree = new FQSPLAT();
 	m_rt_tree->createRTandColor(samp, coe_samp, n_samp);
-	
+
 	delete[] samp;
 	delete[] coe_samp;
 }
@@ -572,13 +572,13 @@ void FXMLScene::dice(int n_cell, FQSPLAT* cloud) const
 {
 	int estimate_ncell = m_scene_numtri*n_cell*2;
 	estimate_ncell += estimate_ncell/9;
-	
+
 	pcdSample* samp = new pcdSample[estimate_ncell];
 	int n_samp = 0;
-	
+
 	printf(" dicing... ");
-	
-	for(unsigned i=0; i<m_mesh.size(); i++) 
+
+	for(unsigned i=0; i<m_mesh.size(); i++)
 	{
 		float epsilon = sqrt(m_mesh[i]->getArea()/m_mesh[i]->getNumTriangle()/2/n_cell);
 		m_mesh[i]->dice(epsilon, samp, n_samp);
@@ -593,13 +593,13 @@ void FXMLScene::diceLight(int n_cell, FQSPLAT* cloud) const
 {
 	int estimate_ncell = m_light_numtri*n_cell*2;
 	estimate_ncell += estimate_ncell/9;
-	
+
 	pcdSample* samp = new pcdSample[estimate_ncell];
 	int n_samp = 0;
-	
+
 	printf(" dicing... ");
-	
-	for(unsigned i=0; i<m_light.size(); i++) 
+
+	for(unsigned i=0; i<m_light.size(); i++)
 	{
 		float epsilon = sqrt(m_light[i]->getArea()/m_light[i]->getNumTriangle()/2/n_cell);
 		m_light[i]->dice(epsilon, samp, n_samp);
@@ -614,14 +614,14 @@ void FXMLScene::diceWithRT(int n_cell, FQSPLAT* cloud) const
 {
 	int estimate_ncell = m_scene_numtri*n_cell*2;
 	estimate_ncell += estimate_ncell/9;
-	
+
 	pcdSample* samp = new pcdSample[estimate_ncell];
 	CoeRec* coe_samp = new CoeRec[estimate_ncell];
 	int n_samp = 0;
-	
+
 	printf(" dicing... ");
-	
-	for(unsigned i=0; i<m_mesh.size(); i++) 
+
+	for(unsigned i=0; i<m_mesh.size(); i++)
 	{
 		float epsilon = sqrt(m_mesh[i]->getArea()/m_mesh[i]->getNumTriangle()/2/n_cell);
 		m_mesh[i]->diceWithRT(epsilon, samp, coe_samp, n_samp);
@@ -640,7 +640,7 @@ void FXMLScene::removeTree()
 
 void FXMLScene::removeRTTree()
 {
-	if(m_rt_tree) 
+	if(m_rt_tree)
 	{
 		delete m_rt_tree;
 		m_rt_tree = NULL;
@@ -651,21 +651,21 @@ void FXMLScene::depthMap(float* data, int map_w, int map_h, double fov, const fl
 {
 	MATRIX44F cameraspaceinv(cameramatrix);
 	cameraspaceinv.inverse();
-	
+
 	for(unsigned i=0; i<m_mesh.size(); i++) m_mesh[i]->depthMap(data, map_w, map_h, cameraspaceinv, fov);
 }
 
 void FXMLScene::depthMapPersp(float* data, int map_w, int map_h, const float cameramatrix[4][4], float& fov) const
 {
 	MATRIX44F cameraspaceinv(cameramatrix);
-	
+
 	for(unsigned i=0; i<m_mesh.size(); i++) m_mesh[i]->depthMapPersp(data, map_w, map_h, cameraspaceinv, fov);
 }
 
 void FXMLScene::depthMapOrtho(float* data, int map_w, int map_h, const float cameramatrix[4][4], float& orthow) const
 {
 	MATRIX44F cameraspaceinv(cameramatrix);
-	
+
 	for(unsigned i=0; i<m_mesh.size(); i++) m_mesh[i]->depthMapOrtho(data, map_w, map_h, cameraspaceinv, orthow);
 }*/
 //:~

@@ -13,8 +13,8 @@ AHelper::~AHelper(void)
 {
 }
 
-MStatus AHelper::createVectorAttr(MObject& attr, 
-					MObject& attr0, MObject& attr1, MObject& attr2, 
+MStatus AHelper::createVectorAttr(MObject& attr,
+					MObject& attr0, MObject& attr1, MObject& attr2,
 					const MString& nameLong,const MString& nameShort)
 {
 	MStatus status;
@@ -50,17 +50,17 @@ void AHelper::extractMeshParams(const MObject& mesh, unsigned & numVertex, unsig
 	numVertex = finmesh.numVertices();
 	numPolygons = finmesh.numPolygons();
 	finmesh.getPoints(vertices);
-	
+
 	pcounts.clear();
 	pconnects.clear();
 	MItMeshPolygon faceIter(mesh);
 	faceIter.reset();
-	for( ; !faceIter.isDone(); faceIter.next() ) 
+	for( ; !faceIter.isDone(); faceIter.next() )
 	{
 		pcounts.append(faceIter.polygonVertexCount());
 		MIntArray  vexlist;
 		faceIter.getVertices ( vexlist );
-		for( unsigned int i=0; i < vexlist.length(); i++ ) 
+		for( unsigned int i=0; i < vexlist.length(); i++ )
 		{
 			pconnects.append(vexlist[vexlist.length()-1-i]);
 		}
@@ -142,10 +142,10 @@ MObject AHelper::getMeshAttr(MDataBlock& data, MObject& attr)
 }
 
 void AHelper::getTypedPath(MFn::Type type, const MObject& root, MDagPath& path)
-{	
+{
 	MItDag itdag;
 	itdag.reset(root, MItDag::kDepthFirst, type);
-	        
+
         for(; !itdag.isDone(); itdag.next())
         {
         	if(itdag.item().hasFn(type))
@@ -160,7 +160,7 @@ void AHelper::getTypedPath(MFn::Type type, const MDagPath& root, MDagPath& path)
 {
 	MItDag itdag;
 	itdag.reset(root, MItDag::kDepthFirst, type);
-	        
+
         for(; !itdag.isDone(); itdag.next())
         {
         	if(itdag.item().hasFn(type))
@@ -174,12 +174,12 @@ void AHelper::getTypedPath(MFn::Type type, const MDagPath& root, MDagPath& path)
 void AHelper::getAllTypedPath(MFn::Type type, MObjectArray& obj_array)
 {
 	obj_array.clear();
-	
+
 	MStatus stat;
 	MItDependencyNodes itdag(type, &stat);
-	
+
 	if(!stat) MGlobal::displayInfo("Error creating iterator");
-	
+
 	for(; !itdag.isDone(); itdag.next())
         {
 		MObject aobj =itdag.thisNode();
@@ -190,31 +190,31 @@ void AHelper::getAllTypedPath(MFn::Type type, MObjectArray& obj_array)
 int AHelper::getAllTypedPathByRoot(MFn::Type type, MObject& root, MObjectArray& obj_array)
 {
 	obj_array.clear();
-	
+
 	MStatus stat;
 	MItDependencyGraph itdag(root, type, MItDependencyGraph::kUpstream, MItDependencyGraph::kDepthFirst, MItDependencyGraph::kNodeLevel, &stat);
-	
+
 	if(!stat) return 0; //MGlobal::displayInfo("Error creating iterator");
-	
+
 	for(; !itdag.isDone(); itdag.next())
         {
 		MObject aobj =itdag.thisNode();
 		obj_array.append(aobj);
         }
-	
+
 	return 1;
 }
 
 void AHelper::getTypedPathByName(MFn::Type type, MString& name, MDagPath& path)
-{	
+{
 	MItDag itdag(MItDag::kDepthFirst, type);
-	        
+
         for(; !itdag.isDone(); itdag.next())
         {
         	if(itdag.item().hasFn(type))
         	{
         		itdag.getPath(path);
-				
+
         		MFnDagNode pf(path);
 				if(pf.name()==name) return;
         	}
@@ -222,15 +222,15 @@ void AHelper::getTypedPathByName(MFn::Type type, MString& name, MDagPath& path)
 }
 
 void AHelper::getTypedNodeByName(MFn::Type type, MString& name, MObject& node)
-{	
+{
 	MItDag itdag(MItDag::kDepthFirst, type);
-	        
+
         for(; !itdag.isDone(); itdag.next())
         {
         	if(itdag.item().hasFn(type))
         	{
         		node = itdag.currentItem();
-				
+
         		MFnDagNode pf(node);
 				//MGlobal::displayInfo(pf.fullPathName());
 				if(pf.fullPathName()==name) return;
@@ -251,7 +251,7 @@ void AHelper::getConnectedNodeName(MString& val, const MPlug& plg)
 	MPlugArray conns;
 	if(!plg.connectedTo (conns, true, true ))  obj = MObject::kNullObj;
 	else  obj = conns[0].node();
-	
+
 	if(obj != MObject::kNullObj) val = MFnDagNode(obj).fullPathName();
 }
 
@@ -267,20 +267,20 @@ MStatus AHelper::createTypedArrayAttr(MObject& attr, const MString& nameLong, co
 	return status;
 }
 
-void AHelper::getNamedObject(MString& name, MObject& obj) 
+void AHelper::getNamedObject(MString& name, MObject& obj)
 {
 	MGlobal::selectByName(name, MGlobal::kReplaceList);
-	
+
 	MSelectionList activeList;
 	MGlobal::getActiveSelectionList(activeList);
 	if(activeList.length()<1)
 	{
 		obj = MObject::kNullObj;
 	}
-	
+
 	MItSelectionList iter(activeList);
 	iter.getDependNode(obj);
-	
+
 //MGlobal::unselectByName(name);
 }
 
@@ -288,13 +288,13 @@ MVectorArray AHelper::getVectorArrayAttr(MDataBlock& data, MObject& attr)
 {
 	MStatus status;
 	MDataHandle hdata = data.inputValue(attr, &status);
-	
+
 	//if ( MS::kSuccess != status ) MGlobal::displayWarning("ERROR getting vector array data handle");
-    	
+
 	MFnVectorArrayData farray(hdata.data(), &status);
-	
+
 	//if ( MS::kSuccess != status ) MGlobal::displayWarning("ERROR creating vector array data array");
-    
+
     	return farray.array();
 }
 
@@ -302,13 +302,13 @@ MDoubleArray AHelper::getDoubleArrayAttr(MDataBlock& data, MObject& attr)
 {
 	MStatus status;
 	MDataHandle hdata = data.inputValue(attr, &status);
-	
+
 	//if ( MS::kSuccess != status ) MGlobal::displayWarning("ERROR getting double array data handle");
-    
+
 	MFnDoubleArrayData farray(hdata.data(), &status);
-	
+
 	//if ( MS::kSuccess != status ) MGlobal::displayWarning("ERROR creating double array data array");
-    
+
     	return farray.array();
 }
 
@@ -382,21 +382,21 @@ void AHelper::validateFilePath(MString& name)
 	std::string str(name.asChar());
 
 	int found = str.find('|', 0);
-	
+
 	while(found>-1)
 	{
 		str[found] = '_';
 		found = str.find('|', found);
 	}
-	
+
 	found = str.find(':', 0);
-	
+
 	while(found>-1)
 	{
 		str[found] = '_';
 		found = str.find(':', found);
 	}
-		
+
 		name = MString(str.c_str());
 }
 
@@ -405,13 +405,13 @@ void AHelper::noDotDagPath(MString& name)
 	std::string str(name.asChar());
 
 	int found = str.find('.', 0);
-	
+
 	while(found>-1)
 	{
 		str[found] = '_';
 		found = str.find('.', found);
 	}
-		
+
 		name = MString(str.c_str());
 }
 
@@ -420,13 +420,13 @@ void AHelper::getWindowsPath(MString& name)
 	std::string str(name.asChar());
 
 	int found = str.find('/', 0);
-	
+
 	while(found>-1)
 	{
 		str[found] = '\\';
 		found = str.find('/', found);
 	}
-		
+
 		name = MString(str.c_str());
 }
 
@@ -436,7 +436,7 @@ void AHelper::getFileNameFirstDot(MString& name)
 
 	int found = str.find('.', 0);
 	if(found>-1)str.erase(found);
-		
+
 	name = MString(str.c_str());
 }
 
@@ -446,7 +446,7 @@ void AHelper::cutFileNameLastSlash(MString& name)
 
 	int found = str.find_last_of('/', str.size()-1);
 	if(found>-1)str.erase(0, found+1);
-		
+
 	name = MString(str.c_str());
 }
 
@@ -456,7 +456,7 @@ void AHelper::changeFileNameExtension(MString& name, const char* ext)
 
 	int found = str.find_last_of('.', str.size()-1);
 	if(found>-1)str.erase(found);
-		
+
 	name = MString(str.c_str());
 
 	name += MString(ext);
@@ -471,11 +471,11 @@ void AHelper::getProjectDataPath(MString& path)
 int AHelper::hasNamedAttribute(const MObject& node, const char* attrname)
 {
 	MFnDependencyNode fnode(node);
-			
+
 	MStatus res;
 	fnode.attribute(attrname, &res);
 	if(res == MS::kFailure) return 0;
-		
+
 	return 1;
 }
 
@@ -493,10 +493,10 @@ void AHelper::getColorAttributeByName(const MFnDependencyNode& fnode, const char
 {
 	MPlug plgR = fnode.findPlug(MString(attrname)+"R");
 	plgR.getValue(r);
-	
+
 	MPlug plgG = fnode.findPlug(MString(attrname)+"G");
 	plgG.getValue(g);
-	
+
 	MPlug plgB = fnode.findPlug(MString(attrname)+"B");
 	plgB.getValue(b);
 }
@@ -505,10 +505,10 @@ void AHelper::getNormalAttributeByName(const MFnDependencyNode& fnode, const cha
 {
 	MPlug plgR = fnode.findPlug(MString(attrname)+"X");
 	plgR.getValue(r);
-	
+
 	MPlug plgG = fnode.findPlug(MString(attrname)+"Y");
 	plgG.getValue(g);
-	
+
 	MPlug plgB = fnode.findPlug(MString(attrname)+"Z");
 	plgB.getValue(b);
 }
@@ -557,15 +557,15 @@ char AHelper::getStringAttributeByName(const MObject& node, const char* attrname
 int AHelper::getConnectedAttributeByName(const MFnDependencyNode& fnode, const char* attrname, MString& v)
 {
 	MPlug plgTo = fnode.findPlug(MString(attrname));
-	
+
 	if(!plgTo.isConnected()) return 0;
-	
+
 	MPlugArray conns;
-	
+
 	plgTo.connectedTo (conns, true, false);
-	
+
 	v = conns[0].name();
-	
+
 	return 1;
 }
 
